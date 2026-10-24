@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-ink: #110e0b;
+  --color-panel: #1c1712;
+  --color-panel-2: #261f18;
+  --color-line: #4a3b2a;
+  --color-gold: #e4c48a;
+  --color-gold-2: #a68449;
+  --color-ember: #e07a3d;
+  --color-parchment: #f6efe2;
+  --color-muted: #b5a58f;
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+}
+
+html {
+  background: var(--color-ink);
+}
+
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(1200px 500px at 50% -10%, rgba(224, 122, 61, 0.16), transparent 55%),
+    var(--color-ink);
+  color: var(--color-parchment);
+  font-family: var(--font-body), Georgia, serif;
+}
+
+::selection {
+  background: #e4c48a;
+  color: #1a120c;
+}
+
+a {
+  color: inherit;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
