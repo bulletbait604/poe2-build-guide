@@ -89,8 +89,7 @@ export function GuideView({
   }, [names]);
 
   const activeBand = guide.levelBands.find((band) => level >= band.from && level <= band.to) ?? guide.levelBands[0];
-  const route = guide.levelBands.filter((band) => band.from < 66).flatMap((band) => band.points);
-  const owned = Math.max(0, Math.min(route.length, level - 1));
+  const owned = Math.max(0, Math.min(64, level - 1));
   const phases = walkOrder
     .map((id) => guide.phases.find((phase) => phase.id === id))
     .filter((phase): phase is Guide["phases"][number] => Boolean(phase));
@@ -163,7 +162,7 @@ export function GuideView({
         </p>
       </div>
 
-      <TreeMap points={route} owned={owned} />
+      <TreeMap routeKey={guide.treeKey} owned={owned} />
 
       <nav className="mt-4 flex flex-wrap gap-2">
         {phases.map((phase) => (
@@ -234,7 +233,7 @@ export function GuideView({
                             </div>
                           ) : null}
                         </div>
-                        <GearBoard lines={band.armor} />
+                        <GearBoard lines={band.armor} weaponNoun={guide.weaponNoun} defence={guide.defence} />
                         <p className="mt-3 text-sm leading-6 text-muted">{band.ignore}</p>
                       </div>
                     );
@@ -268,8 +267,8 @@ export function GuideView({
       <section className="mt-10 border border-line p-4">
         <h2 className="font-display text-2xl">Tree and longer write-ups</h2>
         <p className="mt-2 leading-7 text-muted">
-          The map above is the order for this build. The full tree is the same names, laid out from your class start. One
-          level point arrives at level 2 and then every level. Quest rewards are weapon-set points.
+          The map above is this build&apos;s path from the class start, using the 0.5.5 tree positions. One level point
+          arrives at level 2 and then every level. Quest rewards are weapon-set points, spent on that same branch.
         </p>
         <ul className="mt-3 flex flex-wrap gap-4 text-sm">
           <li>
