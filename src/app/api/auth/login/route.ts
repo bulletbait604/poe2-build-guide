@@ -12,7 +12,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
   if (!loginConfigured()) {
-    return NextResponse.redirect(new URL("/?auth=setup", appOrigin()));
+    return NextResponse.redirect(new URL("/?auth=setup", appOrigin(request)));
   }
 
   const verifier = newVerifier();

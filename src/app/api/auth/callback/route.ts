@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
   const error = request.nextUrl.searchParams.get("error");
   const pkce = open<PkceState>(request.cookies.get(PKCE_COOKIE)?.value);
   const fail = (code: string) => {
-    const response = NextResponse.redirect(new URL(`/?auth=${code}`, appOrigin()));
+    const response = NextResponse.redirect(new URL(`/?auth=${code}`, appOrigin(request)));
     response.cookies.delete(PKCE_COOKIE);
     return response;
   };
@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
   try {
     const session = await exchangeCode(code, pkce.verifier);
     const destination = pkce.next === "/" ? "/?signedin=1" : pkce.next;
-    const response = NextResponse.redirect(new URL(destination, appOrigin()));
+    const response = NextResponse.redirect(new URL(destination, appOrigin(request)));
     const maxAge = Math.max(60, Math.floor((session.expiresAt - Date.now()) / 1000));
     response.cookies.set(SESSION_COOKIE, seal(session), sessionCookieOptions(maxAge));
     response.cookies.delete(PKCE_COOKIE);
