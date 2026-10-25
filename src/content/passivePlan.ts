@@ -281,12 +281,12 @@ function questsFor(from: number, to: number, spec: BuildSpec) {
   }
   if (to === 49) {
     return [
-      "Dark Mists at Journey's End is 2 weapon-set points. Yama the White, in the Trial of the Ancestors, is 2 more.",
+      "Omniphobia, after Dark Mists at Journey's End, is 2 weapon-set points. Yama the White is 2 more.",
     ];
   }
   if (to === 59) {
     return [
-      "Oswin, Akthi and Anundr, the Abominable Yeti, and finishing the interludes are 2 weapon-set points each. Damage for this skill, on the branch you already have.",
+      "Do the Stolen Barya first: Akthi and Anundr are 2 weapon-set points, the Molten Shrine is 5% life, and the Qimah pillar is a resistance or movement speed. Then Lythara in Kriar Village for 40 spirit, and the Yeti for 2 points. Holten last: Oswin is 2 points. The Hooded One in Kingsmarch, after all three, is the last 2.",
     ];
   }
   if (from === 60) {

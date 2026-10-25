@@ -62,6 +62,8 @@ export type Guide = {
   name: string;
   skill: string;
   helper: string;
+  support: string;
+  damage: string;
   summary: string;
   fantasy: string;
   links: GuideLink[];

@@ -1,6 +1,9 @@
 "use client";
 
+import { GearBoard } from "@/components/GearBoard";
+import { GemBar } from "@/components/GemBar";
 import { ItemChip } from "@/components/ItemChip";
+import { TreeMap } from "@/components/TreeMap";
 import type { GameClass } from "@/content/classes";
 import type { Guide, GuideChapter } from "@/lib/types";
 import Image from "next/image";
@@ -13,14 +16,24 @@ function chapterForLevel(level: number): GuideChapter | "levels" {
   return "acts";
 }
 
-const walkOrder = ["act-1", "act-2", "act-3", "act-4", "interlude-1", "interlude-2", "interlude-3", "endgame"];
+const walkOrder = [
+  "act-1",
+  "act-2",
+  "act-3",
+  "act-4",
+  "interlude-barya",
+  "interlude-doryani",
+  "interlude-holten",
+  "endgame",
+];
 
 function bandsFor(id: string, bands: Guide["levelBands"]) {
   if (id === "act-1") return bands.filter((band) => band.to <= 14);
   if (id === "act-2") return bands.filter((band) => band.from >= 15 && band.to <= 29);
   if (id === "act-3") return bands.filter((band) => band.from >= 30 && band.to <= 39);
   if (id === "act-4") return bands.filter((band) => band.from >= 40 && band.to <= 49);
-  if (id === "interlude-3") return bands.filter((band) => band.from >= 50 && band.to <= 59);
+  if (id === "interlude-barya") return bands.filter((band) => band.from >= 50 && band.to <= 54);
+  if (id === "interlude-doryani") return bands.filter((band) => band.from >= 55 && band.to <= 59);
   if (id === "endgame") return bands.filter((band) => band.from >= 60);
   return [];
 }
@@ -76,6 +89,8 @@ export function GuideView({
   }, [names]);
 
   const activeBand = guide.levelBands.find((band) => level >= band.from && level <= band.to) ?? guide.levelBands[0];
+  const route = guide.levelBands.filter((band) => band.from < 66).flatMap((band) => band.points);
+  const owned = Math.max(0, Math.min(route.length, level - 1));
   const phases = walkOrder
     .map((id) => guide.phases.find((phase) => phase.id === id))
     .filter((phase): phase is Guide["phases"][number] => Boolean(phase));
@@ -109,6 +124,13 @@ export function GuideView({
       </div>
 
       <p className="max-w-3xl text-lg leading-8 text-muted">{guide.summary}</p>
+      <GemBar
+        skill={guide.skill}
+        helper={guide.helper}
+        support={guide.support}
+        damage={guide.damage}
+        when={activeBand.title}
+      />
 
       <div className="mt-8 flex flex-wrap items-end gap-6 border border-line bg-panel p-4">
         <label className="text-sm">
@@ -140,6 +162,8 @@ export function GuideView({
           You are on {activeBand.title}. Follow the highlighted chapter, then the upgrade card for this level.
         </p>
       </div>
+
+      <TreeMap points={route} owned={owned} />
 
       <nav className="mt-4 flex flex-wrap gap-2">
         {phases.map((phase) => (
@@ -210,14 +234,7 @@ export function GuideView({
                             </div>
                           ) : null}
                         </div>
-                        <dl className="mt-3 grid gap-2 sm:grid-cols-2">
-                          {band.armor.map((line) => (
-                            <div key={line.slot}>
-                              <dt className="text-xs tracking-[0.16em] text-gold uppercase">{line.slot}</dt>
-                              <dd className="mt-1 leading-6 text-muted">{line.lookFor}</dd>
-                            </div>
-                          ))}
-                        </dl>
+                        <GearBoard lines={band.armor} />
                         <p className="mt-3 text-sm leading-6 text-muted">{band.ignore}</p>
                       </div>
                     );
@@ -251,8 +268,8 @@ export function GuideView({
       <section className="mt-10 border border-line p-4">
         <h2 className="font-display text-2xl">Tree and longer write-ups</h2>
         <p className="mt-2 leading-7 text-muted">
-          The upgrade cards already say which node each point goes into. Open the tree to find that name beside your
-          class start. One level point arrives at level 2 and then every level. Quest rewards are weapon-set points.
+          The map above is the order for this build. The full tree is the same names, laid out from your class start. One
+          level point arrives at level 2 and then every level. Quest rewards are weapon-set points.
         </p>
         <ul className="mt-3 flex flex-wrap gap-4 text-sm">
           <li>
