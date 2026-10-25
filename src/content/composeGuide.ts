@@ -1,6 +1,7 @@
 import { armorForBand } from "@/content/armorPlan";
 import type { BuildSpec } from "@/content/buildSpecs";
 import { storyPhases } from "@/content/campaign";
+import { gearCardsFor, gearTotalsFor } from "@/content/gearCards";
 import { mainSkillReadyAt } from "@/content/gemFacts";
 import { loadoutFor } from "@/content/loadouts";
 import { pointsForBand, routeKeyFor } from "@/content/passivePlan";
@@ -18,6 +19,9 @@ const LINKS = [
   { label: "Campaign rewards", url: "https://maxroll.gg/poe2/getting-started/permanent-stats-from-campaign" },
   { label: "Campaign walkthrough", url: "https://maxroll.gg/poe2/getting-started/path-of-exile-2-campaign-guide" },
   { label: "0.5 checklist", url: "https://mobalytics.gg/poe-2/guides/0-5-campaign-checklist-stats-rewards-skillpoints-and-more" },
+  { label: "poe2db quests", url: "https://poe2db.tw/us/Quest" },
+  { label: "poe2db The Lost Lute", url: "https://poe2db.tw/us/The_Lost_Lute" },
+  { label: "poe2db boots", url: "https://poe2db.tw/us/Boots_dex" },
   { label: "League-starter tier list", url: "https://maxroll.gg/poe2/tierlists/league-starter-build-tier-list" },
   { label: "Ascendancy tier list", url: "https://maxroll.gg/poe2/tierlists/league-starter-ascendancy-tier-list" },
 ];
@@ -113,5 +117,7 @@ export function composeGuide(spec: BuildSpec): Guide {
     phases: storyPhases(spec),
     loadout,
     timeline: timelineFor(spec, loadout),
+    gearCards: gearCardsFor(spec, loadout.gear),
+    gearTotals: gearTotalsFor(spec, loadout.gear),
   };
 }

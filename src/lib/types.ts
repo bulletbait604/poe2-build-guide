@@ -33,6 +33,13 @@ export type LevelBand = {
 export type GuideStep = {
   title: string;
   detail: string;
+  act: string;
+  zone: string;
+  quest: string;
+  npc: string;
+  reward: string;
+  /** Concrete stat targets when this step tells you to change gear. */
+  gear?: string;
   items?: ItemRef[];
 };
 
@@ -76,10 +83,44 @@ export type LevelStep = {
   text: string;
 };
 
+export type StepCheck = {
+  text: string;
+  act: string;
+  zone: string;
+  quest: string;
+  /** True when this line is a gear target. The text must contain a number. */
+  gear?: boolean;
+};
+
 export type TimelineStep = {
   level: number;
   title: string;
-  checks: string[];
+  checks: StepCheck[];
+};
+
+export type GearAffix = {
+  name: string;
+  kind: "Prefix" | "Suffix";
+  rank: "Must" | "Nice" | "Ignore";
+  leveling: string;
+  earlyMaps: string;
+  endgame: string;
+};
+
+export type GearCard = {
+  slot: string;
+  base: string;
+  why: string;
+  note: string;
+  affixes: GearAffix[];
+  how: string;
+};
+
+export type GearTotal = {
+  label: string;
+  leveling: string;
+  earlyMaps: string;
+  endgame: string;
 };
 
 export type Loadout = {
@@ -116,6 +157,8 @@ export type Guide = {
   phases: GuidePhase[];
   loadout: Loadout;
   timeline: TimelineStep[];
+  gearCards: GearCard[];
+  gearTotals: GearTotal[];
 };
 
 export type PoeCharacter = {

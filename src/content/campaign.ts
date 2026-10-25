@@ -1,5 +1,5 @@
 import type { BuildSpec } from "@/content/buildSpecs";
-import type { GuidePhase } from "@/lib/types";
+import type { GuidePhase, GuideStep } from "@/lib/types";
 
 // Campaign route for patch 0.5, checked against:
 // - Maxroll, "Permanent Stats From The Campaign" (updated 2026-09-18)
@@ -8,11 +8,16 @@ import type { GuidePhase } from "@/lib/types";
 //   https://maxroll.gg/poe2/getting-started/path-of-exile-2-campaign-guide
 // - Mobalytics, "PoE 0.5 Campaign Checklist" (updated 2026-06-02)
 //   https://mobalytics.gg/poe-2/guides/0-5-campaign-checklist-stats-rewards-skillpoints-and-more
+// - poe2db quest pages, including https://poe2db.tw/us/The_Lost_Lute ,
+//   https://poe2db.tw/us/Quest , Tradition's Toll, Ancient Vows, Ascent to Power,
+//   The Slithering Dead, Tribal Vengeance, Tribal Medicine, Howling Winds,
+//   Clearing the Way, and Siege of Oriath.
 // Play the Stolen Barya first and Holten last, which is the 0.5 checklist order.
 // Maxroll numbers Holten as its first interlude chapter; the rewards are the same.
 // Permanent rewards kept below: weapon-set passive points, spirit, resistances,
 // life, mana, and the swappable or permanent stat choices. Gem-only bosses,
 // currency bells, and bench unlocks are left out.
+// The Lost Lute is Act 1. The lute is in Ogham Farmlands. Una is in Clearfell Encampment.
 
 function phase(
   id: string,
@@ -21,230 +26,507 @@ function phase(
   levelRange: string,
   levelMin: number,
   levelMax: number,
-  steps: GuidePhase["steps"],
+  steps: GuideStep[],
 ): GuidePhase {
   return { id, chapter, title, levelRange, levelMin, levelMax, steps };
+}
+
+function step(
+  title: string,
+  act: string,
+  zone: string,
+  quest: string,
+  npc: string,
+  reward: string,
+  detail: string,
+  gear?: string,
+): GuideStep {
+  return { title, act, zone, quest, npc, reward, detail, gear };
 }
 
 export function storyPhases(spec: BuildSpec): GuidePhase[] {
   const fight = `Use ${spec.skill}. ${spec.pack}`;
   const flask = spec.speed.includes("cast")
-    ? "Take mana recovery only if you are drinking a mana flask to keep casting. Otherwise take life recovery."
-    : "Take life recovery. Take mana recovery only if this build drinks a mana flask to attack.";
+    ? "Take the 30% increased mana recovery from flasks only if you are drinking a mana flask to keep casting. Otherwise take the 30% increased life recovery."
+    : "Take the 30% increased life recovery from flasks. Take mana recovery only if this build drinks a mana flask to attack.";
   const lesson =
     spec.defence === "armour"
       ? "Take Kaom's lesson. It is 30% increased armour, evasion, and energy shield."
       : "Take Rakiata's lesson. Armour also applies to elemental damage, evasion grants deflection, and energy shield starts recharging faster. Take Kaom's lesson instead if you are stacking armour.";
 
+  const earlyGear =
+    "Boots: 10% increased Movement Speed (Runner's, item level 1) and +(10–29) to maximum Life. Body: +(20–39) to maximum Life. Rings: about 20% fire, 20% cold, and 20% lightning.";
+  const act2Gear =
+    "Boots: 15% increased Movement Speed (Sprinter's, item level 16). Body: +(40–69) life. Each element 30–40%.";
+  const act3Gear =
+    "Boots: 20% increased Movement Speed (Stallion's, item level 33). Body life +(60–99). Each element over 40%.";
+  const act4Gear =
+    "Boots: 25% increased Movement Speed (Gazelle's, item level 46). Push fire, cold, and lightning toward 75% before an interlude.";
+
   return [
     phase("act-1", "acts", "Act 1", "Levels 1–14", 1, 14, [
-      {
-        title: "The Riverbank",
-        detail: `Kill the Bloated Miller. That opens Clearfell Encampment. ${fight}`,
-      },
-      {
-        title: "Clearfell",
-        detail:
-          "The road out is the Grelwood, at the top of the zone. On the way, kill Beira of the Rotten Pack and use the Head of the Winter Wolf. That is +10% cold resistance, permanent. Leave the Mud Burrow and the abandoned stash. Those are gems, not stats.",
-      },
-      {
-        title: "Grelwood, Red Vale, Grim Tangle",
-        detail:
-          "This is the story road. Find Una, enter the Red Vale, and kill the Rust King for the runes. Back in the Grelwood, finish the Tree of Souls and kill Gerung, the Brambleghast. Then walk the Grim Tangle to the exit. Ervig, the Rotted Druid, only drops a support gem, so leave him once the way forward is open.",
-      },
-      {
-        title: "Cemetery of the Eternals",
-        detail:
-          "Asinia is in the Tomb of the Consort. Draven is in the Mausoleum. Their keys open Lachlann of Endless Lament, and he is the door to the Hunting Grounds. Leave the sarcophagus. It is a ring.",
-      },
-      {
-        title: "The Crowbell, then Freythorn",
-        detail:
-          "The Crowbell is in the Hunting Grounds. Killing him is +2 weapon-set passive points. Freythorn is the side zone. Finish the rituals and kill the King in the Mists. That is +30 spirit, and the first kill also drops a spirit gem. Leave the dryad. That fight is only a support gem.",
-      },
-      {
-        title: "Ogham Farmlands and the village",
-        detail:
-          "Pick up Una's lute and return it to her. That is +2 weapon-set points. The Executioner is the door through Ogham Village to the Manor Ramparts. Leave the smithing tools and the crop circle. The tools unlock a salvaging bench, not a stat.",
-      },
-      {
-        title: "Ogham Manor",
-        detail: `On the first floor, read the Psalm of Madness and kill Candlemass, the Living Rite. That is +20 maximum life. Count Geonor is the last floor. ${spec.boss} Then speak to the Hooded One and sail.`,
-      },
+      step(
+        "The Riverbank",
+        "Act 1",
+        "The Riverbank",
+        "Kill the Bloated Miller",
+        "Nobody to turn this in to. The road opens Clearfell Encampment.",
+        "The way into Clearfell. No permanent stat.",
+        `Kill the Bloated Miller in the Riverbank. That opens Clearfell Encampment. ${fight}`,
+        "Weapon: the highest damage " + spec.weaponNoun + " from the first vendor. Boots: 10% increased Movement Speed if a pair is listed.",
+      ),
+      step(
+        "Clearfell",
+        "Act 1",
+        "Clearfell",
+        "Kill Beira of the Rotten Pack",
+        "Use the Head of the Winter Wolf yourself. You do not hand it to an NPC.",
+        "+10% to Cold Resistance.",
+        "The road out of Clearfell is the Grelwood, at the top of the zone. On the way, kill Beira of the Rotten Pack and use the Head of the Winter Wolf. poe2db: right-click to crush it. That is +10% cold resistance, permanent. Leave the Mud Burrow and the abandoned stash. Those are gems, not stats.",
+        earlyGear,
+      ),
+      step(
+        "Grelwood, Red Vale, Grim Tangle",
+        "Act 1",
+        "The Grelwood",
+        "Find the way through the Grelwood",
+        "Una is met in the Grelwood. She later waits in Clearfell Encampment.",
+        "The road to the Cemetery of the Eternals. No permanent stat on the Rust King.",
+        "This is the story road. Find Una, enter the Red Vale, and kill the Rust King for the runes. Back in the Grelwood, finish the Tree of Souls and kill Gerung, the Brambleghast. Then walk the Grim Tangle to the exit. Ervig, the Rotted Druid, only drops a support gem, so leave him once the way forward is open.",
+      ),
+      step(
+        "Cemetery of the Eternals",
+        "Act 1",
+        "Cemetery of the Eternals",
+        "Open the way to the Hunting Grounds",
+        "No turn-in. Asinia is in the Tomb of the Consort. Draven is in the Mausoleum.",
+        "Lachlann of Endless Lament opens the Hunting Grounds. No permanent stat.",
+        "Asinia is in the Tomb of the Consort. Draven is in the Mausoleum. Their keys open Lachlann of Endless Lament, and he is the door to the Hunting Grounds. Leave the sarcophagus. It is a ring.",
+      ),
+      step(
+        "The Crowbell",
+        "Act 1",
+        "Hunting Grounds",
+        "Kill The Crowbell",
+        "Use the Book of Specialisation from the kill. The arena landmark on poe2db is The Great Hunt.",
+        "+2 weapon-set passive points.",
+        "The Crowbell is in the Hunting Grounds. Killing him drops a Book of Specialisation: +2 weapon-set passive points. Those points only apply while that weapon set is active. They are not the point you get for leveling up.",
+      ),
+      step(
+        "Freythorn",
+        "Act 1",
+        "Freythorn",
+        "Ominous Altars",
+        "The +30 spirit is the boss reward. Finn, in Clearfell Encampment, then gives an Uncut Support Gem. Finn does not give the spirit.",
+        "+30 maximum spirit, and a spirit gem on the first kill.",
+        "Freythorn is the side zone off the Hunting Grounds. Finish the rituals and kill the King in the Mists. Quest log: Ominous Altars. That kill is +30 spirit. Spirit pays for auras and minions. It is not mana. The first kill also drops a spirit gem. Leave the dryad. That fight is only a support gem.",
+      ),
+      step(
+        "The Lost Lute",
+        "Act 1",
+        "Ogham Farmlands",
+        "The Lost Lute",
+        "Return the lute to Una in Clearfell Encampment.",
+        "Book of Specialisation: +2 Weapon Set Passive Skill Points.",
+        "Quest log: The Lost Lute. It unlocks after you have been through the dark with Una. The lute is in her house in Ogham Farmlands, the round open-roof building, in a crate at the back. Return it to Una in Clearfell Encampment. Count Geonor does not grant these points.",
+        earlyGear,
+      ),
+      step(
+        "Ogham Village",
+        "Act 1",
+        "Ogham Village",
+        "Kill the Executioner",
+        "Leitis returns to Clearfell. Renly in Clearfell Encampment takes the smithing tools if you bother, and that only unlocks the salvaging bench.",
+        "The road to the Manor Ramparts. No permanent stat.",
+        "The Executioner is the door through Ogham Village to the Manor Ramparts. Leave the smithing tools and the crop circle. The tools unlock a salvaging bench, not a stat.",
+      ),
+      step(
+        "Candlemass",
+        "Act 1",
+        "Ogham Manor",
+        "Kill Candlemass, the Living Rite",
+        "Use Candlemass' Essence yourself. The altar is the Chapel of the Fallen, on the first floor, after you read the Psalm of Madness.",
+        "+20 to maximum life.",
+        "On the first floor of Ogham Manor, read the Psalm of Madness and kill Candlemass, the Living Rite. Right-click Candlemass' Essence. That is +20 maximum life.",
+      ),
+      step(
+        "Count Geonor",
+        "Act 1",
+        "Ogham Manor",
+        "The Mad Wolf of Ogham",
+        "Speak to the Hooded One after the kill. He sends you to the Vastiri Outskirts.",
+        "Passage to Act 2. Geonor does not grant weapon-set points.",
+        `Count Geonor is the last floor. Quest log: The Mad Wolf of Ogham. ${spec.boss} Then speak to the Hooded One and sail.`,
+      ),
     ]),
     phase("act-2", "acts", "Act 2", "Levels 14–29", 14, 29, [
-      {
-        title: "The caravan",
-        detail: `Rathbreaker, in the Vastiri Outskirts, is the door into the Ardura Caravan. Then Mawdun Quarry and Rudja, the Dread Engineer, in Mawdun Mine. That fight is what moves the story. ${fight}`,
-      },
-      {
-        title: "Traitor's Passage",
-        detail: `Kill Balbala, the Traitor, and take the Djinn Barya. It is the key back to the Halani Gates, and the same coin opens the Trial of the Sekhemas. Clear that trial once for the first 2 ascendancy points. ${spec.ascendancyPick} Leave the bell chest. It is a gem.`,
-      },
-      {
-        title: "Jamanra, the first time",
-        detail:
-          "At the Halani Gates, open the three gates and fight Jamanra, the Risen King. He escapes. That is the story. Leave the corpse piles.",
-      },
-      {
-        title: "Keth",
-        detail:
-          "Kill Kabala, the Constrictor Queen, for +2 weapon-set points. Kill hyenas until the Kabala Clan Relic drops. You need that relic at the Valley of the Titans. It is not a bonus by itself. Leave the treasure room.",
-      },
-      {
-        title: "The Lost City and the Buried Shrines",
-        detail:
-          "The Lost City is the road into the Buried Shrines. Azarian, the Forsaken Son, is the story boss. Kill him and take the road onward. Leave the elemental shrine. Those chests are rings, not a permanent stat.",
-      },
-      {
-        title: "The Bone Pits",
-        detail:
-          "The Mastodon Badlands lead here. Kill Iktab, the Deathlord, and Ekbab, Ancient Steed, to finish the zone. Kill snakes until the Sun Clan Relic drops. You need it with the Kabala relic.",
-      },
-      {
-        title: "Valley of the Titans",
-        detail:
-          "Set both relics in the altar. Pick +1 charm slot and 30% increased charm charges gained, or +1 charm slot and 30% increased charm effect duration. You can come back and swap. Then the Titan Grotto. Zalmarath, the Colossus, is the door out.",
-      },
-      {
-        title: "Deshar, the spires, the Dreadnought",
-        detail:
-          "Take the Final Letter in Deshar and give it to Shambrin for +2 weapon-set points. The Path of Mourning leads to the Spires of Deshar. Click the Sisters of Garukhan shrine for +10% lightning resistance. You do not have to kill anything for the shrine. Tor Gul, the Defiler, is the zone boss, so he is the road. Sail the Dreadnought and kill Jamanra, the Abomination. Leave the Watchful Twins. They drop a trial coin, not a stat.",
-      },
+      step(
+        "The caravan",
+        "Act 2",
+        "Vastiri Outskirts",
+        "Earning Passage",
+        "Speak to the Hooded One, then Zarka. The caravan is the Ardura.",
+        "Passage on the Ardura Caravan, plus an Uncut Skill Gem. No permanent stat.",
+        `Quest log: Earning Passage. Rathbreaker, in the Vastiri Outskirts, is the door into the Ardura Caravan. Defeat him and return to Zarka. Then Mawdun Quarry and Rudja, the Dread Engineer, in Mawdun Mine. That fight is what moves the story. ${fight}`,
+        act2Gear,
+      ),
+      step(
+        "Traitor's Passage",
+        "Act 2",
+        "Traitor's Passage",
+        "Ascent to Power",
+        "Balbala, the Traitor, is in Traitor's Passage. Sekhema Asala and the Trial of the Sekhemas are by the Ardura. Use the Altar of Ascendancy inside the trial.",
+        "Balbala's Barya, also called the Djinn Barya. The first clear is your first 2 ascendancy points.",
+        `Kill Balbala, the Traitor, and take the Djinn Barya. Quest log: Ascent to Power. poe2db: take the coin to the Trial of the Sekhemas. It is the key back to the Halani Gates, and the same coin opens the trial. Clear that trial once for the first 2 ascendancy points. ${spec.ascendancyPick} Leave the bell chest. It is a gem.`,
+      ),
+      step(
+        "Jamanra, the first time",
+        "Act 2",
+        "The Halani Gates",
+        "Open the three gates",
+        "The fight is in the Halani Gates. He escapes. No turn-in for a stat.",
+        "The story continues. No permanent stat.",
+        "At the Halani Gates, open the three gates and fight Jamanra, the Risen King. He escapes. That is the story. Leave the corpse piles.",
+      ),
+      step(
+        "Keth",
+        "Act 2",
+        "Keth",
+        "Kill Kabala, the Constrictor Queen",
+        "Use the Book of Specialisation from Kabala. The Kabala Clan Relic is a later turn-in, not this reward.",
+        "+2 weapon-set passive points. The relic is a key, not the points.",
+        "Kill Kabala, the Constrictor Queen, for +2 weapon-set points. Kill hyenas until the Kabala Clan Relic drops. You need that relic at the Valley of the Titans. It is not a bonus by itself. Leave the treasure room.",
+      ),
+      step(
+        "The Lost City and the Buried Shrines",
+        "Act 2",
+        "The Lost City",
+        "Kill Azarian, the Forsaken Son",
+        "No stat turn-in. The Lost City is the road into the Buried Shrines.",
+        "The road onward. No permanent stat.",
+        "The Lost City is the road into the Buried Shrines. Azarian, the Forsaken Son, is the story boss. Kill him and take the road onward. Leave the elemental shrine. Those chests are rings, not a permanent stat.",
+      ),
+      step(
+        "The Bone Pits",
+        "Act 2",
+        "The Bone Pits",
+        "A Theft of Ivory",
+        "Zarka, on the Ardura Caravan, takes the Mastodon Tusks. The Sun Clan Relic is not her reward.",
+        "An Uncut Support Gem from Zarka. The Sun Clan Relic is the key you keep.",
+        "The Mastodon Badlands lead here. Quest log: A Theft of Ivory. Kill Iktab, the Deathlord, and Ekbab, Ancient Steed, and return the tusks to Zarka. That quest is a support gem, not points. Kill snakes until the Sun Clan Relic drops. You need it with the Kabala relic.",
+        act2Gear,
+      ),
+      step(
+        "Valley of the Titans",
+        "Act 2",
+        "Valley of the Titans",
+        "Ancient Vows",
+        "The altar in the Valley of the Titans. You place both relics yourself. You can come back and swap.",
+        "+1 charm slot and 30% increased charm charges gained, or +1 charm slot and 30% increased charm effect duration.",
+        "Quest log: Ancient Vows. Set both relics in the altar. Pick +1 charm slot and 30% increased charm charges gained, or +1 charm slot and 30% increased charm effect duration. You can come back and swap. Then the Titan Grotto. Zalmarath, the Colossus, drops the Flame Ruby. Quest A Crown of Stone is that ruby, turned in to Zarka on the Ardura. It is the door out, not the charm reward.",
+      ),
+      step(
+        "Deshar and the Final Letter",
+        "Act 2",
+        "Deshar",
+        "Tradition's Toll",
+        "Find the Final Letter in Deshar. Give it to Shambrin on the Ardura Caravan.",
+        "Book of Specialisation: +2 weapon-set passive points.",
+        "Quest log: Tradition's Toll. Take the Final Letter in Deshar and give it to Shambrin for +2 weapon-set points. She burns it without reading it. The points are still the reward.",
+      ),
+      step(
+        "The Spires, then the Dreadnought",
+        "Act 2",
+        "The Spires of Deshar",
+        "Click the Sisters of Garukhan shrine",
+        "Click the shrine yourself. No kill and no NPC. Tor Gul is the zone boss on the road. Jamanra, the Abomination, is the act boss on the Dreadnought.",
+        "+10% to Lightning Resistance from the shrine. Jamanra closes Act 2.",
+        "The Path of Mourning leads to the Spires of Deshar. Click the Sisters of Garukhan shrine for +10% lightning resistance. You do not have to kill anything for the shrine. Tor Gul, the Defiler, is the zone boss, so he is the road. Sail the Dreadnought and kill Jamanra, the Abomination. Leave the Watchful Twins. They drop a trial coin, not a stat.",
+        act2Gear,
+      ),
     ]),
     phase("act-3", "acts", "Act 3", "Levels 30–42", 30, 42, [
-      {
-        title: "Sandswept Marsh",
-        detail: `The marsh is only the road to Ziggurat Encampment. Leave Rootdredge and the Orok campfire. One is a gem and the other is a jeweller's orb. ${fight}`,
-      },
-      {
-        title: "Jungle Ruins",
-        detail:
-          "Kill Mighty Silverfist before you leave the ruins. That is +2 weapon-set points. Take the Venom Crypts waypoint while you are here. Leave the troubled camp.",
-      },
-      {
-        title: "Venom Crypts",
-        detail:
-          "Take the venom vial to Servi in Ziggurat Encampment. The choice is permanent: 25% increased stun threshold, 30% increased elemental ailment threshold, or 25% increased mana regeneration. You cannot change it. Leave the hidden sarcophagi.",
-      },
-      {
-        title: "The wetlands and the machines",
-        detail:
-          "Infested Barrens leads to the Chimeral Wetlands. Xyclucian, the Chimera, is the door into Jiquani's Machinarium. The Trial of Chaos is in the wetlands. Run it once when you want the next 2 ascendancy points. In the machinarium, open the doors with the soul cores and kill Blackjaw, the Remnant, for +10% fire resistance. Zicoatl, Warden of the Core, in Jiquani's Sanctum drops the large soul core that opens the waterways. Leave the toxic bloom and the third door of gold.",
-      },
-      {
-        title: "The waterways and Azak Bog",
-        detail:
-          "The Matlan Waterways are the levers, then Azak Bog. Kill Ignagduk, the Bog Witch, for +30 spirit and turn the quest in to Servi. Leave the flame ritual. It is a temporary buff.",
-      },
-      {
-        title: "The past, then Doryani",
-        detail:
-          "In the Drowned City, the story door is the Queen of Filth in the Apex of Filth. Leave the Molten Vault. Mektul unlocks a reforging bench, not a stat. Then Ketzuli, High Priest of the Sun, in the Temple of Kopec, and Viper Napuatzi in Utzaal. A large corpse in Utzaal or Aggorat can drop a Sacrificial Heart. Sacrifice it at the altar in Aggorat for +2 weapon-set points, then enter the Black Chambers and kill Doryani, Royal Thaumaturge.",
-      },
+      step(
+        "Sandswept Marsh",
+        "Act 3",
+        "Sandswept Marsh",
+        "Reach Ziggurat Encampment",
+        "Servi and Oswald are in Ziggurat Encampment. You do not need them yet.",
+        "The town. No permanent stat.",
+        `The marsh is only the road to Ziggurat Encampment. Leave Rootdredge and the Orok campfire. One is a gem and the other is a jeweller's orb. ${fight}`,
+        act3Gear,
+      ),
+      step(
+        "Jungle Ruins",
+        "Act 3",
+        "Jungle Ruins",
+        "Kill Mighty Silverfist",
+        "Use the Book of Specialisation from the kill. Take the Venom Crypts waypoint before you leave.",
+        "+2 weapon-set passive points.",
+        "Kill Mighty Silverfist before you leave the ruins. That is +2 weapon-set points. Take the Venom Crypts waypoint while you are here. Leave the troubled camp.",
+      ),
+      step(
+        "Venom Crypts",
+        "Act 3",
+        "The Venom Crypts",
+        "The Slithering Dead",
+        "Servi, in Ziggurat Encampment. The item you carry is Corpse-snake Venom. She turns it into a Venom Draught.",
+        "Permanent, and you cannot change it: 25% increased stun threshold, or 30% increased elemental ailment threshold, or 25% increased mana regeneration.",
+        "Take the venom vial to Servi in Ziggurat Encampment. Quest log: The Slithering Dead. The choice is permanent: 25% increased stun threshold, 30% increased elemental ailment threshold, or 25% increased mana regeneration. You cannot change it. Leave the hidden sarcophagi.",
+      ),
+      step(
+        "The wetlands and the machines",
+        "Act 3",
+        "Chimeral Wetlands",
+        "Trial of Chaos, then Blackjaw",
+        "The Trial of Chaos is in the Chimeral Wetlands. Blackjaw, the Remnant, is in Jiquani's Machinarium. Deliver a Small Soul Core to the Stone Altar to open him.",
+        "The next 2 ascendancy points from one Trial of Chaos clear. Blackjaw is +10% fire resistance.",
+        "Infested Barrens leads to the Chimeral Wetlands. Xyclucian, the Chimera, is the door into Jiquani's Machinarium. The Trial of Chaos is in the wetlands. Run it once when you want the next 2 ascendancy points. In the machinarium, open the doors with the soul cores and kill Blackjaw, the Remnant, for +10% fire resistance. Zicoatl, Warden of the Core, in Jiquani's Sanctum drops the large soul core that opens the waterways. Leave the toxic bloom and the third door of gold.",
+        act3Gear,
+      ),
+      step(
+        "The waterways and Azak Bog",
+        "Act 3",
+        "The Azak Bog",
+        "Tribal Vengeance",
+        "Servi, in Ziggurat Encampment, after you kill Ignagduk.",
+        "+30 maximum spirit from Ignagduk. Servi's turn-in also includes a charm. The spirit is the permanent stat.",
+        "The Matlan Waterways are the levers, then Azak Bog. Quest log: Tribal Vengeance. Kill Ignagduk, the Bog Witch, for +30 spirit and turn the quest in to Servi. Leave the flame ritual. It is a temporary buff.",
+      ),
+      step(
+        "The Molten Vault",
+        "Act 3",
+        "The Molten Vault",
+        "Treasures of Utzaal",
+        "Oswald, in Ziggurat Encampment, after you kill Mektul, the Forgemaster.",
+        "The Reforging Bench. Not a stat. Skip it if you only want permanent rewards.",
+        "In the Drowned City, the Molten Vault is optional. Quest log: Treasures of Utzaal. Mektul unlocks a reforging bench through Oswald, not a stat. The story door in the Drowned City is the Queen of Filth in the Apex of Filth.",
+      ),
+      step(
+        "Aggorat, then Doryani",
+        "Act 3",
+        "Aggorat",
+        "Sacrifice the Sacrificial Heart",
+        "The altar is in Aggorat. A large corpse in Utzaal or Aggorat can drop the heart. Ketzuli is in the Temple of Kopec. Viper Napuatzi is in Utzaal. Doryani is in the Black Chambers.",
+        "+2 weapon-set passive points from the altar. Doryani closes Act 3.",
+        "Ketzuli, High Priest of the Sun, in the Temple of Kopec, and Viper Napuatzi in Utzaal are the story road. A large corpse in Utzaal or Aggorat can drop a Sacrificial Heart. Sacrifice it at the altar in Aggorat for +2 weapon-set points, then enter the Black Chambers and kill Doryani, Royal Thaumaturge.",
+        act3Gear,
+      ),
     ]),
     phase("act-4", "acts", "Act 4", "Levels 42–52", 42, 52, [
-      {
-        title: "Kingsmarch",
-        detail: `Talk to the town and take the boat. The marked islands hold the weapon pieces, and they can be sailed in any order. Skip gem hunts, map scraps, and bell chests. ${fight}`,
-      },
-      {
-        title: "Isle of Kin",
-        detail:
-          "Cross the island into the Volcanic Warrens and kill Krutog, Lord of Kin. He is a weapon piece. Leave the Blind Beast. That fight is a greater rune. The skill points are not on this island.",
-      },
-      {
-        title: "Whakapanu",
-        detail: `Kill the Great White One and take the shark fin to Kaimana at the Karui boat in Kingsmarch. ${lesson} You can swap the lesson later. Then the Singing Caverns. Diamora, Song of Death, is the weapon piece. Leave the beckoning clam. It trades for an amulet, not a permanent stat.`,
-      },
-      {
-        title: "Shrike Island",
-        detail:
-          "Kill the Scourge of the Skies. That is a weapon piece. Speak to Matiki if she is here. She is part of the road to the Eye of Hinekora. Leave the dead sailors.",
-      },
-      {
-        title: "The prison",
-        detail: `In the Abandoned Prison, the Goddess of Justice is a flask choice you can swap later: 30% increased life recovery from flasks, or 30% increased mana recovery from flasks. ${flask} Then kill the Prisoner in Solitary Confinement. That is a weapon piece. Leave the armoury.`,
-      },
-      {
-        title: "Eye of Hinekora and the ancestors",
-        detail:
-          "In the Silent Hall, pay your respects. That is +5% maximum mana. In the Halls of the Dead, finish the three tests. Each choice is permanent: Ngamahu is +5 strength or +5 fire resistance, Tasalio is +5 intelligence or +5 cold resistance, and Tawhoa is +5 dexterity or +5 lightning resistance. Take the resistance you are lowest on, or the attribute a gem is demanding. Then kill Yama the White and speak to Hinekora. That is +2 weapon-set points.",
-      },
-      {
-        title: "Arastas, then the captain",
-        detail:
-          "Kill Torvian, Hand of the Saviour, on Arastas, and Benedictus, First Herald, in the Excavation. Leave the bells. They are currency. Then Kedge Bay and Journey's End. Kill Captain Hartlin, finish Dark Mists, and kill Omniphobia, Fear Manifest. That turn-in is +2 weapon-set points.",
-      },
-      {
-        title: "Tavakai",
-        detail: `Sail to Ngakanu and enter the Heart of the Tribe. Tavakai, the Chieftain, is the act boss. ${spec.boss} The defence lesson was the shark fin on Whakapanu. The Atlas is still closed.`,
-      },
+      step(
+        "Kingsmarch",
+        "Act 4",
+        "Kingsmarch",
+        "The Search",
+        "Makoru, in Kingsmarch, hires the ship.",
+        "The boat. The weapon pieces are the island bosses, not permanent stats.",
+        `Quest log: The Search. Talk to Makoru and take the boat. The marked islands hold the weapon pieces, and they can be sailed in any order. Skip gem hunts, map scraps, and bell chests. ${fight}`,
+        act4Gear,
+      ),
+      step(
+        "Isle of Kin",
+        "Act 4",
+        "Isle of Kin",
+        "The Blind Beast",
+        "Nobody. Leave the beast.",
+        "A greater rune. Not weapon-set points.",
+        "Cross the island into the Volcanic Warrens and kill Krutog, Lord of Kin. He is a weapon piece. Leave the Blind Beast. That fight is a greater rune. The skill points are not on this island.",
+      ),
+      step(
+        "Whakapanu",
+        "Act 4",
+        "Whakapanu Island",
+        "Tribal Medicine",
+        "Kaimana. She takes the Shark Fin in Ngakanu, and also at the Karui boat in Kingsmarch.",
+        "Kaom's Lesson or Rakiata's Lesson. You can swap later. This is not weapon-set points.",
+        `Kill the Great White One on Whakapanu Island and pick up the Shark Fin. Quest log: Tribal Medicine. Take it to Kaimana. ${lesson} You can swap the lesson later. Diamora, Song of Death, is a different quest: Whakapanu Island, in the Singing Caverns. She is a weapon piece. Leave the beckoning clam. It trades for an amulet, not a permanent stat.`,
+      ),
+      step(
+        "Shrike Island",
+        "Act 4",
+        "Shrike Island",
+        "Kill the Scourge of the Skies",
+        "Matiki is here after you have killed the Siren. She is the road to the Eye of Hinekora, not a stat turn-in.",
+        "A weapon piece. No permanent stat.",
+        "Kill the Scourge of the Skies. That is a weapon piece. Speak to Matiki if she is here. She is part of the road to the Eye of Hinekora. Leave the dead sailors.",
+      ),
+      step(
+        "The prison",
+        "Act 4",
+        "Abandoned Prison",
+        "Abandoned Prison",
+        "The Goddess of Justice is the shrine in the prison. The Prisoner is in Solitary Confinement.",
+        "A swappable flask bonus: 30% increased life recovery from flasks, or 30% increased mana recovery from flasks. The Prisoner is a weapon piece.",
+        `Quest log: Abandoned Prison. The Goddess of Justice is a flask choice you can swap later: 30% increased life recovery from flasks, or 30% increased mana recovery from flasks. ${flask} Then kill the Prisoner in Solitary Confinement. That is a weapon piece. Leave the armoury.`,
+      ),
+      step(
+        "The Silent Hall",
+        "Act 4",
+        "The Silent Hall",
+        "Pay your respects",
+        "The hall itself. No NPC.",
+        "+5% to maximum mana.",
+        "In the Silent Hall, pay your respects. That is +5% maximum mana.",
+      ),
+      step(
+        "Halls of the Dead",
+        "Act 4",
+        "Halls of the Dead",
+        "Trial of the Ancestors",
+        "The three totems are in the Halls of the Dead. After Yama the White, speak to Hinekora.",
+        "Each test is permanent: Ngamahu is +5 strength or +5% fire resistance, Tasalio is +5 intelligence or +5% cold resistance, and Tawhoa is +5 dexterity or +5% lightning resistance. Hinekora then grants +2 weapon-set points.",
+        "Quest log: Trial of the Ancestors. Matiki is freed when Diamora dies, and she is part of the road to the Eye of Hinekora. In the Halls of the Dead, finish the three tests. Each choice is permanent: Ngamahu is +5 strength or +5 fire resistance, Tasalio is +5 intelligence or +5 cold resistance, and Tawhoa is +5 dexterity or +5 lightning resistance. Take the resistance you are lowest on, or the attribute a gem is demanding. Then kill Yama the White and speak to Hinekora. That is +2 weapon-set points.",
+        act4Gear,
+      ),
+      step(
+        "Arastas, then Dark Mists",
+        "Act 4",
+        "Journey's End",
+        "Dark Mists",
+        "Makoru, in Kingsmarch, sends you to Kedge Bay. Kill Captain Hartlin at Journey's End, then Omniphobia, Fear Manifest. Tujen is part of the Verisium steps. The points are the Omniphobia reward.",
+        "+2 weapon-set passive points from Omniphobia. Verisium on this quest is not the stat.",
+        "Kill Torvian, Hand of the Saviour, on Arastas, and Benedictus, First Herald, in the Excavation. Leave the bells. They are currency. Then Kedge Bay and Journey's End. Quest log: Dark Mists. Kill Captain Hartlin, finish Dark Mists, and kill Omniphobia, Fear Manifest. That turn-in is +2 weapon-set points.",
+      ),
+      step(
+        "Tavakai",
+        "Act 4",
+        "Ngakanu",
+        "Kill Tavakai, the Chieftain",
+        "The Heart of the Tribe is the boss arena in Ngakanu.",
+        "Act 4 ends. The defence lesson was already the shark fin. The Atlas is still closed.",
+        `Sail to Ngakanu and enter the Heart of the Tribe. Tavakai, the Chieftain, is the act boss. ${spec.boss} The defence lesson was the shark fin on Whakapanu. The Atlas is still closed.`,
+      ),
     ]),
     phase("interlude-barya", "interludes", "The Stolen Barya", "Do this one first", 52, 54, [
-      {
-        title: "Khari Crossing",
-        detail:
-          "Do this interlude first. It gets harder if you outlevel it. Resistances drop as soon as you enter an interlude, so check the lowest one before you zone in. Kill Akthi, the Final Sting, and Anundr, the Sandworm, then speak to Risu. That is +2 weapon-set points. The Skullmaw Stairway is off this zone. Use the Molten One's Gift at the Molten Shrine. That is +5% maximum life.",
-      },
-      {
-        title: "The road to Qimah",
-        detail:
-          "Pools of Khatal, then Sel Khari Sanctuary. Elzarah, the Cobra Lord, is the story boss there. Then the Galai Gates and Vornas, the Fell Flame. Those bosses open the road. They do not give a permanent stat. Leave the sanctuary jewellery.",
-      },
-      {
-        title: "Qimah",
-        detail:
-          "The seven pillars are in a niche at the edge of the zone. Choose one, and you can come back and swap: +5 to all attributes, +5% to all elemental resistances, 12% increased cooldown recovery, 3% increased movement speed, 20% increased presence area, or 15% increased global defences. Do not take the experience pillar. It turns the other bonuses into penalties. Azmadi, the Faridun Prince, in the Qimah Reservoir closes this interlude. Do not farm the vials. They are currency.",
-      },
+      step(
+        "Khari Crossing",
+        "Interlude: The Stolen Barya",
+        "The Khari Crossing",
+        "Clearing the Way",
+        "Risu, in the Khari Bazaar, gives the Book of Specialisation.",
+        "+2 weapon-set passive points. poe2db lists this quest as Act 6. It is this interlude.",
+        "Do this interlude first. It gets harder if you outlevel it. Quest log: Clearing the Way. Kill Akthi, the Final Sting, and Anundr, the Sandworm, in the Khari Crossing, then speak to Risu. That is +2 weapon-set points.",
+        "Resistances drop as soon as you enter an interlude. Recap fire, cold, and lightning toward 75% before you zone in. Boots stay at 25% or more movement speed.",
+      ),
+      step(
+        "The Molten Shrine",
+        "Interlude: The Stolen Barya",
+        "Skullmaw Stairway",
+        "Use the Molten One's Gift",
+        "Use the gift at the Molten Shrine yourself.",
+        "+5% increased maximum life.",
+        "The Skullmaw Stairway is off the Khari Crossing. Use the Molten One's Gift at the Molten Shrine. Right-click it. That is +5% maximum life.",
+      ),
+      step(
+        "The road to Qimah",
+        "Interlude: The Stolen Barya",
+        "Sel Khari Sanctuary",
+        "Open the road to Qimah",
+        "No stat turn-in. Elzarah, the Cobra Lord, is in Sel Khari Sanctuary. Vornas, the Fell Flame, is at the Galai Gates.",
+        "The road. No permanent stat.",
+        "Pools of Khatal, then Sel Khari Sanctuary. Elzarah, the Cobra Lord, is the story boss there. Then the Galai Gates and Vornas, the Fell Flame. Those bosses open the road. They do not give a permanent stat. Leave the sanctuary jewellery.",
+      ),
+      step(
+        "Qimah",
+        "Interlude: The Stolen Barya",
+        "Qimah",
+        "Choose one pillar",
+        "The seven pillars are in a niche at the edge of Qimah. You can come back and swap. Azmadi, the Faridun Prince, in the Qimah Reservoir closes the interlude.",
+        "One swappable boon: +5 to all attributes, +5% to all elemental resistances, 12% increased cooldown recovery, 3% increased movement speed, 20% increased presence area, or 15% increased global defences. Do not take the experience pillar.",
+        "The seven pillars are in a niche at the edge of the zone. Choose one, and you can come back and swap: +5 to all attributes, +5% to all elemental resistances, 12% increased cooldown recovery, 3% increased movement speed, 20% increased presence area, or 15% increased global defences. Do not take the experience pillar. It turns the other bonuses into penalties. Azmadi, the Faridun Prince, in the Qimah Reservoir closes this interlude. Do not farm the vials. They are currency.",
+      ),
     ]),
     phase("interlude-doryani", "interludes", "Doryani's Contingency", "Spirit, then the yeti", 55, 57, [
-      {
-        title: "Kriar Village",
-        detail: `The Glade and the Ashen Forest are the road in. Kill Lythara, the Wayward Spear, for +40 spirit. With the King in the Mists and Ignagduk, that is 100 spirit from the campaign. Do this even if ${spec.skill} does not reserve spirit yet. If you needed the spirit more than the barya, this interlude can be the first one instead.`,
-      },
-      {
-        title: "Glacial Tarn and the yeti",
-        detail:
-          "Rakkar, the Frozen Talon, is the road through the Glacial Tarn. Then the Howling Caves. Kill the Abominable Yeti and turn the tusks in. That is +2 weapon-set points. Leave the caves once the yeti is dead.",
-      },
-      {
-        title: "The peaks and the vault",
-        detail:
-          "Kriar Peaks lead to the Etched Ravine. Stormgore, the Guardian, is the road, and Zolin and Zelina in the Cuachic Vault close the interlude. Elder Madox offers one free unique. That is loot, not a stat. Take it only if you are already there and it beats what you have on.",
-      },
+      step(
+        "Kriar Village",
+        "Interlude: Doryani's Contingency",
+        "Kriar Village",
+        "Slay Lythara, the Wayward Spear",
+        "The reward is on the kill. The Glade and the Ashen Forest are the road in.",
+        "+40 maximum spirit. With the King in the Mists and Ignagduk, the campaign total is 100 spirit.",
+        `The Glade and the Ashen Forest are the road in. Kill Lythara, the Wayward Spear, for +40 spirit. With the King in the Mists and Ignagduk, that is 100 spirit from the campaign. Do this even if ${spec.skill} does not reserve spirit yet. If you needed the spirit more than the barya, this interlude can be the first one instead.`,
+      ),
+      step(
+        "The yeti",
+        "Interlude: Doryani's Contingency",
+        "Howling Caves",
+        "Howling Winds",
+        "Hilda, in the Glade. Bring her the Ice Tusks from the Howling Caves.",
+        "Book of Specialisation: +2 weapon-set passive points. poe2db lists Howling Winds as Act 6. It is this interlude.",
+        "Quest log: Howling Winds. Rakkar, the Frozen Talon, is the road through the Glacial Tarn. Then the Howling Caves. Kill the Abominable Yeti, pick up the Ice Tusks, and return them to Hilda in the Glade. That is +2 weapon-set points. Leave the caves once the yeti is dead.",
+      ),
+      step(
+        "The peaks and the vault",
+        "Interlude: Doryani's Contingency",
+        "Cuachic Vault",
+        "Close Doryani's Contingency",
+        "Elder Madox is in Kriar Peaks and offers one unique. Zolin and Zelina are in the Cuachic Vault.",
+        "One free unique from Madox, if you want it. It is loot, not a permanent stat. The vault closes the interlude.",
+        "Kriar Peaks lead to the Etched Ravine. Stormgore, the Guardian, is the road, and Zolin and Zelina in the Cuachic Vault close the interlude. Elder Madox offers one free unique. That is loot, not a stat. Take it only if you are already there and it beats what you have on.",
+      ),
     ]),
     phase("interlude-holten", "interludes", "The Curse of Holten", "Last, then Kingsmarch", 58, 60, [
-      {
-        title: "The road to Wolvenhold",
-        detail:
-          "Do Holten last. It is the short one. The road is the Scorched Farmlands (Isolde of the White Shroud and Heldra of the Black Pyre), the Stones of Serle (Siora, Blade of the Mists), the Blackwood, and Holten. Leave the ferryman. He sells runes.",
-      },
-      {
-        title: "Oswin, then the estate",
-        detail:
-          "Kill Oswin, the Dread Warden, in Wolvenhold for +2 weapon-set points. Thane Wulfric and Lady Elyswyth in Holten Estate close the interlude.",
-      },
-      {
-        title: "The Hooded One",
-        detail:
-          "Return to Kingsmarch after all three interludes and speak to the Hooded One to finish Siege of Oriath. That is the last +2 weapon-set points. You should have 24 from the campaign. Fix the lowest resistance before you open a map.",
-      },
+      step(
+        "The road to Wolvenhold",
+        "Interlude: The Curse of Holten",
+        "Scorched Farmlands",
+        "Reach Holten",
+        "No stat turn-in on this road. Leave the ferryman.",
+        "The road to Wolvenhold. No permanent stat.",
+        "Do Holten last. It is the short one. The road is the Scorched Farmlands (Isolde of the White Shroud and Heldra of the Black Pyre), the Stones of Serle (Siora, Blade of the Mists), the Blackwood, and Holten. Leave the ferryman. He sells runes.",
+      ),
+      step(
+        "Oswin",
+        "Interlude: The Curse of Holten",
+        "Wolvenhold",
+        "Kill Oswin, the Dread Warden",
+        "Use the Book of Specialisation from Oswin in Wolvenhold.",
+        "+2 weapon-set passive points.",
+        "Kill Oswin, the Dread Warden, in Wolvenhold for +2 weapon-set points. Thane Wulfric and Lady Elyswyth in Holten Estate close the interlude.",
+      ),
+      step(
+        "The Hooded One",
+        "Interlude: Kingsmarch",
+        "Kingsmarch",
+        "Siege of Oriath",
+        "The Hooded One, in Kingsmarch, after all three interludes.",
+        "Book of Specialisation: the last +2 weapon-set points. You should have 24.",
+        "Return to Kingsmarch after all three interludes and speak to the Hooded One to finish Siege of Oriath. poe2db lists that quest under Act 4. It is this turn-in, not a second copy of the Act 4 boat. That is the last +2 weapon-set points. You should have 24 from the campaign.",
+        "75% fire, 75% cold, and 75% lightning before you open a map. Boots: 30% increased Movement Speed if you can buy it.",
+      ),
     ]),
     phase("endgame", "endgame", "Endgame", "Maps", 60, 100, [
-      {
-        title: "White maps",
-        detail: `Run white maps until ${spec.skill} clears a pack without you stopping. Then raise the tier.`,
-      },
-      {
-        title: "What to upgrade",
-        detail: `Weapon damage, then life, then the lowest resistance. The defence on the gear is ${spec.defence}.`,
-      },
-      {
-        title: "Uniques stay optional",
-        detail: "A unique below is a suggestion. Wear it when it drops and beats the rare. Do not stop mapping to buy one.",
-      },
-      { title: "Bosses", detail: spec.boss },
+      step(
+        "White maps",
+        "Maps",
+        "Your map device",
+        "Run white maps",
+        "No quest NPC.",
+        "Map completion. No campaign stat.",
+        `Run white maps until ${spec.skill} clears a pack without you stopping. Then raise the tier.`,
+        "75% fire, 75% cold, and 75% lightning. Chaos resistance 30–50%. Boots 30–35% increased Movement Speed.",
+      ),
+      step(
+        "What to upgrade",
+        "Maps",
+        "Town or the trade site",
+        "Gear check",
+        "Buy the rare, or craft with a Transmutation and an Augmentation while the base is still normal.",
+        "The targets on the Gear tab.",
+        `Weapon damage, then life, then the lowest resistance. The defence on the gear is ${spec.defence}.`,
+        "Body life +(120–214) if this build wears life. Energy shield builds shop flat energy shield +(61–96) instead. Do not chase 75% chaos.",
+      ),
+      step(
+        "Uniques stay optional",
+        "Maps",
+        "Anywhere",
+        "A unique is optional",
+        "No turn-in.",
+        "Nothing you have to buy.",
+        "A unique below is a suggestion. Wear it when it drops and beats the rare. Do not stop mapping to buy one.",
+      ),
+      step("Bosses", "Maps", "The boss arena", spec.boss, "No extra NPC.", "The boss loot.", spec.boss),
     ]),
   ];
 }

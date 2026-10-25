@@ -31,14 +31,50 @@ for (const spec of specs) {
     }
   }
 
-  const ready = guide.timeline.find((step) => step.checks.some((check) => check.startsWith(`Socket ${spec.skill} now`)));
+  const ready = guide.timeline.find((step) => step.checks.some((check) => check.text.startsWith(`Socket ${spec.skill} now`)));
   const levelOne = guide.timeline.find((step) => step.level === 1);
-  const opening = levelOne?.checks.join(" ") ?? "";
+  const opening = levelOne?.checks.map((check) => check.text).join(" ") ?? "";
   if (ready && ready.level > 1 && !opening.includes(`Do not socket ${spec.skill} yet`)) {
     failures.push(`${spec.id} level 1 still tells you to socket ${spec.skill}`);
   }
   if (!ready && !opening.includes(`Socket ${spec.skill}.`)) {
     failures.push(`${spec.id} level 1 does not name ${spec.skill}`);
+  }
+
+  for (const phase of guide.phases) {
+    for (const step of phase.steps) {
+      if (!step.act.trim() || !step.zone.trim() || !step.quest.trim()) {
+        failures.push(`${spec.id} ${phase.id} step "${step.title}" is missing act, zone, or quest`);
+      }
+      if (step.gear && !/\d/.test(step.gear)) {
+        failures.push(`${spec.id} ${phase.id} gear step "${step.title}" has no stat number`);
+      }
+    }
+  }
+  for (const step of guide.timeline) {
+    for (const row of step.checks) {
+      if (!row.act.trim() || !row.zone.trim() || !row.quest.trim()) {
+        failures.push(`${spec.id} level ${step.level} check is missing act, zone, or quest`);
+      }
+      if (row.gear && !/\d/.test(row.text)) {
+        failures.push(`${spec.id} level ${step.level} gear check has no stat number`);
+      }
+    }
+  }
+  if (guide.gearCards.length < 6) failures.push(`${spec.id} gear cards are missing slots`);
+  for (const card of guide.gearCards) {
+    if (!card.base.trim() || !card.why.trim() || !card.how.trim()) {
+      failures.push(`${spec.id} ${card.slot} card is missing the base, the reason, or how to get it`);
+    }
+    if (!card.affixes.some((affix) => affix.rank === "Must")) {
+      failures.push(`${spec.id} ${card.slot} has no must-have affix`);
+    }
+    for (const affix of card.affixes) {
+      if (affix.kind !== "Prefix" && affix.kind !== "Suffix") failures.push(`${spec.id} ${card.slot} ${affix.name} has no prefix or suffix`);
+      for (const value of [affix.leveling, affix.earlyMaps, affix.endgame]) {
+        if (!/\d/.test(value)) failures.push(`${spec.id} ${card.slot} ${affix.name} is missing a number`);
+      }
+    }
   }
 
   for (const group of guide.loadout.groups) {
@@ -66,8 +102,19 @@ for (const spec of specs) {
 }
 
 const ice = composeGuide(specs.find((spec) => spec.id === "deadeye-ice-shot")!);
-if (!ice.timeline.some((step) => step.level === 31 && step.checks.some((check) => check.includes("Ice Shot")))) {
+if (!ice.timeline.some((step) => step.level === 31 && step.checks.some((check) => check.text.includes("Ice Shot")))) {
   failures.push("Ice Shot does not join at level 31");
+}
+const lute = ice.phases.flatMap((phase) => phase.steps).find((step) => step.quest === "The Lost Lute");
+if (!lute || lute.act !== "Act 1" || !lute.zone.includes("Ogham Farmlands") || !lute.npc.includes("Clearfell Encampment")) {
+  failures.push("The Lost Lute is not Act 1, Ogham Farmlands, returned to Una in Clearfell Encampment");
+}
+if (lute && /Kingsmarch/.test(`${lute.detail} ${lute.npc} ${lute.zone}`)) {
+  failures.push("The Lost Lute still sends you to Kingsmarch");
+}
+const level12 = ice.timeline.find((step) => step.level === 12);
+if (!level12?.checks.some((check) => check.quest === "The Lost Lute" && check.text.includes("Ogham Farmlands"))) {
+  failures.push("Level 12 does not name The Lost Lute in Ogham Farmlands");
 }
 const fire = composeGuide(specs.find((spec) => spec.id === "tactician-supporting-fire")!);
 if (!fire.timeline.some((step) => step.level === 36)) failures.push("Supporting Fire respec is not at level 36");
