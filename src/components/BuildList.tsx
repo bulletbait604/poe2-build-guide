@@ -35,7 +35,7 @@ export function BuildList({
       </p>
       <p className="mt-3 max-w-2xl text-sm leading-6 text-gold">{ladder.message}</p>
 
-      <div className="mt-6 grid gap-3">
+      <div className="mt-6 grid gap-3 sm:grid-cols-2">
         {guides.map((guide) => (
           <Link
             key={guide.id}
