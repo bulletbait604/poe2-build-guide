@@ -76,6 +76,12 @@ export type LevelStep = {
   text: string;
 };
 
+export type TimelineStep = {
+  level: number;
+  title: string;
+  checks: string[];
+};
+
 export type Loadout = {
   overview: string;
   numbers: string[];
@@ -109,6 +115,7 @@ export type Guide = {
   levelBands: LevelBand[];
   phases: GuidePhase[];
   loadout: Loadout;
+  timeline: TimelineStep[];
 };
 
 export type PoeCharacter = {

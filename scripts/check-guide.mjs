@@ -5,6 +5,8 @@ const gems = JSON.parse(readFileSync(new URL("../src/content/gemArt.json", impor
 const tree = JSON.parse(readFileSync(new URL("../src/content/treeRoutes.json", import.meta.url), "utf8"));
 const armor = readFileSync(new URL("../src/content/armorPlan.ts", import.meta.url), "utf8");
 const loadouts = readFileSync(new URL("../src/content/loadouts.ts", import.meta.url), "utf8");
+const timeline = readFileSync(new URL("../src/content/timeline.ts", import.meta.url), "utf8");
+const guideView = readFileSync(new URL("../src/components/GuideView.tsx", import.meta.url), "utf8");
 const specs = [
   readFileSync(new URL("../src/content/buildSpecs.ts", import.meta.url), "utf8"),
   readFileSync(new URL("../src/content/extraSpecs.ts", import.meta.url), "utf8"),
@@ -80,6 +82,10 @@ if (!loadouts.includes("https://mobalytics.gg/poe-2/builds/ice-shot-deadeye")) {
   failures.push("loadouts are missing the Mobalytics Ice Shot source");
 }
 if (!loadouts.includes("https://poe.ninja/poe2/builds")) failures.push("loadouts are missing poe.ninja");
+if (!timeline.includes("Trial of the Sekhemas")) failures.push("timeline is missing the first ascendancy trial");
+if (!timeline.includes("Trial of Chaos")) failures.push("timeline is missing the Trial of Chaos");
+if (!timeline.includes("Balbala")) failures.push("timeline is missing Balbala");
+if (!guideView.includes("Do this now")) failures.push("guide view is missing the current-step marker");
 
 const counts = new Map();
 for (const match of specs.matchAll(/ascendancyId: "([^"]+)"/g)) {
