@@ -112,13 +112,19 @@ function checksFor(level: number, spec: BuildSpec, loadout: Loadout, supports: s
   return checks.slice(0, 4);
 }
 
+function levelFrom(row: Loadout["leveling"][number]) {
+  const inText = row.text.match(/\blevel (\d+)\b/i);
+  if (inText) return Number(inText[1]);
+  const single = row.levels.match(/^(\d+)\+?$/);
+  if (single) return Number(single[1]);
+  return null;
+}
+
 function extras(loadout: Loadout): TimelineStep[] {
   const steps: TimelineStep[] = [];
   for (const row of loadout.leveling) {
-    const match = row.text.match(/level (\d+)/i);
-    if (!match) continue;
-    const level = Number(match[1]);
-    if (!Number.isFinite(level) || level < 2 || level > 95 || STOPS.includes(level)) continue;
+    const level = levelFrom(row);
+    if (level === null || level < 2 || level > 95 || STOPS.includes(level)) continue;
     steps.push({
       level,
       title: titleFor(level),
