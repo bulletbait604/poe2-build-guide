@@ -1,9 +1,13 @@
 import { armorForBand } from "@/content/armorPlan";
 import type { BuildSpec } from "@/content/buildSpecs";
+import { pointsForBand } from "@/content/passivePlan";
 import type { Guide, GuidePhase, LevelBand } from "@/lib/types";
 
+const TREE = "https://poe2ref.com/passive-tree";
+
 const LINKS = [
-  { label: "Passive tree", url: "https://pathofexile2.com/passive-skill-tree" },
+  { label: "Passive tree", url: TREE },
+  { label: "Official tree", url: "https://pathofexile2.com/passive-skill-tree" },
   { label: "poe.ninja builds", url: "https://poe.ninja/poe2/builds" },
   { label: "Maxroll guides", url: "https://maxroll.gg/poe2/build-guides" },
   { label: "Mobalytics builds", url: "https://mobalytics.gg/poe-2/builds" },
@@ -30,6 +34,7 @@ function buildBands(spec: BuildSpec): LevelBand[] {
   return RANGES.map(([from, to, title]) => {
     const armor = armorForBand(spec, to);
     const equip = armor.map((line) => `${line.slot}: ${line.lookFor}`).join(" ");
+    const plan = pointsForBand(spec, from, to);
     return {
       from,
       to,
@@ -38,6 +43,9 @@ function buildBands(spec: BuildSpec): LevelBand[] {
       armor,
       gem: gemLine(spec, to),
       ignore: ignoreLine(spec, to),
+      pointsIntro: plan.intro,
+      points: plan.points,
+      questPoints: plan.quests,
     };
   });
 }
@@ -55,7 +63,7 @@ function gemLine(spec: BuildSpec, to: number) {
 
 function ignoreLine(spec: BuildSpec, to: number) {
   if (to <= 9) return "Do not buy a unique to fill a slot. A dropped rare with life is the upgrade.";
-  if (to <= 19) return "Do not respec. On the passive tree, take life and damage next to where you started.";
+  if (to <= 19) return "Do not refund a point you just placed. The list above is the order.";
   if (to <= 29) return "Do not take a second ascendancy node until the first one has been in use for a whole zone.";
   if (to <= 44) return "Do not path across the tree for one notable, and do not start a second build in the other weapon set.";
   if (to <= 59) return "Do not skip an interlude reward. The points and the spirit are permanent.";
@@ -82,6 +90,11 @@ function buildPhases(spec: BuildSpec): GuidePhase[] {
         detail: `Take the ${spec.weaponNoun} with the highest damage. ${spec.weaponStat} Put ${spec.skill} on it before you walk out. A unique is not required.`,
       },
       { title: "Clearfell and the Grelwood", detail: spec.pack },
+      {
+        title: "The first passive points",
+        detail:
+          "Level 2 is the first passive point, then one point every level. The upgrade card under this act lists those points in order. A quest reward is a weapon-set point, not a replacement for them.",
+      },
       {
         title: "Pick up gems, leave the rest",
         detail: "Take every uncut skill gem and uncut support gem. Sell a blue item that is not an upgrade. Life on the body matters more than a famous name.",
@@ -219,7 +232,7 @@ export function composeGuide(spec: BuildSpec): Guide {
     summary: spec.summary,
     fantasy: spec.fantasy,
     links: LINKS,
-    treeUrl: "https://pathofexile2.com/passive-skill-tree",
+    treeUrl: TREE,
     uniques: spec.uniques,
     levelBands: buildBands(spec),
     phases: buildPhases(spec),

@@ -25,6 +25,9 @@ export type LevelBand = {
   gem: string;
   ignore: string;
   armor: ArmorLine[];
+  pointsIntro: string;
+  points: string[];
+  questPoints: string[];
 };
 
 export type GuideStep = {

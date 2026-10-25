@@ -191,6 +191,25 @@ export function GuideView({
                           {current ? <span className="ml-3 text-sm tracking-[0.14em] text-ember uppercase">Do this now</span> : null}
                         </p>
                         <p className="mt-2 leading-6">{band.gem}</p>
+                        <div className="mt-3 border border-line bg-ink/40 p-3">
+                          <p className="text-xs tracking-[0.16em] text-gold uppercase">Passive points</p>
+                          <p className="mt-2 leading-6">{band.pointsIntro}</p>
+                          <ol className="mt-2 list-decimal space-y-1 pl-5 leading-6">
+                            {band.points.map((point, index) => (
+                              <li key={`${band.title}-${index}`}>{point}</li>
+                            ))}
+                          </ol>
+                          {band.questPoints.length > 0 ? (
+                            <div className="mt-3 space-y-2 border-t border-line pt-3">
+                              <p className="text-xs tracking-[0.16em] text-gold uppercase">Quest points</p>
+                              {band.questPoints.map((quest) => (
+                                <p key={quest} className="leading-6">
+                                  {quest}
+                                </p>
+                              ))}
+                            </div>
+                          ) : null}
+                        </div>
                         <dl className="mt-3 grid gap-2 sm:grid-cols-2">
                           {band.armor.map((line) => (
                             <div key={line.slot}>
@@ -232,8 +251,8 @@ export function GuideView({
       <section className="mt-10 border border-line p-4">
         <h2 className="font-display text-2xl">Tree and longer write-ups</h2>
         <p className="mt-2 leading-7 text-muted">
-          Open the official passive tree and take life plus damage next to your start. The other links are other
-          people&apos;s guides, for when you want the long version.
+          The upgrade cards already say which node each point goes into. Open the tree to find that name beside your
+          class start. One level point arrives at level 2 and then every level. Quest rewards are weapon-set points.
         </p>
         <ul className="mt-3 flex flex-wrap gap-4 text-sm">
           <li>
