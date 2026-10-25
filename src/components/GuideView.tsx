@@ -1,6 +1,7 @@
 "use client";
 
 import { GearBoard } from "@/components/GearBoard";
+import { GearCards } from "@/components/GearCards";
 import { GemLinks } from "@/components/GemLinks";
 import { ItemChip } from "@/components/ItemChip";
 import { TreeMap } from "@/components/TreeMap";
@@ -62,7 +63,12 @@ function StepCard({
                   checked={checked}
                   onChange={() => onToggle(key)}
                 />
-                <span className={checked ? "text-muted line-through" : "text-parchment"}>{check}</span>
+                <span className={checked ? "text-muted line-through" : "text-parchment"}>
+                  <span className="block text-xs tracking-[0.12em] text-gold uppercase">
+                    {check.act} · {check.zone} · {check.quest}
+                  </span>
+                  {check.text}
+                </span>
               </label>
             </li>
           );
@@ -263,7 +269,24 @@ export function GuideView({
                       <p className="text-parchment">
                         {index + 1}. {step.title}
                       </p>
+                      <p className="mt-1 text-xs tracking-[0.12em] text-gold uppercase">
+                        {step.act} · {step.zone} · {step.quest}
+                      </p>
                       <p className="mt-1 text-sm text-muted">{step.detail}</p>
+                      <p className="mt-1 text-sm">
+                        <span className="text-gold">Talk to. </span>
+                        {step.npc}
+                      </p>
+                      <p className="text-sm">
+                        <span className="text-gold">Reward. </span>
+                        {step.reward}
+                      </p>
+                      {step.gear ? (
+                        <p className="text-sm">
+                          <span className="text-gold">Gear. </span>
+                          {step.gear}
+                        </p>
+                      ) : null}
                     </li>
                   ))}
                 </ol>
@@ -285,20 +308,14 @@ export function GuideView({
       {tab === "Gear" ? (
         <section id="gear" className="mt-2">
           <p className="max-w-3xl text-muted">
-            Read the slot, then the stage you are in. The number is the target. The picture under the cards is the same list for level {level}.
+            Read across one row to compare leveling, early maps, and endgame. Must is the roll you shop for. Nice is the extra. Ignore is the roll that looks good and does not matter. The picture under the table is the same list for level {level}.
           </p>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            {guide.loadout.gear.map((row) => (
-              <div key={row.slot} className="border border-line bg-[#14110e] p-3">
-                <h3 className="font-display text-xl">{row.slot}</h3>
-                <p className="mt-2 text-xs tracking-[0.14em] text-gold uppercase">Acts 1–2</p>
-                <p>{row.early}</p>
-                <p className="mt-2 text-xs tracking-[0.14em] text-gold uppercase">Acts 3–4</p>
-                <p>{row.late}</p>
-                <p className="mt-2 text-xs tracking-[0.14em] text-gold uppercase">Maps</p>
-                <p>{row.maps}</p>
-              </div>
-            ))}
+          <div className="mt-4">
+            <GearCards
+              cards={guide.gearCards}
+              totals={guide.gearTotals}
+              spec={{ weaponNoun: guide.weaponNoun, defence: guide.defence }}
+            />
           </div>
           <h2 className="mt-8 font-display text-2xl">At level {level}</h2>
           <p className="mt-1 text-muted">{activeBand.gem}</p>
