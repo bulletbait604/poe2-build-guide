@@ -3,6 +3,12 @@ import { readFileSync } from "node:fs";
 const campaign = readFileSync(new URL("../src/content/campaign.ts", import.meta.url), "utf8");
 const gems = JSON.parse(readFileSync(new URL("../src/content/gemArt.json", import.meta.url), "utf8"));
 const tree = JSON.parse(readFileSync(new URL("../src/content/treeRoutes.json", import.meta.url), "utf8"));
+const armor = readFileSync(new URL("../src/content/armorPlan.ts", import.meta.url), "utf8");
+const loadouts = readFileSync(new URL("../src/content/loadouts.ts", import.meta.url), "utf8");
+const specs = [
+  readFileSync(new URL("../src/content/buildSpecs.ts", import.meta.url), "utf8"),
+  readFileSync(new URL("../src/content/extraSpecs.ts", import.meta.url), "utf8"),
+].join("\n");
 
 const required = [
   "Balbala, the Traitor",
@@ -66,6 +72,26 @@ if (!notables("warrior").includes("Brutal")) failures.push("warrior route is mis
 if (!notables("monk").includes("Flow Like Water")) failures.push("monk route is missing Flow Like Water");
 if (tree.patch !== "0.5.5") failures.push("tree patch is not 0.5.5");
 if (!String(tree.source).includes("grindinggear/poe2-skilltree-export")) failures.push("tree source is not the official export");
+
+if (!armor.includes("75% fire, 75% cold, and 75% lightning")) failures.push("armor plan is missing the 75% cap");
+if (!loadouts.includes("Rapid Attacks II")) failures.push("loadouts are missing Rapid Attacks II");
+if (!loadouts.includes("lightning-arrow-deadeye")) failures.push("loadouts are missing the Lightning Arrow source");
+if (!loadouts.includes("https://mobalytics.gg/poe-2/builds/ice-shot-deadeye")) {
+  failures.push("loadouts are missing the Mobalytics Ice Shot source");
+}
+if (!loadouts.includes("https://poe.ninja/poe2/builds")) failures.push("loadouts are missing poe.ninja");
+
+const counts = new Map();
+for (const match of specs.matchAll(/ascendancyId: "([^"]+)"/g)) {
+  counts.set(match[1], (counts.get(match[1]) ?? 0) + 1);
+}
+if (counts.size < 22) failures.push(`expected 22 ascendancies, found ${counts.size}`);
+for (const [id, count] of counts) {
+  if (count < 5) failures.push(`${id} has ${count} builds, expected at least 5`);
+}
+const ids = [...specs.matchAll(/id: "([^"]+)"/g)].map((match) => match[1]);
+const dupes = ids.filter((id, index) => ids.indexOf(id) !== index);
+if (dupes.length) failures.push(`duplicate build ids: ${dupes.join(", ")}`);
 
 if (failures.length) {
   console.error(failures.join("\n"));

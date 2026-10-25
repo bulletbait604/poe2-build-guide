@@ -1,7 +1,7 @@
 "use client";
 
 import { GearBoard } from "@/components/GearBoard";
-import { GemBar } from "@/components/GemBar";
+import { GemLinks } from "@/components/GemLinks";
 import { ItemChip } from "@/components/ItemChip";
 import { TreeMap } from "@/components/TreeMap";
 import type { GameClass } from "@/content/classes";
@@ -27,6 +27,9 @@ const walkOrder = [
   "endgame",
 ];
 
+const tabs = ["Overview", "Leveling", "Skills", "Gear", "Passive", "Play"] as const;
+type Tab = (typeof tabs)[number];
+
 function bandsFor(id: string, bands: Guide["levelBands"]) {
   if (id === "act-1") return bands.filter((band) => band.to <= 14);
   if (id === "act-2") return bands.filter((band) => band.from >= 15 && band.to <= 29);
@@ -48,6 +51,7 @@ export function GuideView({
   initialLevel: number;
 }) {
   const [level, setLevel] = useState(initialLevel);
+  const [tab, setTab] = useState<Tab>("Overview");
   const [prices, setPrices] = useState<Record<string, string>>({});
 
   useEffect(() => {
@@ -93,6 +97,7 @@ export function GuideView({
   const phases = walkOrder
     .map((id) => guide.phases.find((phase) => phase.id === id))
     .filter((phase): phase is Guide["phases"][number] => Boolean(phase));
+  const loadout = guide.loadout;
 
   function priceFor(name: string) {
     return prices[name.toLowerCase()] ?? null;
@@ -122,16 +127,7 @@ export function GuideView({
         </div>
       </div>
 
-      <p className="max-w-3xl text-lg leading-8 text-muted">{guide.summary}</p>
-      <GemBar
-        skill={guide.skill}
-        helper={guide.helper}
-        support={guide.support}
-        damage={guide.damage}
-        when={activeBand.title}
-      />
-
-      <div className="mt-8 flex flex-wrap items-end gap-6 border border-line bg-panel p-4">
+      <div className="flex flex-wrap items-end gap-6 border border-line bg-panel p-4">
         <label className="text-sm">
           <span className="block text-muted">Your level</span>
           <input
@@ -157,93 +153,221 @@ export function GuideView({
             onChange={(event) => setLevel(Number(event.target.value))}
           />
         </label>
-        <p className="text-sm text-gold">
-          You are on {activeBand.title}. Follow the highlighted chapter, then the upgrade card for this level.
-        </p>
+        <p className="text-sm text-gold">You are on {activeBand.title}.</p>
       </div>
 
-      <TreeMap routeKey={guide.treeKey} owned={owned} />
-
-      <nav className="mt-4 flex flex-wrap gap-2">
-        {phases.map((phase) => (
-          <a key={phase.id} href={`#${phase.id}`} className="border border-line px-3 py-2 text-sm text-parchment hover:border-gold">
-            {phase.title.replace(/ ·.*/, "")}
-          </a>
+      <div id="guide-tabs" className="mt-4 flex flex-wrap gap-2">
+        {tabs.map((name) => (
+          <button
+            key={name}
+            type="button"
+            onClick={() => setTab(name)}
+            className={`border px-3 py-2 text-sm ${tab === name ? "border-gold text-gold" : "border-line text-parchment hover:border-gold"}`}
+          >
+            {name}
+          </button>
         ))}
-      </nav>
-
-      <div className="mt-6 space-y-8">
-        {phases.map((phase) => {
-          const here =
-            level >= phase.levelMin &&
-            level <= phase.levelMax &&
-            !phases.some(
-              (other) =>
-                other.levelMin > phase.levelMin &&
-                level >= other.levelMin &&
-                level <= other.levelMax,
-            );
-          const upgrades = bandsFor(phase.id, guide.levelBands);
-          return (
-            <section key={phase.id} id={phase.id} className={`border p-4 ${here ? "border-gold bg-panel" : "border-line"}`}>
-              <h2 className="font-display text-3xl">
-                {phase.title}
-                <span className="ml-3 text-sm text-muted">{phase.levelRange}</span>
-                {here ? <span className="ml-3 text-sm tracking-[0.14em] text-ember uppercase">You are here</span> : null}
-              </h2>
-              <ol className="mt-4 space-y-4">
-                {phase.steps.map((step, index) => (
-                  <li key={step.title} className="grid grid-cols-[2rem_minmax(0,1fr)] gap-3">
-                    <span className="font-display text-gold">{index + 1}</span>
-                    <div>
-                      <h3 className="text-lg text-parchment">{step.title}</h3>
-                      <p className="mt-1 leading-7 text-muted">{step.detail}</p>
-                    </div>
-                  </li>
-                ))}
-              </ol>
-              {upgrades.length > 0 ? (
-                <div className="mt-6 space-y-3">
-                  <h3 className="font-display text-xl text-gold">Upgrades every 5 levels</h3>
-                  {upgrades.map((band) => {
-                    const current = band.from === activeBand.from;
-                    return (
-                      <div key={band.title} className={`border p-3 ${current ? "border-gold" : "border-line"}`}>
-                        <p className="font-display text-lg">
-                          {band.title}
-                          {current ? <span className="ml-3 text-sm tracking-[0.14em] text-ember uppercase">Do this now</span> : null}
-                        </p>
-                        <p className="mt-2 leading-6">{band.gem}</p>
-                        <div className="mt-3 border border-line bg-ink/40 p-3">
-                          <p className="text-xs tracking-[0.16em] text-gold uppercase">Passive points</p>
-                          <p className="mt-2 leading-6">{band.pointsIntro}</p>
-                          <ol className="mt-2 list-decimal space-y-1 pl-5 leading-6">
-                            {band.points.map((point, index) => (
-                              <li key={`${band.title}-${index}`}>{point}</li>
-                            ))}
-                          </ol>
-                          {band.questPoints.length > 0 ? (
-                            <div className="mt-3 space-y-2 border-t border-line pt-3">
-                              <p className="text-xs tracking-[0.16em] text-gold uppercase">Quest points</p>
-                              {band.questPoints.map((quest) => (
-                                <p key={quest} className="leading-6">
-                                  {quest}
-                                </p>
-                              ))}
-                            </div>
-                          ) : null}
-                        </div>
-                        <GearBoard lines={band.armor} weaponNoun={guide.weaponNoun} defence={guide.defence} />
-                        <p className="mt-3 text-sm leading-6 text-muted">{band.ignore}</p>
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : null}
-            </section>
-          );
-        })}
       </div>
+
+      {tab === "Overview" ? (
+        <section id="overview" className="mt-6 max-w-3xl">
+          <p className="text-lg leading-8 text-parchment">{loadout.overview}</p>
+          <h2 className="mt-8 font-display text-3xl">Numbers</h2>
+          <ul className="mt-3 space-y-2">
+            {loadout.numbers.map((line) => (
+              <li key={line} className="border border-line bg-panel px-3 py-2 leading-7">
+                {line}
+              </li>
+            ))}
+          </ul>
+          <h2 className="mt-8 font-display text-3xl">Ascendancy order</h2>
+          <ol className="mt-3 list-decimal space-y-2 pl-5 leading-7">
+            {loadout.ascendancy.map((step) => (
+              <li key={step}>{step}</li>
+            ))}
+          </ol>
+          <h2 className="mt-8 font-display text-3xl">First buttons</h2>
+          <ol className="mt-3 list-decimal space-y-2 pl-5 leading-7">
+            {loadout.rotation.slice(0, 4).map((step) => (
+              <li key={step}>{step}</li>
+            ))}
+          </ol>
+          <p className="mt-4 text-sm leading-6 text-muted">
+            Skills, gear, the passive path, and the full rotation are the other tabs. The wording here is original.
+            The links at the bottom are the pages the layout follows.
+          </p>
+        </section>
+      ) : null}
+
+      {tab === "Skills" ? (
+        <section id="skills" className="mt-6">
+          <p className="max-w-3xl leading-7 text-muted">
+            Each row is one skill. The icons to the right are the supports linked into it. A gem with no supports is
+            still on the bar. It is listed because the source page names it, and that page does not print a support
+            under it.
+          </p>
+          <div className="mt-4">
+            <GemLinks groups={loadout.groups} damage={guide.damage} />
+          </div>
+        </section>
+      ) : null}
+
+      {tab === "Gear" ? (
+        <section id="gear" className="mt-6">
+          <p className="max-w-3xl leading-7 text-muted">
+            Three stages. Early is Acts 1–2. Late is Acts 3–4 and the interludes. Maps are the cap. The paper doll
+            under the table is the piece list for the level you set above.
+          </p>
+          <div className="mt-4 hidden overflow-x-auto border border-line sm:block">
+            <table className="w-full min-w-[44rem] text-left text-sm">
+              <thead className="bg-panel text-gold">
+                <tr>
+                  <th className="p-3 font-display text-base">Slot</th>
+                  <th className="p-3 font-display text-base">Acts 1–2</th>
+                  <th className="p-3 font-display text-base">Acts 3–4</th>
+                  <th className="p-3 font-display text-base">Maps</th>
+                </tr>
+              </thead>
+              <tbody>
+                {loadout.gear.map((row) => (
+                  <tr key={row.slot} className="border-t border-line align-top">
+                    <th className="p-3 font-display text-base text-parchment">{row.slot}</th>
+                    <td className="p-3 leading-6">{row.early}</td>
+                    <td className="p-3 leading-6">{row.late}</td>
+                    <td className="p-3 leading-6">{row.maps}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="mt-4 space-y-3 sm:hidden">
+            {loadout.gear.map((row) => (
+              <div key={row.slot} className="border border-line p-3">
+                <h3 className="font-display text-xl">{row.slot}</h3>
+                <p className="mt-2 text-xs tracking-[0.14em] text-gold uppercase">Acts 1–2</p>
+                <p className="mt-1 leading-6">{row.early}</p>
+                <p className="mt-2 text-xs tracking-[0.14em] text-gold uppercase">Acts 3–4</p>
+                <p className="mt-1 leading-6">{row.late}</p>
+                <p className="mt-2 text-xs tracking-[0.14em] text-gold uppercase">Maps</p>
+                <p className="mt-1 leading-6">{row.maps}</p>
+              </div>
+            ))}
+          </div>
+          <h2 className="mt-8 font-display text-3xl">At level {level}</h2>
+          <p className="mt-2 leading-7">{activeBand.gem}</p>
+          <GearBoard lines={activeBand.armor} weaponNoun={guide.weaponNoun} defence={guide.defence} />
+        </section>
+      ) : null}
+
+      {tab === "Passive" ? (
+        <section id="passive" className="mt-6">
+          <TreeMap routeKey={guide.treeKey} owned={owned} />
+          <div className="mt-4 border border-line bg-ink/40 p-3">
+            <p className="text-xs tracking-[0.16em] text-gold uppercase">Points for {activeBand.title}</p>
+            <p className="mt-2 leading-6">{activeBand.pointsIntro}</p>
+            <ol className="mt-2 list-decimal space-y-1 pl-5 leading-6">
+              {activeBand.points.map((point, index) => (
+                <li key={`${activeBand.title}-${index}`}>{point}</li>
+              ))}
+            </ol>
+            {activeBand.questPoints.length > 0 ? (
+              <div className="mt-3 space-y-2 border-t border-line pt-3">
+                <p className="text-xs tracking-[0.16em] text-gold uppercase">Quest points</p>
+                {activeBand.questPoints.map((quest) => (
+                  <p key={quest} className="leading-6">
+                    {quest}
+                  </p>
+                ))}
+              </div>
+            ) : null}
+          </div>
+        </section>
+      ) : null}
+
+      {tab === "Play" ? (
+        <section id="play" className="mt-6 max-w-3xl">
+          <h2 className="font-display text-3xl">How it runs</h2>
+          <ol className="mt-4 list-decimal space-y-3 pl-5 leading-7">
+            {loadout.rotation.map((step) => (
+              <li key={step}>{step}</li>
+            ))}
+          </ol>
+        </section>
+      ) : null}
+
+      {tab === "Leveling" ? (
+        <section id="leveling" className="mt-6">
+          <h2 className="font-display text-3xl">Level by level</h2>
+          <div className="mt-4 space-y-3">
+            {loadout.leveling.map((step) => (
+              <div key={step.levels} className="border border-line p-3">
+                <p className="font-display text-xl text-gold">{step.levels}</p>
+                <p className="mt-2 leading-7">{step.text}</p>
+              </div>
+            ))}
+          </div>
+          <nav className="mt-6 flex flex-wrap gap-2">
+            {phases.map((phase) => (
+              <a key={phase.id} href={`#${phase.id}`} className="border border-line px-3 py-2 text-sm text-parchment hover:border-gold">
+                {phase.title.replace(/ ·.*/, "")}
+              </a>
+            ))}
+          </nav>
+          <div className="mt-6 space-y-8">
+            {phases.map((phase) => {
+              const here =
+                level >= phase.levelMin &&
+                level <= phase.levelMax &&
+                !phases.some(
+                  (other) =>
+                    other.levelMin > phase.levelMin &&
+                    level >= other.levelMin &&
+                    level <= other.levelMax,
+                );
+              const upgrades = bandsFor(phase.id, guide.levelBands);
+              return (
+                <section key={phase.id} id={phase.id} className={`border p-4 ${here ? "border-gold bg-panel" : "border-line"}`}>
+                  <h2 className="font-display text-3xl">
+                    {phase.title}
+                    <span className="ml-3 text-sm text-muted">{phase.levelRange}</span>
+                    {here ? <span className="ml-3 text-sm tracking-[0.14em] text-ember uppercase">You are here</span> : null}
+                  </h2>
+                  <ol className="mt-4 space-y-4">
+                    {phase.steps.map((step, index) => (
+                      <li key={step.title} className="grid grid-cols-[2rem_minmax(0,1fr)] gap-3">
+                        <span className="font-display text-gold">{index + 1}</span>
+                        <div>
+                          <h3 className="text-lg text-parchment">{step.title}</h3>
+                          <p className="mt-1 leading-7 text-muted">{step.detail}</p>
+                        </div>
+                      </li>
+                    ))}
+                  </ol>
+                  {upgrades.length > 0 ? (
+                    <div className="mt-6 space-y-3">
+                      <h3 className="font-display text-xl text-gold">Upgrades every 5 levels</h3>
+                      {upgrades.map((band) => {
+                        const current = band.from === activeBand.from;
+                        return (
+                          <div key={band.title} className={`border p-3 ${current ? "border-gold" : "border-line"}`}>
+                            <p className="font-display text-lg">
+                              {band.title}
+                              {current ? <span className="ml-3 text-sm tracking-[0.14em] text-ember uppercase">Do this now</span> : null}
+                            </p>
+                            <p className="mt-2 leading-6">{band.gem}</p>
+                            <GearBoard lines={band.armor} weaponNoun={guide.weaponNoun} defence={guide.defence} />
+                            <p className="mt-3 text-sm leading-6 text-muted">{band.ignore}</p>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : null}
+                </section>
+              );
+            })}
+          </div>
+        </section>
+      ) : null}
 
       <section className="mt-10">
         <h2 className="font-display text-3xl">Unique suggestions</h2>
@@ -265,10 +389,11 @@ export function GuideView({
       </section>
 
       <section className="mt-10 border border-line p-4">
-        <h2 className="font-display text-2xl">Tree and longer write-ups</h2>
+        <h2 className="font-display text-2xl">Sources</h2>
         <p className="mt-2 leading-7 text-muted">
-          The map above is this build&apos;s path from the class start, using the 0.5.5 tree positions. One level point
-          arrives at level 2 and then every level. Quest rewards are weapon-set points, spent on that same branch.
+          Maxroll is the long-form guide, with a skill panel, a gear table, and a rotation. Mobalytics is the second
+          written source, used where it prints equipment numbers. poe.ninja is the public ladder, for what people are
+          actually playing. The sentences on this page are not copied from those sites.
         </p>
         <ul className="mt-3 flex flex-wrap gap-4 text-sm">
           <li>

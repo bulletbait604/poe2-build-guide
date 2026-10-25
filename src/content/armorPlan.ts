@@ -12,8 +12,26 @@ function lines(entries: Array<[string, string]>): ArmorLine[] {
   return entries.map(([slot, lookFor]) => ({ slot, lookFor }));
 }
 
+function resist(to: number) {
+  if (to <= 9) return "One resistance, any amount, on a ring or the amulet.";
+  if (to <= 14) return "About 20% fire, 20% cold, and 20% lightning, split across the rings so each ring covers a different element.";
+  if (to <= 29) return "30–40% fire, 30–40% cold, and 30–40% lightning. Raise whichever element is lowest.";
+  if (to <= 49) return "Each of fire, cold, and lightning over 40%. Chaos resistance is a bonus, not a number you chase to 75%.";
+  if (to <= 59) return "Push fire, cold, and lightning toward 75% before the interlude penalty. Recap whatever falls.";
+  return "75% fire, 75% cold, and 75% lightning. Chaos resistance of 30–50% is the maps target. 75% chaos is not required.";
+}
+
+function boots(to: number) {
+  if (to <= 4) {
+    return "Movement speed if a pair has it. Otherwise any life. Buy movement speed from the Act 1 vendor as soon as a pair is listed.";
+  }
+  return "Movement speed is mandatory. A pair with 0% movement speed is not an upgrade. Add life, then one resistance, on those same boots.";
+}
+
 export function armorForBand(input: ArmorInput, to: number): ArmorLine[] {
   const weapon = `${input.weaponStat} A white ${input.weaponNoun} that hits harder beats a unique you are waiting on.`;
+  const jewels = resist(to);
+  const bootLine = boots(to);
 
   if (to <= 4) {
     return lines([
@@ -21,8 +39,8 @@ export function armorForBand(input: ArmorInput, to: number): ArmorLine[] {
       ["Body", `Any life. ${input.defence} is a bonus. An empty chest is the thing to fix.`],
       ["Helmet", "Life, or one resistance. Skip a helmet that has neither."],
       ["Gloves", "Life, or leave the slot. Speed does not matter yet."],
-      ["Boots", "Movement speed if a pair has it. Otherwise any life."],
-      ["Jewelry", "One resistance on a ring or the amulet. Do not shop a full set."],
+      ["Boots", bootLine],
+      ["Jewelry", jewels],
     ]);
   }
 
@@ -32,8 +50,8 @@ export function armorForBand(input: ArmorInput, to: number): ArmorLine[] {
       ["Body", `Life, then ${input.defence}.`],
       ["Helmet", "Life or a resistance."],
       ["Gloves", `Life. ${input.speed} only if the pair already has life.`],
-      ["Boots", "Movement speed. Life on the same pair if you can find both."],
-      ["Jewelry", "A second resistance, on a different piece from the first."],
+      ["Boots", bootLine],
+      ["Jewelry", jewels],
     ]);
   }
 
@@ -43,8 +61,8 @@ export function armorForBand(input: ArmorInput, to: number): ArmorLine[] {
       ["Body", `Life is the first number, then ${input.defence}.`],
       ["Helmet", "Life and one resistance."],
       ["Gloves", `Life and ${input.speed}.`],
-      ["Boots", "Movement speed and life."],
-      ["Jewelry", "About 20% of each element is enough. Attributes only if a gem is red."],
+      ["Boots", bootLine],
+      ["Jewelry", jewels],
     ]);
   }
 
@@ -54,8 +72,8 @@ export function armorForBand(input: ArmorInput, to: number): ArmorLine[] {
       ["Body", `A higher life roll. Keep ${input.defence} on the chest.`],
       ["Helmet", "Life and a resistance. Replace a helmet that has neither."],
       ["Gloves", `Life and ${input.speed}.`],
-      ["Boots", "Movement speed, life, and any resistance."],
-      ["Jewelry", "A different resistance on each piece. Aim near 30% of each element."],
+      ["Boots", bootLine],
+      ["Jewelry", jewels],
     ]);
   }
 
@@ -65,8 +83,8 @@ export function armorForBand(input: ArmorInput, to: number): ArmorLine[] {
       ["Body", `Life, then ${input.defence}.`],
       ["Helmet", `Life, ${input.defence}, and a resistance.`],
       ["Gloves", `Life and ${input.speed}.`],
-      ["Boots", "Movement speed and life. Do not drop movement speed for a small life roll."],
-      ["Jewelry", "Raise whichever resistance is lowest."],
+      ["Boots", bootLine],
+      ["Jewelry", jewels],
     ]);
   }
 
@@ -76,8 +94,8 @@ export function armorForBand(input: ArmorInput, to: number): ArmorLine[] {
       ["Body", `The highest life you have, with ${input.defence}.`],
       ["Helmet", "Life and a resistance. Energy shield, armour, or evasion on top is welcome."],
       ["Gloves", `Life and ${input.speed}. A damage roll is extra, not required.`],
-      ["Boots", "Movement speed, life, and one resistance."],
-      ["Jewelry", "Near 40% of each element. Life on the belt or amulet if resists are already fine."],
+      ["Boots", bootLine],
+      ["Jewelry", `${jewels} Life on the belt or amulet once the resistances are in that range.`],
     ]);
   }
 
@@ -87,8 +105,8 @@ export function armorForBand(input: ArmorInput, to: number): ArmorLine[] {
       ["Body", `${input.defence} and life on the chest. This is the piece that keeps you up.`],
       ["Helmet", `Life and ${input.defence}.`],
       ["Gloves", `Life and ${input.speed}.`],
-      ["Boots", "Movement speed and life."],
-      ["Jewelry", `Get ${input.defence} on three pieces in total, not one fancy slot.`],
+      ["Boots", bootLine],
+      ["Jewelry", `${jewels} Get ${input.defence} on three pieces in total, not one fancy slot.`],
     ]);
   }
 
@@ -98,8 +116,8 @@ export function armorForBand(input: ArmorInput, to: number): ArmorLine[] {
       ["Body", `More life. ${input.defence} stays.`],
       ["Helmet", "Life, a resistance, and some defence. Replace a helmet with none of those."],
       ["Gloves", `Life and ${input.speed}.`],
-      ["Boots", "If the boots have no movement speed, replace them."],
-      ["Jewelry", "The lowest resistance moves up. Do not craft. A better drop is the upgrade."],
+      ["Boots", bootLine],
+      ["Jewelry", jewels],
     ]);
   }
 
@@ -109,8 +127,8 @@ export function armorForBand(input: ArmorInput, to: number): ArmorLine[] {
       ["Body", `Life and ${input.defence}.`],
       ["Helmet", "Life and a resistance."],
       ["Gloves", `Life and ${input.speed}.`],
-      ["Boots", "Movement speed, life, and a resistance."],
-      ["Jewelry", "Each element over 40% if you can. Chaos resistance is a bonus."],
+      ["Boots", bootLine],
+      ["Jewelry", jewels],
     ]);
   }
 
@@ -120,8 +138,8 @@ export function armorForBand(input: ArmorInput, to: number): ArmorLine[] {
       ["Body", `Life first. ${input.defence} second.`],
       ["Helmet", "Life and a resistance."],
       ["Gloves", `Life and ${input.speed}.`],
-      ["Boots", "Movement speed and life."],
-      ["Jewelry", "Top up the resistance that the last island punished."],
+      ["Boots", bootLine],
+      ["Jewelry", jewels],
     ]);
   }
 
@@ -131,8 +149,8 @@ export function armorForBand(input: ArmorInput, to: number): ArmorLine[] {
       ["Body", `Life and ${input.defence}, because resistances are about to fall.`],
       ["Helmet", "Life and as much resistance as the piece has."],
       ["Gloves", `Life. ${input.speed} still matters.`],
-      ["Boots", "Movement speed, life, and a resistance."],
-      ["Jewelry", "Push each elemental resistance as high as you can before the drop."],
+      ["Boots", bootLine],
+      ["Jewelry", jewels],
     ]);
   }
 
@@ -142,8 +160,8 @@ export function armorForBand(input: ArmorInput, to: number): ArmorLine[] {
       ["Body", `Life on the chest. ${input.defence} on it.`],
       ["Helmet", "Life and a resistance. Recap whatever fell under the cap."],
       ["Gloves", `Life and ${input.speed}.`],
-      ["Boots", "Movement speed stays. Add life if the pair is short."],
-      ["Jewelry", "Fix the lowest resistance, then the next. A charm for the ailment that killed you is enough."],
+      ["Boots", bootLine],
+      ["Jewelry", `${jewels} A charm for the ailment that killed you is enough.`],
     ]);
   }
 
@@ -153,8 +171,8 @@ export function armorForBand(input: ArmorInput, to: number): ArmorLine[] {
       ["Body", `Life and ${input.defence} on the chest.`],
       ["Helmet", `Life, ${input.defence}, and a resistance.`],
       ["Gloves", `Life and ${input.speed}.`],
-      ["Boots", "Movement speed, life, and a resistance."],
-      ["Jewelry", "Resistances toward the cap, then life."],
+      ["Boots", bootLine],
+      ["Jewelry", jewels],
     ]);
   }
 
@@ -163,7 +181,7 @@ export function armorForBand(input: ArmorInput, to: number): ArmorLine[] {
     ["Body", `Life and ${input.defence}. A unique body is optional and listed below.`],
     ["Helmet", `Life, ${input.defence}, and a resistance you still need.`],
     ["Gloves", `Life, ${input.speed}, and then ${input.damage}.`],
-    ["Boots", "Movement speed, life, and a resistance. Do not give up movement speed."],
-    ["Jewelry", `Resistances at the cap, then life, then ${input.damage}.`],
+    ["Boots", bootLine],
+    ["Jewelry", `${jewels} Then life, then ${input.damage}.`],
   ]);
 }

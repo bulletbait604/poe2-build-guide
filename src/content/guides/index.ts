@@ -1,8 +1,9 @@
 import { buildSpecs } from "@/content/buildSpecs";
 import { composeGuide } from "@/content/composeGuide";
+import { extraSpecs } from "@/content/extraSpecs";
 import type { Guide } from "@/lib/types";
 
-export const guides: Guide[] = buildSpecs.map(composeGuide);
+export const guides: Guide[] = [...buildSpecs, ...extraSpecs].map(composeGuide);
 
 export function getGuide(id: string) {
   return guides.find((guide) => guide.id === id) ?? null;

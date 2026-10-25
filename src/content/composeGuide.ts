@@ -1,8 +1,9 @@
 import { armorForBand } from "@/content/armorPlan";
 import type { BuildSpec } from "@/content/buildSpecs";
 import { storyPhases } from "@/content/campaign";
+import { loadoutFor } from "@/content/loadouts";
 import { pointsForBand, routeKeyFor } from "@/content/passivePlan";
-import type { Guide, LevelBand } from "@/lib/types";
+import type { Guide, LevelBand, Loadout } from "@/lib/types";
 
 const TREE = "https://poe2ref.com/passive-tree";
 
@@ -15,6 +16,8 @@ const LINKS = [
   { label: "Campaign rewards", url: "https://maxroll.gg/poe2/getting-started/permanent-stats-from-campaign" },
   { label: "Campaign walkthrough", url: "https://maxroll.gg/poe2/getting-started/path-of-exile-2-campaign-guide" },
   { label: "0.5 checklist", url: "https://mobalytics.gg/poe-2/guides/0-5-campaign-checklist-stats-rewards-skillpoints-and-more" },
+  { label: "League-starter tier list", url: "https://maxroll.gg/poe2/tierlists/league-starter-build-tier-list" },
+  { label: "Ascendancy tier list", url: "https://maxroll.gg/poe2/tierlists/league-starter-ascendancy-tier-list" },
 ];
 
 const RANGES: Array<[number, number, string]> = [
@@ -34,7 +37,7 @@ const RANGES: Array<[number, number, string]> = [
   [66, 100, "Late maps"],
 ];
 
-function buildBands(spec: BuildSpec): LevelBand[] {
+function buildBands(spec: BuildSpec, loadout: Loadout): LevelBand[] {
   return RANGES.map(([from, to, title]) => {
     const armor = armorForBand(spec, to);
     const equip = armor.map((line) => `${line.slot}: ${line.lookFor}`).join(" ");
@@ -45,7 +48,7 @@ function buildBands(spec: BuildSpec): LevelBand[] {
       title,
       equip,
       armor,
-      gem: gemLine(spec, to),
+      gem: gemLine(spec, to, loadout),
       ignore: ignoreLine(spec, to),
       pointsIntro: plan.intro,
       points: plan.points,
@@ -54,15 +57,14 @@ function buildBands(spec: BuildSpec): LevelBand[] {
   });
 }
 
-function gemLine(spec: BuildSpec, to: number) {
-  if (to <= 4) return `Put ${spec.skill} on the bar as soon as the gem drops. ${spec.helper} waits for a second skill gem.`;
-  if (to <= 14) return `${spec.skill} stays the main skill. Add ${spec.helper} and use it the way the pack step describes.`;
-  if (to <= 24) {
-    return `${spec.ascendancyPick} Socket ${spec.support} only if the gem says it supports ${spec.skill}.`;
-  }
-  if (to <= 44) return `Keep ${spec.skill} and ${spec.helper}. A higher-level gem beats a new skill name.`;
-  if (to <= 59) return `${spec.skill} clears. ${spec.helper} is for packs and bosses, not a new combo.`;
-  return `${spec.skill} is still the skill. Add one support at a time. A new gem is a different build.`;
+function gemLine(spec: BuildSpec, to: number, loadout: Loadout) {
+  const main = loadout.groups.flatMap((group) => group.skills).find((skill) => skill.name === spec.skill);
+  const supports = main?.supports ?? [];
+  const first = supports[0];
+  if (to <= 4) return `Put ${spec.skill} on the bar as soon as the gem drops. ${spec.helper} is the second button.`;
+  if (!first) return `${spec.skill} stays the main skill. ${spec.helper} is the second button. The skill tab lists every gem this route names.`;
+  if (to <= 14) return `${spec.skill} stays the main skill. First support: ${first}.`;
+  return `Link ${supports.join(", ")} into ${spec.skill}. Add one of those supports at a time. The skill tab is the full layout.`;
 }
 
 function ignoreLine(spec: BuildSpec, to: number) {
@@ -75,6 +77,14 @@ function ignoreLine(spec: BuildSpec, to: number) {
 }
 
 export function composeGuide(spec: BuildSpec): Guide {
+  const loadout = loadoutFor(spec);
+  const seen = new Set<string>();
+  const links = [];
+  for (const link of [...loadout.sources, ...LINKS]) {
+    if (seen.has(link.url)) continue;
+    seen.add(link.url);
+    links.push(link);
+  }
   return {
     id: spec.id,
     patch: "0.5.5",
@@ -88,13 +98,14 @@ export function composeGuide(spec: BuildSpec): Guide {
     damage: spec.damage,
     summary: spec.summary,
     fantasy: spec.fantasy,
-    links: LINKS,
+    links,
     treeUrl: TREE,
     treeKey: routeKeyFor(spec),
     weaponNoun: spec.weaponNoun,
     defence: spec.defence,
     uniques: spec.uniques,
-    levelBands: buildBands(spec),
+    levelBands: buildBands(spec, loadout),
     phases: storyPhases(spec),
+    loadout,
   };
 }

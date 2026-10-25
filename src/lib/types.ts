@@ -53,6 +53,40 @@ export type GuideLink = {
   url: string;
 };
 
+export type LinkedGem = {
+  name: string;
+  supports: string[];
+};
+
+export type GemGroup = {
+  label: string;
+  detail: string;
+  skills: LinkedGem[];
+};
+
+export type GearStage = {
+  slot: string;
+  early: string;
+  late: string;
+  maps: string;
+};
+
+export type LevelStep = {
+  levels: string;
+  text: string;
+};
+
+export type Loadout = {
+  overview: string;
+  numbers: string[];
+  ascendancy: string[];
+  groups: GemGroup[];
+  rotation: string[];
+  leveling: LevelStep[];
+  gear: GearStage[];
+  sources: GuideLink[];
+};
+
 export type Guide = {
   id: string;
   patch: "0.5.5";
@@ -74,6 +108,7 @@ export type Guide = {
   uniques: UniqueSuggestion[];
   levelBands: LevelBand[];
   phases: GuidePhase[];
+  loadout: Loadout;
 };
 
 export type PoeCharacter = {
