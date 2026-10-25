@@ -68,6 +68,9 @@ export type Guide = {
   fantasy: string;
   links: GuideLink[];
   treeUrl: string;
+  treeKey: string;
+  weaponNoun: string;
+  defence: string;
   uniques: UniqueSuggestion[];
   levelBands: LevelBand[];
   phases: GuidePhase[];

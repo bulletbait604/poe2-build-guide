@@ -1,7 +1,7 @@
 import { armorForBand } from "@/content/armorPlan";
 import type { BuildSpec } from "@/content/buildSpecs";
 import { storyPhases } from "@/content/campaign";
-import { pointsForBand } from "@/content/passivePlan";
+import { pointsForBand, routeKeyFor } from "@/content/passivePlan";
 import type { Guide, LevelBand } from "@/lib/types";
 
 const TREE = "https://poe2ref.com/passive-tree";
@@ -12,6 +12,9 @@ const LINKS = [
   { label: "poe.ninja builds", url: "https://poe.ninja/poe2/builds" },
   { label: "Maxroll guides", url: "https://maxroll.gg/poe2/build-guides" },
   { label: "Mobalytics builds", url: "https://mobalytics.gg/poe-2/builds" },
+  { label: "Campaign rewards", url: "https://maxroll.gg/poe2/getting-started/permanent-stats-from-campaign" },
+  { label: "Campaign walkthrough", url: "https://maxroll.gg/poe2/getting-started/path-of-exile-2-campaign-guide" },
+  { label: "0.5 checklist", url: "https://mobalytics.gg/poe-2/guides/0-5-campaign-checklist-stats-rewards-skillpoints-and-more" },
 ];
 
 const RANGES: Array<[number, number, string]> = [
@@ -75,7 +78,7 @@ export function composeGuide(spec: BuildSpec): Guide {
   return {
     id: spec.id,
     patch: "0.5.5",
-    updated: "2026-10-24",
+    updated: "2026-10-25",
     classId: spec.classId,
     ascendancyId: spec.ascendancyId,
     name: spec.name,
@@ -87,6 +90,9 @@ export function composeGuide(spec: BuildSpec): Guide {
     fantasy: spec.fantasy,
     links: LINKS,
     treeUrl: TREE,
+    treeKey: routeKeyFor(spec),
+    weaponNoun: spec.weaponNoun,
+    defence: spec.defence,
     uniques: spec.uniques,
     levelBands: buildBands(spec),
     phases: storyPhases(spec),

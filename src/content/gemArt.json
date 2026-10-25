@@ -1,0 +1,402 @@
+{
+  "Acidic Concoction": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/RangerBrewConcoctionPoisonSkill.webp",
+    "listedAs": null
+  },
+  "Ancestral Spirits": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/BruteWarbringerDefenders.webp",
+    "listedAs": null
+  },
+  "Arc": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/SorceressArc.webp",
+    "listedAs": null
+  },
+  "Arcane Tempo": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/Support/FasterCastSupport.webp",
+    "listedAs": "Rapid Casting"
+  },
+  "Artillery Ballista": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/MercRipwireBallista.webp",
+    "listedAs": null
+  },
+  "Ball Lightning": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/SorceressBallLightning.webp",
+    "listedAs": null
+  },
+  "Blood Boil": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/PrimalistBloodBoilsSkillIcon.webp",
+    "listedAs": null
+  },
+  "Blood Hunt": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/HuntressBloodHuntSkillIcon.webp",
+    "listedAs": null
+  },
+  "Bone Cage": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/WitchBoneCage.webp",
+    "listedAs": null
+  },
+  "Boneshatter": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/BruteBoneshatter.webp",
+    "listedAs": null
+  },
+  "Bonestorm": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/WitchBoneStorm.webp",
+    "listedAs": null
+  },
+  "Charged Staff": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/MonkChargedStaff.webp",
+    "listedAs": null
+  },
+  "Comet": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/SorceressComet.webp",
+    "listedAs": null
+  },
+  "Concentrated Effect": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/Support/ConcentratedEffectSupport.webp",
+    "listedAs": "Concentrated Area"
+  },
+  "Contagion": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/WitchContagion.webp",
+    "listedAs": null
+  },
+  "Dark Effigy": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/WitchDarkEffigy.webp",
+    "listedAs": null
+  },
+  "Demon Form": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/WitchTransformDemon.webp",
+    "listedAs": null
+  },
+  "Detonate Dead": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/WitchDetonateDead.webp",
+    "listedAs": null
+  },
+  "Earthquake": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/BruteEarthquake.webp",
+    "listedAs": null
+  },
+  "Earthshatter": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/BruteEarthshatter.webp",
+    "listedAs": null
+  },
+  "Elemental Expression": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/MonkInvokerWildStrike.webp",
+    "listedAs": null
+  },
+  "Elemental Storm": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/SorceressElementalStorm.webp",
+    "listedAs": null
+  },
+  "Entangle": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/DruidEntangle.webp",
+    "listedAs": null
+  },
+  "Essence Drain": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/WitchEssenceDrain.webp",
+    "listedAs": null
+  },
+  "Explosive Concoction": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/RangerBrewConcoctionFireSkill.webp",
+    "listedAs": null
+  },
+  "Explosive Grenade": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/ExplosiveGrenade.webp",
+    "listedAs": null
+  },
+  "Explosive Spear": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/HuntressRemoteMineSpear.webp",
+    "listedAs": null
+  },
+  "Falling Thunder": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/MonkLightningStrike.webp",
+    "listedAs": null
+  },
+  "Fire Spell on Hit": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/SmithOfKitavaTriggerFireballsSkillIcon.webp",
+    "listedAs": null
+  },
+  "Fireball": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/SorceressGreaterFireball.webp",
+    "listedAs": null
+  },
+  "Flame Wall": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/SorceressFlameWall.webp",
+    "listedAs": null
+  },
+  "Flames of Chayula": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/MonkHandOfChayula.webp",
+    "listedAs": "Hand of Chayula"
+  },
+  "Flicker Strike": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/MonkFlickerStrikeTeleport.webp",
+    "listedAs": null
+  },
+  "Fragmentation Rounds": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/BurstShotPhysical.webp",
+    "listedAs": null
+  },
+  "Frost Bomb": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/SorceressFrostBomb.webp",
+    "listedAs": null
+  },
+  "Frost Wall": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/SorceressFrostWall.webp",
+    "listedAs": null
+  },
+  "Frostbolt": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/SorceressFrostbolt.webp",
+    "listedAs": null
+  },
+  "Furious Slam": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/DruidBearSlam.webp",
+    "listedAs": null
+  },
+  "Galvanic Shards": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/BurstShotStormblast.webp",
+    "listedAs": null
+  },
+  "Gas Arrow": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/RangerGasCloudSkill.webp",
+    "listedAs": null
+  },
+  "Glacial Lance": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/HuntressGlacialLance.webp",
+    "listedAs": null
+  },
+  "High Velocity Rounds": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/PowerShotPhysical.webp",
+    "listedAs": null
+  },
+  "Ice Nova": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/SorceressIceNova.webp",
+    "listedAs": null
+  },
+  "Ice Shot": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/RangerIceShot.webp",
+    "listedAs": null
+  },
+  "Ice Storm": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/IceStormSkillStaff.webp",
+    "listedAs": "Icestorm"
+  },
+  "Ice Strike": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/MonkComboAttack.webp",
+    "listedAs": null
+  },
+  "Into the Breach": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/MonkBreachWalk.webp",
+    "listedAs": null
+  },
+  "Kelari": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/SorceressSummonSandDjinn.webp",
+    "listedAs": "Kelari, the Tainted Sands"
+  },
+  "Killing Palm": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/MonkKillingPalm.webp",
+    "listedAs": null
+  },
+  "Lightning Arrow": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/RangerLightningArrow.webp",
+    "listedAs": null
+  },
+  "Lightning Rod": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/RangerLightningRodRainSkill.webp",
+    "listedAs": null
+  },
+  "Lightning Spear": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/HuntressStormSpear.webp",
+    "listedAs": null
+  },
+  "Lunar Assault": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/DruidLunarAssault.webp",
+    "listedAs": null
+  },
+  "Martial Tempo": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/Support/FasterAttack.webp",
+    "listedAs": "Rapid Attacks"
+  },
+  "Maul": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/DruidBearMaul.webp",
+    "listedAs": null
+  },
+  "Molten Blast": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/BruteMoltenBlast.webp",
+    "listedAs": null
+  },
+  "Navira's Fracturing": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/Rolldodge.webp",
+    "listedAs": null
+  },
+  "Oil Grenade": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/OilGrenade.webp",
+    "listedAs": null
+  },
+  "Orb of Storms": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/SorceressOrbOfStorms.webp",
+    "listedAs": null
+  },
+  "Perfect Strike": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/BrutePerfectStrike.webp",
+    "listedAs": null
+  },
+  "Permafrost Bolts": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/BurstShotPermafrost.webp",
+    "listedAs": null
+  },
+  "Poisonburst": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/RangerPoisonBurstArrow.webp",
+    "listedAs": "Poisonburst Arrow"
+  },
+  "Poisonburst Arrow": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/RangerPoisonBurstArrow.webp",
+    "listedAs": null
+  },
+  "Rain of Arrows": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/RangerRainOfArrowsSkill.webp",
+    "listedAs": null
+  },
+  "Rake": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/HuntressBloodHunt.webp",
+    "listedAs": null
+  },
+  "Ritual Sacrifice": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/PrimalistStabCorpseSkillIcon.webp",
+    "listedAs": null
+  },
+  "Rolling Slam": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/BruteDoubleSlam.webp",
+    "listedAs": null
+  },
+  "Ruzhan's Reckoning": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/Rolldodge.webp",
+    "listedAs": null
+  },
+  "Seismic Cry": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/BruteSeismicCry.webp",
+    "listedAs": null
+  },
+  "Shattering Palm": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/MonkShatteringPalm.webp",
+    "listedAs": null
+  },
+  "Shield Wall": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/BruteShieldWall.webp",
+    "listedAs": null
+  },
+  "Shred": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/DruidFrozenClaws.webp",
+    "listedAs": null
+  },
+  "Skeletal Sniper": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/WitchArcherSkeleton.webp",
+    "listedAs": null
+  },
+  "Snipe": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/RangerSnipeShotArrow.webp",
+    "listedAs": null
+  },
+  "Spark": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/SorceressSpark.webp",
+    "listedAs": null
+  },
+  "Spearfield": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/HuntressSpearField.webp",
+    "listedAs": null
+  },
+  "Storm Blast Bolts": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/SiegeCascadeStormblast.webp",
+    "listedAs": "Stormblast Bolts"
+  },
+  "Storm Lance": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/HuntressOverchargedSpear.webp",
+    "listedAs": null
+  },
+  "Storm Wave": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/MonkStormWave.webp",
+    "listedAs": null
+  },
+  "Sunder": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/BruteSunder.webp",
+    "listedAs": null
+  },
+  "Supercharged Slam": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/BruteSuperchargedSlam.webp",
+    "listedAs": null
+  },
+  "Supporting Fire": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/TacticianDeathFromAboveSkillIcon.webp",
+    "listedAs": null
+  },
+  "Temper Weapon": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/SmithOfKitavaImbueWeaponSkillIcon.webp",
+    "listedAs": null
+  },
+  "Tempest Bell": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/MonkTempestBell.webp",
+    "listedAs": null
+  },
+  "Tempest Flurry": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/MonkTempestFlurry.webp",
+    "listedAs": null
+  },
+  "Thunderstorm": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/LightningStormSkill.webp",
+    "listedAs": null
+  },
+  "Tornado": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/DruidTornado.webp",
+    "listedAs": null
+  },
+  "Twister": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/TwisterSkillIcon.webp",
+    "listedAs": null
+  },
+  "Unearth": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/WitchUnearth.webp",
+    "listedAs": null
+  },
+  "Volcanic Fissure": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/BruteVolcanicFissure.webp",
+    "listedAs": null
+  },
+  "Volcano": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/DruidVolcano.webp",
+    "listedAs": null
+  },
+  "Walking Calamity": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/DruidWalkingCalamity.webp",
+    "listedAs": null
+  },
+  "Whirling Assault": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/MonkWhirlingAssault.webp",
+    "listedAs": null
+  },
+  "Whirling Slash": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/HuntressWhirlingSlash.webp",
+    "listedAs": null
+  },
+  "Wild Protector": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/WildspeakerBearSkill.webp",
+    "listedAs": null
+  },
+  "a support that says it supports attacks": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/Support/FasterAttack.webp",
+    "listedAs": null
+  },
+  "a support that says it supports grenades": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/Support/ConcentratedEffectSupport.webp",
+    "listedAs": null
+  },
+  "a support that says it supports minions": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/Support/MinionMeleeSplashSupport.webp",
+    "listedAs": null
+  },
+  "a support that says it supports spells": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/Support/FasterCastSupport.webp",
+    "listedAs": null
+  },
+  "one fire spell in the trigger": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/SmithOfKitavaTriggerFireballsSkillIcon.webp",
+    "listedAs": null
+  }
+}
