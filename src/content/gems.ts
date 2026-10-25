@@ -17,7 +17,7 @@ const tips: Record<string, string> = {
   Twister: "A travelling hit. Send it through the pack and follow it.",
   "Whirling Slash": "A close swing that starts the twister. Step in, then out.",
   Rake: "A bleeding spear hit. Apply it and let the blood work.",
-  "Blood Hunt": "The follow-up on a bleeding enemy. Use it after Rake.",
+  "Blood Hunt": "The hit after Rake. Use it on an enemy that is already bleeding.",
   Spearfield: "Spears in the ground. Drop the field and stand where it covers the pack.",
   "Rolling Slam": "A two-part slam. The second hit is the one that matters.",
   Boneshatter: "A heavy melee hit. Use it on a stunned or standing boss.",
@@ -34,7 +34,7 @@ const tips: Record<string, string> = {
   "High Velocity Rounds": "A single heavy crossbow hit. Save it for the rare or the boss.",
   "Artillery Ballista": "A ballista that fires for you. Drop it, then keep shooting.",
   "Ice Strike": "A cold quarterstaff combo. The last hit is the freeze.",
-  "Tempest Bell": "A bell on the ground. Hit it so the wave covers the pack.",
+  "Tempest Bell": "A bell on the ground. Hit the bell so the wave covers the pack.",
   "Falling Thunder": "A lightning slam after you leap. Land it on the pack.",
   "Storm Wave": "A wave from the staff. Send it down the pack.",
   "Tempest Flurry": "Fast quarterstaff hits. Stay on one enemy until the combo finishes.",
@@ -70,7 +70,7 @@ const tips: Record<string, string> = {
   Maul: "The bear attack. Hit, then step. You are in melee.",
   "Furious Slam": "A heavy slam. Use it on a boss that has stopped.",
   Thunderstorm: "A storm around you. Walk the edge of the pack, not the middle, if it hurts you too.",
-  "Walking Calamity": "A moving disaster. Point it through the pack.",
+  "Walking Calamity": "At maximum rage it builds glory, then meteors fall while you walk.",
   Shred: "Fast clawing hits. Stay on one enemy until it ends.",
   "Lunar Assault": "A leaping attack. Land it on the pack.",
   "Bone Cage": "Bones around the enemy. Trap, then the other spell.",
@@ -86,7 +86,7 @@ const tips: Record<string, string> = {
   Earthshatter: "Spikes, then a slam that breaks them. The slam is the damage.",
   "Supercharged Slam": "A charged slam. Release it on the boss or a packed door.",
   "Volcanic Fissure": "A fiery crack. Aim it through the pack.",
-  "Supporting Fire": "Extra shots while you attack. Keep the grenade or the bolts going.",
+  "Supporting Fire": "Extra shots while you attack. Press it every time it is ready.",
   "Temper Weapon": "A buff on your weapon. Turn it on before the boss.",
   "Elemental Expression": "A staff spell that follows your attack. Hit, and it casts.",
   "Flames of Chayula": "The Chayula flame attack.",
@@ -98,6 +98,54 @@ const tips: Record<string, string> = {
   "Martial Tempo": "More attack speed for the main skill.",
   "Arcane Tempo": "More cast speed for the main skill.",
   "Concentrated Effect": "Smaller area, more damage.",
+  "Rapid Attacks": "More attack speed for the linked attack.",
+  "Rapid Attacks I": "More attack speed for the linked attack.",
+  "Rapid Attacks II": "More attack speed for the linked attack. This is the higher tier of the same support.",
+  "Rapid Attacks III": "More attack speed for the linked attack. This is the higher tier of the same support.",
+  Barrage: "Repeat the linked attack. Use it when the pack or the boss is already marked.",
+  "Herald of Ice": "An aura. Frozen kills explode. Turn it on and leave it.",
+  "Herald of Thunder": "An aura. Shocked kills call lightning. Turn it on and leave it.",
+  "Herald of Ash": "An aura. Overkill fire spreads. Turn it on and leave it.",
+  "Wind Dancer": "An aura that adds evasion and knocks melee hits back.",
+  "Ghost Dance": "An aura. A hit spends a shroud and gives energy shield back.",
+  "Ice Bite I": "Cold attack support. Link it to the cold hit.",
+  "Ice Bite II": "Cold attack support. Link it to the cold hit.",
+  "Elemental Armament I": "More elemental damage for the linked attack.",
+  "Elemental Armament II": "More elemental damage for the linked attack.",
+  "Lightning Attunement": "Lightning support for the linked attack or spell.",
+  Innervate: "Lightning support. Link it to the lightning attack.",
+  Execute: "More damage to enemies that are already low.",
+  Deliberation: "A support on the main attack. Read the gem; it changes the hit.",
+  "Primal Armament II": "More physical damage on the linked attack.",
+  "Mirage Deadeye": "The Deadeye copy. It shoots when you shoot.",
+  "Tornado Shot": "A tornado you leave in the pack so later arrows split off it.",
+  "Voltaic Mark": "A lightning mark. Put it on the rare or the boss.",
+  "Freezing Mark": "A cold mark. Put it on the boss before the snipe.",
+  "Ice-Tipped Arrows": "A buff. Turn it on so shots leave ice fragments.",
+  "Escape Shot": "A shot that also moves you. Aim behind you to leap forward.",
+  "Freezing Salvo": "A burst of cold shots. Use it to freeze a boss before Snipe.",
+  "Blind II": "The target is less likely to hit you, and less likely to evade you.",
+  "Combat Frenzy": "Frenzy charges from freezing. Barrage spends them.",
+  "Mark of Siphoning": "A mark support. Link it to the mark, not to the attack.",
+  "Prolonged Duration I": "The linked effect lasts longer.",
+  "Prolonged Duration II": "The linked effect lasts longer.",
+  "Magnified Area I": "A larger area on the linked gem.",
+  "Magnified Area II": "A larger area on the linked gem.",
+  "Fire Attunement": "Fire support. On a grenade or a minion command, this is what ignites.",
+  "Short Fuse I": "Grenades explode sooner.",
+  "Short Fuse II": "Grenades explode sooner.",
+  "Cast on Critical": "The linked spell triggers when the attack or spell crits.",
+  "Infernal Legion": "The minion burns. Use it on a minion you expect to die.",
+  "Infernal Legion I": "The minion burns. Use it on a minion you expect to die.",
+  "Hollow Form": "A short form. Tap it and the copies finish the assault.",
+  "Grim Pillars": "Pillars from a spell totem. Drop the totem, then let the pillars work.",
+  "Spell Totem": "A totem that casts the linked spell.",
+  "Spiral Volley": "A bow attack that spends frenzy charges. It needs Resonance or the charges do not come back.",
+  "Oil Barrage": "Spends power charges and fires a wave of oil projectiles.",
+  "Shockwave Totem": "A totem that slams. Drop it and fight next to it.",
+  "Arctic Armour": "A cold guard. Turn it on before a boss.",
+  "Frozen Locus": "A cold mark on the ground. Detonate it with the large spike of Glacial Cascade.",
+  "Glacial Cascade": "A cold wave. The large spike at the end is the hit that matters.",
 };
 
 function fallback(name: string, role: "skill" | "helper" | "support") {
@@ -109,11 +157,21 @@ function fallback(name: string, role: "skill" | "helper" | "support") {
   return `Socket ${name} only when the gem says it supports the main skill.`;
 }
 
+function artFor(name: string): ArtEntry | undefined {
+  if (icons[name]) return icons[name];
+  const stripped = name.replace(/ (?:I|II|III|IV)$/, "");
+  if (stripped !== name && icons[stripped]) return icons[stripped];
+  for (const entry of Object.values(icons)) {
+    if (entry.listedAs === name || entry.listedAs === stripped) return entry;
+  }
+  return undefined;
+}
+
 export function gemInfo(name: string, role: "skill" | "helper" | "support") {
-  const entry = icons[name];
+  const entry = artFor(name);
   const listed = entry?.listedAs;
   const specific = tips[name] ?? fallback(name, role);
-  const tip = listed ? `${specific} In the gem list this is ${listed}.` : specific;
+  const tip = listed && listed !== name ? `${specific} In the gem list this is ${listed}.` : specific;
   return {
     name,
     icon: entry?.icon ?? null,
