@@ -1,6 +1,7 @@
 import { armorForBand } from "@/content/armorPlan";
 import type { BuildSpec } from "@/content/buildSpecs";
 import { storyPhases } from "@/content/campaign";
+import { mainSkillReadyAt } from "@/content/gemFacts";
 import { loadoutFor } from "@/content/loadouts";
 import { pointsForBand, routeKeyFor } from "@/content/passivePlan";
 import { timelineFor } from "@/content/timeline";
@@ -62,9 +63,12 @@ function gemLine(spec: BuildSpec, to: number, loadout: Loadout) {
   const main = loadout.groups.flatMap((group) => group.skills).find((skill) => skill.name === spec.skill);
   const supports = main?.supports ?? [];
   const first = supports[0];
-  if (to <= 4) return `Put ${spec.skill} on the bar as soon as the gem drops. ${spec.helper} is the second button.`;
+  const readyAt = mainSkillReadyAt(spec.skill, loadout.overview, loadout.leveling);
+  if (to < readyAt) {
+    return `${spec.skill} is not on the bar yet. It joins at level ${readyAt}. ${spec.helper} is the second button once its gem is offered.`;
+  }
   if (!first) return `${spec.skill} stays the main skill. ${spec.helper} is the second button. The skill tab lists every gem this route names.`;
-  if (to <= 14) return `${spec.skill} stays the main skill. First support: ${first}.`;
+  if (to < readyAt + 10) return `${spec.skill} is the main skill from level ${readyAt}. First support: ${first}.`;
   return `Link ${supports.join(", ")} into ${spec.skill}. Add one of those supports at a time. The skill tab is the full layout.`;
 }
 

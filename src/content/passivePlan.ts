@@ -39,10 +39,10 @@ function spendsFor(spec: BuildSpec) {
   const out = route.nodes.map(describe);
   const last = route.nodes[route.nodes.length - 1]?.name ?? "the last node";
   const follow = [
-    `The next small node connected to ${last}. Take it when the stat is damage, life, energy shield, armour, or evasion.`,
-    `Stay beside ${last}. If the next node is only an attribute, take it and keep walking. Do not cross to another class start.`,
-    `The next node on this same branch. A notable is the right click when it is the very next node and it matches ${spec.damage}.`,
-    `Keep this branch. Quest weapon-set points go here too, on weapon set 1.`,
+    `Take the next node connected to ${last} when it gives damage, life, energy shield, armour, or evasion.`,
+    `If the only node touching ${last} is an attribute, take it and keep walking this branch. Do not cross to another class start.`,
+    `Take the next notable on this branch when it matches ${spec.damage}.`,
+    `Quest weapon-set points go on weapon set 1, on this same branch.`,
   ];
   let extra = 0;
   while (out.length < 64) {
@@ -94,7 +94,8 @@ function questsFor(from: number, to: number, spec: BuildSpec) {
 export function pointsForBand(spec: BuildSpec, from: number, to: number): PointPlan {
   if (from >= 66) {
     return {
-      intro: "By level 65 you have already placed 64 level points. From 66 to 100 you get one more each level.",
+      intro:
+        "By level 65 you have already placed 64 level points. From 66 to 100 you get one more each level. Stay on the same branch you started in the campaign.",
       points: [
         "Each new point is the next small node on the branch you already started.",
         "Take a notable only when it is the very next node and it gives damage, life, energy shield, armour, or evasion for this build.",
