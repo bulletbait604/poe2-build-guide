@@ -3,6 +3,7 @@ import type { BuildSpec } from "@/content/buildSpecs";
 import { storyPhases } from "@/content/campaign";
 import { loadoutFor } from "@/content/loadouts";
 import { pointsForBand, routeKeyFor } from "@/content/passivePlan";
+import { timelineFor } from "@/content/timeline";
 import type { Guide, LevelBand, Loadout } from "@/lib/types";
 
 const TREE = "https://poe2ref.com/passive-tree";
@@ -107,5 +108,6 @@ export function composeGuide(spec: BuildSpec): Guide {
     levelBands: buildBands(spec, loadout),
     phases: storyPhases(spec),
     loadout,
+    timeline: timelineFor(spec, loadout),
   };
 }

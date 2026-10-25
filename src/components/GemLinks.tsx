@@ -15,19 +15,46 @@ function colorFor(damage: string) {
   return "#e4c48a";
 }
 
-function GemFace({ name, role, color }: { name: string; role: "skill" | "helper" | "support"; color: string }) {
+function Socket({
+  name,
+  role,
+  color,
+  large,
+  index,
+  onOpen,
+}: {
+  name: string;
+  role: "skill" | "helper" | "support";
+  color: string;
+  large?: boolean;
+  index?: number;
+  onOpen: (name: string) => void;
+}) {
   const info = gemInfo(name, role);
+  const size = large ? "h-20 w-20" : "h-14 w-14";
   return (
-    <span className="relative block h-14 w-14 border bg-black sm:h-16 sm:w-16" style={{ borderColor: color }}>
-      {info.icon ? (
-        <Image src={info.icon} alt="" fill className="object-contain p-1" sizes="64px" />
-      ) : (
-        <svg viewBox="0 0 80 96" className="h-full w-full" aria-hidden>
-          <polygon points="40,4 72,22 72,74 40,92 8,74 8,22" fill="#140f0c" stroke={color} strokeWidth="3" />
-          <polygon points="40,16 60,28 60,68 40,80 20,68 20,28" fill={color} opacity="0.85" />
-        </svg>
-      )}
-    </span>
+    <button
+      type="button"
+      className="group relative w-24 shrink-0 text-center hover:z-30"
+      onClick={() => onOpen(name)}
+      onMouseEnter={() => onOpen(name)}
+    >
+      {index ? <span className="mb-1 block font-display text-xs text-gold">{index}</span> : <span className="mb-1 block h-4" />}
+      <span className={`relative mx-auto block border bg-black ${size}`} style={{ borderColor: color }}>
+        {info.icon ? (
+          <Image src={info.icon} alt="" fill className="object-contain p-1" sizes="80px" />
+        ) : (
+          <svg viewBox="0 0 80 96" className="h-full w-full" aria-hidden>
+            <polygon points="40,4 72,22 72,74 40,92 8,74 8,22" fill="#140f0c" stroke={color} strokeWidth="3" />
+            <polygon points="40,16 60,28 60,68 40,80 20,68 20,28" fill={color} opacity="0.85" />
+          </svg>
+        )}
+      </span>
+      <span className={`mt-1 block leading-4 ${large ? "font-display text-sm text-parchment" : "text-xs text-muted"}`}>{name}</span>
+      <span className="pointer-events-none absolute top-full left-1/2 z-20 mt-1 hidden w-52 -translate-x-1/2 border border-gold bg-ink p-3 text-left text-sm leading-6 text-parchment group-hover:block">
+        {info.tip}
+      </span>
+    </button>
   );
 }
 
@@ -37,49 +64,38 @@ export function GemLinks({ groups, damage }: { groups: GemGroup[]; damage: strin
   const active = open ? gemInfo(open, "skill") : null;
 
   return (
-    <div className="space-y-6" id="gem-links">
+    <div className="space-y-5" id="gem-links">
       {groups.map((group) => (
-        <section key={group.label} className="border border-line bg-panel p-4">
-          <h3 className="font-display text-2xl text-parchment">{group.label}</h3>
-          <p className="mt-2 max-w-3xl leading-7 text-muted">{group.detail}</p>
-          <div className="mt-4 space-y-4">
+        <section key={group.label} className="border border-line bg-[#14110e] p-4">
+          <h3 className="font-display text-xl text-parchment">{group.label}</h3>
+          <p className="mt-1 max-w-3xl text-sm leading-6 text-muted">{group.detail}</p>
+          <div className="mt-4 space-y-3">
             {group.skills.map((skill) => (
-              <div key={`${group.label}-${skill.name}`} className="border border-line bg-ink/40 p-3">
-                <div className="flex flex-col gap-3 sm:flex-row sm:overflow-x-auto sm:pb-1">
-                  <button
-                    type="button"
-                    className="group relative w-28 shrink-0 text-center hover:z-30"
-                    onClick={() => setOpen(skill.name)}
-                    onMouseEnter={() => setOpen(skill.name)}
-                  >
-                    <GemFace name={skill.name} role="skill" color={color} />
-                    <span className="mt-1 block font-display text-sm text-parchment">{skill.name}</span>
-                    <span className="pointer-events-none absolute top-full left-0 z-20 mt-1 hidden w-56 border border-gold bg-ink p-3 text-left text-sm leading-6 text-parchment group-hover:block">
-                      {gemInfo(skill.name, "skill").tip}
-                    </span>
-                  </button>
+              <div key={`${group.label}-${skill.name}`} className="border border-line/80 bg-black/50 p-3">
+                <div className="flex flex-wrap items-end gap-2">
+                  <Socket name={skill.name} role="skill" color={color} large onOpen={setOpen} />
                   {skill.supports.length > 0 ? (
-                    <div className="flex flex-wrap items-start gap-2 border-gold/50 sm:min-w-0 sm:flex-1 sm:flex-nowrap sm:overflow-x-auto sm:border-l sm:pl-3">
-                      {skill.supports.map((support) => (
-                        <button
+                    <div className="flex flex-wrap items-end gap-2 border-t border-gold/40 pt-2 sm:border-t-0 sm:border-l sm:pt-0 sm:pl-3">
+                      {skill.supports.map((support, index) => (
+                        <Socket
                           key={`${skill.name}-${support}`}
-                          type="button"
-                          className="group relative w-24 shrink-0 text-center hover:z-30"
-                          onClick={() => setOpen(support)}
-                          onMouseEnter={() => setOpen(support)}
-                        >
-                          <GemFace name={support} role="support" color={color} />
-                          <span className="mt-1 block text-xs leading-4 text-muted">{support}</span>
-                          <span className="pointer-events-none absolute top-full left-1/2 z-20 mt-1 hidden w-52 -translate-x-1/2 border border-gold bg-ink p-3 text-left text-sm leading-6 text-parchment group-hover:block">
-                            {gemInfo(support, "support").tip}
-                          </span>
-                        </button>
+                          name={support}
+                          role="support"
+                          color={color}
+                          index={index + 1}
+                          onOpen={setOpen}
+                        />
                       ))}
                     </div>
                   ) : (
-                    <p className="self-center text-sm text-muted">No support is printed for this gem.</p>
+                    <p className="mb-6 text-sm text-muted">Use this button by itself.</p>
                   )}
                 </div>
+                {skill.supports.length > 0 ? (
+                  <p className="mt-2 text-xs leading-5 text-muted">
+                    Add these in order. Support 1 first. Stop when you run out of sockets. The last number is the one you drop.
+                  </p>
+                ) : null}
               </div>
             ))}
           </div>
@@ -91,7 +107,6 @@ export function GemLinks({ groups, damage }: { groups: GemGroup[]; damage: strin
           <p className="mt-1">{active.tip}</p>
         </div>
       ) : null}
-      <p className="text-sm text-muted">Tap a gem on a phone to pin the note. On a wider screen, hover the icon.</p>
     </div>
   );
 }

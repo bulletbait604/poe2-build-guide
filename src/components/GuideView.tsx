@@ -5,7 +5,7 @@ import { GemLinks } from "@/components/GemLinks";
 import { ItemChip } from "@/components/ItemChip";
 import { TreeMap } from "@/components/TreeMap";
 import type { GameClass } from "@/content/classes";
-import type { Guide, GuideChapter } from "@/lib/types";
+import type { Guide, GuideChapter, TimelineStep } from "@/lib/types";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
@@ -27,18 +27,54 @@ const walkOrder = [
   "endgame",
 ];
 
-const tabs = ["Overview", "Leveling", "Skills", "Gear", "Passive", "Play"] as const;
+const tabs = ["Now", "Leveling", "Skills", "Gear", "Tree", "Play"] as const;
 type Tab = (typeof tabs)[number];
 
-function bandsFor(id: string, bands: Guide["levelBands"]) {
-  if (id === "act-1") return bands.filter((band) => band.to <= 14);
-  if (id === "act-2") return bands.filter((band) => band.from >= 15 && band.to <= 29);
-  if (id === "act-3") return bands.filter((band) => band.from >= 30 && band.to <= 39);
-  if (id === "act-4") return bands.filter((band) => band.from >= 40 && band.to <= 49);
-  if (id === "interlude-barya") return bands.filter((band) => band.from >= 50 && band.to <= 54);
-  if (id === "interlude-doryani") return bands.filter((band) => band.from >= 55 && band.to <= 59);
-  if (id === "endgame") return bands.filter((band) => band.from >= 60);
-  return [];
+function short(text: string) {
+  const cut = text.split(/(?<=\.)\s/)[0] ?? text;
+  return cut.length > 170 ? `${cut.slice(0, 167)}…` : cut;
+}
+
+function StepCard({
+  step,
+  active,
+  done,
+  onToggle,
+  guideId,
+}: {
+  step: TimelineStep;
+  active: boolean;
+  done: Record<string, boolean>;
+  onToggle: (key: string) => void;
+  guideId: string;
+}) {
+  return (
+    <article id={`step-${step.level}`} className={`border p-4 ${active ? "border-gold bg-panel" : "border-line bg-[#14110e]"}`}>
+      <div className="flex items-baseline justify-between gap-3">
+        <h3 className="font-display text-2xl text-parchment">{step.title}</h3>
+        {active ? <span className="text-xs tracking-[0.16em] text-ember uppercase">Do this now</span> : null}
+      </div>
+      <ul className="mt-3 space-y-2">
+        {step.checks.map((check, index) => {
+          const key = `${guideId}:${step.level}:${index}`;
+          const checked = Boolean(done[key]);
+          return (
+            <li key={key}>
+              <label className="flex items-start gap-3 text-sm leading-6">
+                <input
+                  type="checkbox"
+                  className="mt-1 accent-gold"
+                  checked={checked}
+                  onChange={() => onToggle(key)}
+                />
+                <span className={checked ? "text-muted line-through" : "text-parchment"}>{check}</span>
+              </label>
+            </li>
+          );
+        })}
+      </ul>
+    </article>
+  );
 }
 
 export function GuideView({
@@ -51,17 +87,16 @@ export function GuideView({
   initialLevel: number;
 }) {
   const [level, setLevel] = useState(initialLevel);
-  const [tab, setTab] = useState<Tab>("Overview");
+  const [tab, setTab] = useState<Tab>("Now");
   const [prices, setPrices] = useState<Record<string, string>>({});
+  const [done, setDone] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     const raw = localStorage.getItem("poe2-guide-progress");
     if (initialLevel !== 1 || !raw) return;
     try {
       const saved = JSON.parse(raw) as { guideId?: string; level?: number };
-      if (saved.guideId === guide.id && typeof saved.level === "number") {
-        setLevel(saved.level);
-      }
+      if (saved.guideId === guide.id && typeof saved.level === "number") setLevel(saved.level);
     } catch {
       localStorage.removeItem("poe2-guide-progress");
     }
@@ -73,6 +108,27 @@ export function GuideView({
       JSON.stringify({ guideId: guide.id, level, chapter: chapterForLevel(level) }),
     );
   }, [guide.id, level]);
+
+  useEffect(() => {
+    const raw = localStorage.getItem(`poe2-checks:${guide.id}`);
+    if (!raw) {
+      setDone({});
+      return;
+    }
+    try {
+      setDone(JSON.parse(raw) as Record<string, boolean>);
+    } catch {
+      setDone({});
+    }
+  }, [guide.id]);
+
+  function toggle(key: string) {
+    setDone((current) => {
+      const next = { ...current, [key]: !current[key] };
+      localStorage.setItem(`poe2-checks:${guide.id}`, JSON.stringify(next));
+      return next;
+    });
+  }
 
   const names = useMemo(() => guide.uniques.map((piece) => piece.name), [guide]);
 
@@ -97,41 +153,37 @@ export function GuideView({
   const phases = walkOrder
     .map((id) => guide.phases.find((phase) => phase.id === id))
     .filter((phase): phase is Guide["phases"][number] => Boolean(phase));
-  const loadout = guide.loadout;
+  const currentIndex = guide.timeline.reduce((found, step, index) => (step.level <= level ? index : found), 0);
+  const current = guide.timeline[currentIndex];
+  const upcoming = guide.timeline[currentIndex + 1];
 
   function priceFor(name: string) {
     return prices[name.toLowerCase()] ?? null;
   }
 
   return (
-    <article>
-      <div className="relative mb-8 min-h-[420px] overflow-hidden border border-line bg-black">
-        <Image
-          src={gameClass.portrait}
-          alt={gameClass.name}
-          fill
-          priority
-          className="object-contain object-left"
-          sizes="100vw"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/10 via-black/55 to-black" />
-        <div className="relative z-10 flex min-h-[420px] flex-col justify-end p-6 sm:ml-auto sm:w-1/2 sm:justify-center">
+    <article className="text-[15px] leading-6">
+      <header className="grid gap-4 border border-line bg-black sm:grid-cols-[180px_minmax(0,1fr)]">
+        <div className="relative h-40 sm:h-full sm:min-h-44">
+          <Image src={gameClass.portrait} alt="" fill priority className="object-cover object-top" sizes="180px" />
+        </div>
+        <div className="flex flex-col justify-center px-4 py-4 sm:px-6">
           <Link href={`/class/${gameClass.id}/${guide.ascendancyId}`} className="text-sm text-muted hover:text-gold">
             {gameClass.name}
           </Link>
-          <p className="mt-3 font-display text-xs tracking-[0.22em] text-gold uppercase">
+          <p className="mt-1 text-xs tracking-[0.18em] text-gold uppercase">
             Patch {guide.patch} · {guide.updated}
           </p>
-          <h1 className="mt-2 font-display text-4xl text-parchment sm:text-5xl">{guide.name}</h1>
-          <p className="mt-3 leading-7 text-parchment/90">{guide.fantasy}</p>
+          <h1 className="mt-1 font-display text-4xl text-parchment">{guide.name}</h1>
+          <p className="mt-2 max-w-2xl text-muted">{guide.summary}</p>
         </div>
-      </div>
+      </header>
 
-      <div className="flex flex-wrap items-end gap-6 border border-line bg-panel p-4">
+      <div className="mt-4 flex flex-wrap items-end gap-4 border border-line bg-panel p-3">
         <label className="text-sm">
           <span className="block text-muted">Your level</span>
           <input
-            className="mt-1 w-24 border border-line bg-ink px-2 py-1 text-parchment"
+            className="mt-1 w-20 border border-line bg-ink px-2 py-1 text-parchment"
             type="number"
             min={1}
             max={100}
@@ -142,274 +194,184 @@ export function GuideView({
             }}
           />
         </label>
-        <label className="min-w-48 flex-1 text-sm">
-          <span className="block text-muted">Drag to the level you are</span>
+        <label className="min-w-40 flex-1 text-sm">
+          <span className="block text-muted">Drag to where you are</span>
           <input
             className="mt-3 w-full accent-gold"
             type="range"
             min={1}
-            max={90}
-            value={Math.min(level, 90)}
+            max={100}
+            value={level}
             onChange={(event) => setLevel(Number(event.target.value))}
           />
         </label>
-        <p className="text-sm text-gold">You are on {activeBand.title}.</p>
+        <p className="text-sm text-gold">Level {level}. {current?.title}.</p>
       </div>
 
-      <div id="guide-tabs" className="mt-4 flex flex-wrap gap-2">
+      <div id="guide-tabs" className="sticky top-0 z-40 mt-3 flex flex-wrap gap-1 bg-ink/95 py-2 backdrop-blur">
         {tabs.map((name) => (
           <button
             key={name}
             type="button"
             onClick={() => setTab(name)}
-            className={`border px-3 py-2 text-sm ${tab === name ? "border-gold text-gold" : "border-line text-parchment hover:border-gold"}`}
+            className={`border px-3 py-2 text-sm ${tab === name ? "border-gold bg-gold text-ink" : "border-line text-parchment hover:border-gold"}`}
           >
             {name}
           </button>
         ))}
       </div>
 
-      {tab === "Overview" ? (
-        <section id="overview" className="mt-6 max-w-3xl">
-          <p className="text-lg leading-8 text-parchment">{loadout.overview}</p>
-          <h2 className="mt-8 font-display text-3xl">Numbers</h2>
-          <ul className="mt-3 space-y-2">
-            {loadout.numbers.map((line) => (
-              <li key={line} className="border border-line bg-panel px-3 py-2 leading-7">
-                {line}
-              </li>
-            ))}
-          </ul>
-          <h2 className="mt-8 font-display text-3xl">Ascendancy order</h2>
-          <ol className="mt-3 list-decimal space-y-2 pl-5 leading-7">
-            {loadout.ascendancy.map((step) => (
-              <li key={step}>{step}</li>
-            ))}
-          </ol>
-          <h2 className="mt-8 font-display text-3xl">First buttons</h2>
-          <ol className="mt-3 list-decimal space-y-2 pl-5 leading-7">
-            {loadout.rotation.slice(0, 4).map((step) => (
-              <li key={step}>{step}</li>
-            ))}
-          </ol>
-          <p className="mt-4 text-sm leading-6 text-muted">
-            Skills, gear, the passive path, and the full rotation are the other tabs. The wording here is original.
-            The links at the bottom are the pages the layout follows.
+      {tab === "Now" && current ? (
+        <section id="now" className="mt-2 space-y-4">
+          <p className="max-w-3xl text-muted">
+            Do the list on the gold card. Check a line when it is done. The next card is what is coming, not what you do today.
           </p>
-        </section>
-      ) : null}
-
-      {tab === "Skills" ? (
-        <section id="skills" className="mt-6">
-          <p className="max-w-3xl leading-7 text-muted">
-            Each row is one skill. The icons to the right are the supports linked into it. A gem with no supports is
-            still on the bar. It is listed because the source page names it, and that page does not print a support
-            under it.
-          </p>
-          <div className="mt-4">
-            <GemLinks groups={loadout.groups} damage={guide.damage} />
-          </div>
-        </section>
-      ) : null}
-
-      {tab === "Gear" ? (
-        <section id="gear" className="mt-6">
-          <p className="max-w-3xl leading-7 text-muted">
-            Three stages. Early is Acts 1–2. Late is Acts 3–4 and the interludes. Maps are the cap. The paper doll
-            under the table is the piece list for the level you set above.
-          </p>
-          <div className="mt-4 hidden overflow-x-auto border border-line sm:block">
-            <table className="w-full min-w-[44rem] text-left text-sm">
-              <thead className="bg-panel text-gold">
-                <tr>
-                  <th className="p-3 font-display text-base">Slot</th>
-                  <th className="p-3 font-display text-base">Acts 1–2</th>
-                  <th className="p-3 font-display text-base">Acts 3–4</th>
-                  <th className="p-3 font-display text-base">Maps</th>
-                </tr>
-              </thead>
-              <tbody>
-                {loadout.gear.map((row) => (
-                  <tr key={row.slot} className="border-t border-line align-top">
-                    <th className="p-3 font-display text-base text-parchment">{row.slot}</th>
-                    <td className="p-3 leading-6">{row.early}</td>
-                    <td className="p-3 leading-6">{row.late}</td>
-                    <td className="p-3 leading-6">{row.maps}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <div className="mt-4 space-y-3 sm:hidden">
-            {loadout.gear.map((row) => (
-              <div key={row.slot} className="border border-line p-3">
-                <h3 className="font-display text-xl">{row.slot}</h3>
-                <p className="mt-2 text-xs tracking-[0.14em] text-gold uppercase">Acts 1–2</p>
-                <p className="mt-1 leading-6">{row.early}</p>
-                <p className="mt-2 text-xs tracking-[0.14em] text-gold uppercase">Acts 3–4</p>
-                <p className="mt-1 leading-6">{row.late}</p>
-                <p className="mt-2 text-xs tracking-[0.14em] text-gold uppercase">Maps</p>
-                <p className="mt-1 leading-6">{row.maps}</p>
-              </div>
-            ))}
-          </div>
-          <h2 className="mt-8 font-display text-3xl">At level {level}</h2>
-          <p className="mt-2 leading-7">{activeBand.gem}</p>
-          <GearBoard lines={activeBand.armor} weaponNoun={guide.weaponNoun} defence={guide.defence} />
-        </section>
-      ) : null}
-
-      {tab === "Passive" ? (
-        <section id="passive" className="mt-6">
-          <TreeMap routeKey={guide.treeKey} owned={owned} />
-          <div className="mt-4 border border-line bg-ink/40 p-3">
-            <p className="text-xs tracking-[0.16em] text-gold uppercase">Points for {activeBand.title}</p>
-            <p className="mt-2 leading-6">{activeBand.pointsIntro}</p>
-            <ol className="mt-2 list-decimal space-y-1 pl-5 leading-6">
-              {activeBand.points.map((point, index) => (
-                <li key={`${activeBand.title}-${index}`}>{point}</li>
-              ))}
-            </ol>
-            {activeBand.questPoints.length > 0 ? (
-              <div className="mt-3 space-y-2 border-t border-line pt-3">
-                <p className="text-xs tracking-[0.16em] text-gold uppercase">Quest points</p>
-                {activeBand.questPoints.map((quest) => (
-                  <p key={quest} className="leading-6">
-                    {quest}
-                  </p>
-                ))}
-              </div>
-            ) : null}
-          </div>
-        </section>
-      ) : null}
-
-      {tab === "Play" ? (
-        <section id="play" className="mt-6 max-w-3xl">
-          <h2 className="font-display text-3xl">How it runs</h2>
-          <ol className="mt-4 list-decimal space-y-3 pl-5 leading-7">
-            {loadout.rotation.map((step) => (
-              <li key={step}>{step}</li>
-            ))}
-          </ol>
+          <StepCard step={current} active done={done} onToggle={toggle} guideId={guide.id} />
+          {upcoming ? (
+            <div>
+              <p className="mb-2 text-xs tracking-[0.16em] text-gold uppercase">Coming up</p>
+              <StepCard step={upcoming} active={false} done={done} onToggle={toggle} guideId={guide.id} />
+            </div>
+          ) : null}
+          <p className="text-sm text-muted">{activeBand.ignore}</p>
         </section>
       ) : null}
 
       {tab === "Leveling" ? (
-        <section id="leveling" className="mt-6">
-          <h2 className="font-display text-3xl">Level by level</h2>
-          <div className="mt-4 space-y-3">
-            {loadout.leveling.map((step) => (
-              <div key={step.levels} className="border border-line p-3">
-                <p className="font-display text-xl text-gold">{step.levels}</p>
-                <p className="mt-2 leading-7">{step.text}</p>
-              </div>
+        <section id="leveling" className="mt-2">
+          <p className="max-w-3xl text-muted">
+            A new card every few levels. Stay on the gold one. The quest list under the cards is the permanent rewards. Skip a fight that only drops a gem.
+          </p>
+          <div className="mt-4 space-y-3 border-l border-gold/40 pl-4">
+            {guide.timeline.map((step, index) => (
+              <StepCard
+                key={step.level}
+                step={step}
+                active={index === currentIndex}
+                done={done}
+                onToggle={toggle}
+                guideId={guide.id}
+              />
             ))}
           </div>
-          <nav className="mt-6 flex flex-wrap gap-2">
+          <div className="mt-8 space-y-3">
+            <h2 className="font-display text-2xl">Quest rewards, act by act</h2>
             {phases.map((phase) => (
-              <a key={phase.id} href={`#${phase.id}`} className="border border-line px-3 py-2 text-sm text-parchment hover:border-gold">
-                {phase.title.replace(/ ·.*/, "")}
-              </a>
+              <details key={phase.id} id={phase.id} className="border border-line bg-[#14110e] p-3" open={level >= phase.levelMin && level <= phase.levelMax}>
+                <summary className="cursor-pointer font-display text-xl text-parchment">
+                  {phase.title} <span className="text-sm text-muted">{phase.levelRange}</span>
+                </summary>
+                <ol className="mt-3 space-y-3">
+                  {phase.steps.map((step, index) => (
+                    <li key={step.title}>
+                      <p className="text-parchment">
+                        {index + 1}. {step.title}
+                      </p>
+                      <p className="mt-1 text-sm text-muted">{step.detail}</p>
+                    </li>
+                  ))}
+                </ol>
+              </details>
             ))}
-          </nav>
-          <div className="mt-6 space-y-8">
-            {phases.map((phase) => {
-              const here =
-                level >= phase.levelMin &&
-                level <= phase.levelMax &&
-                !phases.some(
-                  (other) =>
-                    other.levelMin > phase.levelMin &&
-                    level >= other.levelMin &&
-                    level <= other.levelMax,
-                );
-              const upgrades = bandsFor(phase.id, guide.levelBands);
-              return (
-                <section key={phase.id} id={phase.id} className={`border p-4 ${here ? "border-gold bg-panel" : "border-line"}`}>
-                  <h2 className="font-display text-3xl">
-                    {phase.title}
-                    <span className="ml-3 text-sm text-muted">{phase.levelRange}</span>
-                    {here ? <span className="ml-3 text-sm tracking-[0.14em] text-ember uppercase">You are here</span> : null}
-                  </h2>
-                  <ol className="mt-4 space-y-4">
-                    {phase.steps.map((step, index) => (
-                      <li key={step.title} className="grid grid-cols-[2rem_minmax(0,1fr)] gap-3">
-                        <span className="font-display text-gold">{index + 1}</span>
-                        <div>
-                          <h3 className="text-lg text-parchment">{step.title}</h3>
-                          <p className="mt-1 leading-7 text-muted">{step.detail}</p>
-                        </div>
-                      </li>
-                    ))}
-                  </ol>
-                  {upgrades.length > 0 ? (
-                    <div className="mt-6 space-y-3">
-                      <h3 className="font-display text-xl text-gold">Upgrades every 5 levels</h3>
-                      {upgrades.map((band) => {
-                        const current = band.from === activeBand.from;
-                        return (
-                          <div key={band.title} className={`border p-3 ${current ? "border-gold" : "border-line"}`}>
-                            <p className="font-display text-lg">
-                              {band.title}
-                              {current ? <span className="ml-3 text-sm tracking-[0.14em] text-ember uppercase">Do this now</span> : null}
-                            </p>
-                            <p className="mt-2 leading-6">{band.gem}</p>
-                            <GearBoard lines={band.armor} weaponNoun={guide.weaponNoun} defence={guide.defence} />
-                            <p className="mt-3 text-sm leading-6 text-muted">{band.ignore}</p>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  ) : null}
-                </section>
-              );
-            })}
           </div>
         </section>
       ) : null}
 
+      {tab === "Skills" ? (
+        <section id="skills" className="mt-2">
+          <p className="mb-4 max-w-3xl text-muted">
+            The big gem is the skill. The numbered gems are the supports, in the order you add them. A skill with no numbers is pressed by itself.
+          </p>
+          <GemLinks groups={guide.loadout.groups} damage={guide.damage} />
+        </section>
+      ) : null}
+
+      {tab === "Gear" ? (
+        <section id="gear" className="mt-2">
+          <p className="max-w-3xl text-muted">
+            Read the slot, then the stage you are in. The number is the target. The picture under the cards is the same list for level {level}.
+          </p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            {guide.loadout.gear.map((row) => (
+              <div key={row.slot} className="border border-line bg-[#14110e] p-3">
+                <h3 className="font-display text-xl">{row.slot}</h3>
+                <p className="mt-2 text-xs tracking-[0.14em] text-gold uppercase">Acts 1–2</p>
+                <p>{short(row.early)}</p>
+                <p className="mt-2 text-xs tracking-[0.14em] text-gold uppercase">Acts 3–4</p>
+                <p>{short(row.late)}</p>
+                <p className="mt-2 text-xs tracking-[0.14em] text-gold uppercase">Maps</p>
+                <p>{short(row.maps)}</p>
+              </div>
+            ))}
+          </div>
+          <h2 className="mt-8 font-display text-2xl">At level {level}</h2>
+          <p className="mt-1 text-muted">{short(activeBand.gem)}</p>
+          <GearBoard lines={activeBand.armor} weaponNoun={guide.weaponNoun} defence={guide.defence} />
+        </section>
+      ) : null}
+
+      {tab === "Tree" ? (
+        <section id="passive" className="mt-2">
+          <div className="mb-4 border border-gold bg-panel p-4">
+            <p className="text-xs tracking-[0.16em] text-gold uppercase">Spend the next points in this order</p>
+            <p className="mt-2 text-muted">{activeBand.pointsIntro}</p>
+            <ol className="mt-2 list-decimal space-y-1 pl-5">
+              {activeBand.points.slice(0, 4).map((point) => (
+                <li key={point}>{point}</li>
+              ))}
+            </ol>
+          </div>
+          <TreeMap routeKey={guide.treeKey} owned={owned} />
+        </section>
+      ) : null}
+
+      {tab === "Play" ? (
+        <section id="play" className="mt-2 max-w-3xl">
+          <h2 className="font-display text-2xl">Press the buttons in this order</h2>
+          <ol className="mt-4 list-decimal space-y-3 pl-5">
+            {guide.loadout.rotation.map((step) => (
+              <li key={step}>{step}</li>
+            ))}
+          </ol>
+          <h2 className="mt-8 font-display text-2xl">Ascendancy</h2>
+          <ol className="mt-3 list-decimal space-y-2 pl-5">
+            {guide.loadout.ascendancy.map((step) => (
+              <li key={step}>{step}</li>
+            ))}
+          </ol>
+        </section>
+      ) : null}
+
       <section className="mt-10">
-        <h2 className="font-display text-3xl">Unique suggestions</h2>
-        <p className="mt-2 max-w-3xl leading-7 text-muted">
-          These are optional. A rare with the stats above is the plan. Wear a unique when it drops and beats that rare.
-          Do not buy one to start the build.
-        </p>
-        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+        <h2 className="font-display text-2xl">Uniques, if one drops</h2>
+        <p className="mt-2 max-w-3xl text-muted">Wear it when it beats the rare you have. Do not buy one to start.</p>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
           {guide.uniques.map((piece) => (
-            <div key={piece.name} className="flex gap-4 border border-line p-3">
+            <div key={piece.name} className="flex gap-3 border border-line p-3">
               <ItemChip name={piece.name} slot={piece.slot} icon={piece.icon} price={priceFor(piece.name)} />
               <div>
                 <p className="text-xs tracking-[0.16em] text-gold uppercase">From level {piece.level}</p>
-                <p className="mt-2 leading-6">{piece.note}</p>
+                <p className="mt-1">{piece.note}</p>
               </div>
             </div>
           ))}
         </div>
       </section>
 
-      <section className="mt-10 border border-line p-4">
-        <h2 className="font-display text-2xl">Sources</h2>
-        <p className="mt-2 leading-7 text-muted">
-          Maxroll is the long-form guide, with a skill panel, a gear table, and a rotation. Mobalytics is the second
-          written source, used where it prints equipment numbers. poe.ninja is the public ladder, for what people are
-          actually playing. The sentences on this page are not copied from those sites.
+      <section className="mt-8 border border-line p-4">
+        <h2 className="font-display text-xl">Where this layout comes from</h2>
+        <p className="mt-2 text-sm text-muted">
+          The tabs, the socket row, and the slot cards follow the shape of the Maxroll, Mobalytics, and PoE Vault guides.
+          The sentences are written for this page. The links are the pages the numbers came from.
         </p>
-        <ul className="mt-3 flex flex-wrap gap-4 text-sm">
-          <li>
-            <a className="text-gold hover:underline" href={guide.treeUrl} target="_blank" rel="noreferrer">
-              Passive tree
-            </a>
-          </li>
-          {guide.links
-            .filter((link) => link.url !== guide.treeUrl)
-            .map((link) => (
-              <li key={link.url}>
-                <a className="text-gold hover:underline" href={link.url} target="_blank" rel="noreferrer">
-                  {link.label}
-                </a>
-              </li>
-            ))}
+        <ul className="mt-3 flex flex-wrap gap-3 text-sm">
+          {guide.links.map((link) => (
+            <li key={link.url}>
+              <a className="text-gold hover:underline" href={link.url} target="_blank" rel="noreferrer">
+                {link.label}
+              </a>
+            </li>
+          ))}
         </ul>
       </section>
     </article>

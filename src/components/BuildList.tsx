@@ -29,8 +29,7 @@ export function BuildList({
       <p className="mt-4 font-display text-xs tracking-[0.28em] text-ember uppercase">{ascendancy.name}</p>
       <h1 className="mt-2 font-display text-4xl text-parchment">Choose a route</h1>
       <p className="mt-3 max-w-2xl leading-7 text-muted">
-        These are the routes for this ascendancy in patch 0.5.5, including the starters on the October 2026 lists.
-        Pick one. The next page has the gem links, the gear numbers, the level order, and how the buttons are pressed.
+        Pick one route. The next page opens on the level you are, with a short checklist. A new checklist shows up every few levels.
       </p>
       <p className="mt-3 max-w-2xl text-sm leading-6 text-gold">{ladder.message}</p>
 
