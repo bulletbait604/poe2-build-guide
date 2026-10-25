@@ -8,18 +8,7 @@ import { notFound } from "next/navigation";
 function paintGuide(guide: Guide): Guide {
   return {
     ...guide,
-    gear: guide.gear.map((piece) => withIcon(piece)),
-    levelBands: guide.levelBands.map((band) => ({
-      ...band,
-      items: band.items.map((item) => withIcon(item)),
-    })),
-    phases: guide.phases.map((phase) => ({
-      ...phase,
-      steps: phase.steps.map((step) => ({
-        ...step,
-        items: step.items?.map((item) => withIcon(item)),
-      })),
-    })),
+    uniques: guide.uniques.map((piece) => withIcon(piece)),
   };
 }
 
@@ -41,7 +30,6 @@ export default async function GuidePage({
     <GuideView
       guide={paintGuide(guide)}
       gameClass={gameClass}
-      variantId={query.ascendancy ?? null}
       initialLevel={Number.isFinite(level) ? Math.min(100, Math.max(1, level)) : 1}
     />
   );

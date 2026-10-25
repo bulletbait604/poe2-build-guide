@@ -8,12 +8,10 @@ export function getGuide(id: string) {
   return guides.find((guide) => guide.id === id) ?? null;
 }
 
+export function guidesForAscendancy(ascendancyId: string) {
+  return guides.filter((guide) => guide.ascendancyId === ascendancyId);
+}
+
 export function guideForAscendancy(ascendancyId: string) {
-  return (
-    guides.find(
-      (guide) =>
-        guide.ascendancyId === ascendancyId ||
-        guide.variants.some((variant) => variant.ascendancyId === ascendancyId),
-    ) ?? null
-  );
+  return guidesForAscendancy(ascendancyId)[0] ?? null;
 }

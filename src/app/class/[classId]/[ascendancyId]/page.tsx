@@ -1,6 +1,6 @@
 import { BuildList } from "@/components/BuildList";
 import { getAscendancy, getClass } from "@/content/classes";
-import { getGuide } from "@/content/guides";
+import { guidesForAscendancy } from "@/content/guides";
 import { getLadder } from "@/lib/ladder";
 import { notFound } from "next/navigation";
 
@@ -15,8 +15,8 @@ export default async function AscendancyPage({
   const gameClass = getClass(classId);
   const ascendancy = getAscendancy(classId, ascendancyId);
   if (!gameClass || !ascendancy) notFound();
-  const guide = getGuide(ascendancy.guideId);
-  if (!guide) notFound();
+  const routes = guidesForAscendancy(ascendancyId);
+  if (routes.length === 0) notFound();
   const ladder = await getLadder();
-  return <BuildList gameClass={gameClass} ascendancy={ascendancy} guide={guide} ladder={ladder} />;
+  return <BuildList gameClass={gameClass} ascendancy={ascendancy} guides={routes} ladder={ladder} />;
 }

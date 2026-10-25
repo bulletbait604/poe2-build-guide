@@ -11,17 +11,15 @@ import { useState } from "react";
 export function BuildList({
   gameClass,
   ascendancy,
-  guide,
+  guides,
   ladder,
 }: {
   gameClass: GameClass;
   ascendancy: AscendancyInfo;
-  guide: Guide;
+  guides: Guide[];
   ladder: LadderSnapshot;
 }) {
   const group = ladder.groups.find((entry) => entry.ascendancyId === ascendancy.id);
-  const variant = guide.variants.find((entry) => entry.ascendancyId === ascendancy.id);
-  const href = variant ? `/guide/${guide.id}?ascendancy=${ascendancy.id}` : `/guide/${guide.id}`;
 
   return (
     <section>
@@ -29,26 +27,29 @@ export function BuildList({
         {gameClass.name}
       </Link>
       <p className="mt-4 font-display text-xs tracking-[0.28em] text-ember uppercase">{ascendancy.name}</p>
-      <h1 className="mt-2 font-display text-4xl text-parchment">{guide.name}</h1>
-      <p className="mt-3 max-w-2xl leading-7 text-muted">{guide.summary}</p>
+      <h1 className="mt-2 font-display text-4xl text-parchment">Choose a route</h1>
+      <p className="mt-3 max-w-2xl leading-7 text-muted">
+        Each route tells you which stats to look for on your armour as you level. Uniques are suggestions for later,
+        not items you need to buy before you start.
+      </p>
       <p className="mt-3 max-w-2xl text-sm leading-6 text-gold">{ladder.message}</p>
 
-      {variant ? (
-        <aside className="mt-6 border border-gold/40 bg-panel p-4">
-          <h2 className="font-display text-xl text-gold">{variant.title}</h2>
-          <p className="mt-2 leading-7 text-parchment">{variant.differs}</p>
-        </aside>
-      ) : null}
-
-      <Link href={href} className="mt-6 block border border-line bg-panel-2 p-5 hover:border-gold">
-        <span className="font-display text-2xl text-parchment">{guide.name}</span>
-        <span className="mt-1 block text-sm text-muted">
-          {guide.skill} with {guide.helper}. Acts, interludes, maps, and a checkpoint every few levels.
-        </span>
-        <span className="mt-3 block text-xs tracking-[0.16em] text-gold uppercase">
-          {group && ladder.live ? `${group.count} in the top 1,000` : "Open the route"}
-        </span>
-      </Link>
+      <div className="mt-6 grid gap-3">
+        {guides.map((guide) => (
+          <Link
+            key={guide.id}
+            href={`/guide/${guide.id}`}
+            className="block border border-line bg-panel-2 p-5 hover:border-gold"
+          >
+            <span className="font-display text-2xl text-parchment">{guide.name}</span>
+            <span className="mt-1 block text-sm leading-6 text-muted">{guide.summary}</span>
+            <span className="mt-3 block text-xs tracking-[0.16em] text-gold uppercase">
+              {guide.skill} with {guide.helper}
+              {group && ladder.live ? ` · ${group.count} in the top 1,000` : ""}
+            </span>
+          </Link>
+        ))}
+      </div>
 
       {ladder.live && group && group.characters.length > 0 ? (
         <div className="mt-8">

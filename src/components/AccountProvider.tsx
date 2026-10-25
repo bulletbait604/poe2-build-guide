@@ -28,10 +28,9 @@ export function useAccount() {
 
 export function characterHref(character: PoeCharacter) {
   const match = matchLadderClass(character.class);
-  if (!match?.guideId) return "/";
-  const params = new URLSearchParams({ level: String(character.level) });
-  if (match.ascendancyId) params.set("ascendancy", match.ascendancyId);
-  return `/guide/${match.guideId}?${params.toString()}`;
+  if (match?.classId && match.ascendancyId) return `/class/${match.classId}/${match.ascendancyId}`;
+  if (match?.classId) return `/class/${match.classId}`;
+  return "/";
 }
 
 export function AccountProvider({

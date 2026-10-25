@@ -14,12 +14,6 @@ const chapters: Array<{ id: GuideChapter | "levels"; label: string }> = [
   { id: "levels", label: "Every 5 levels" },
 ];
 
-const priorityLabel = {
-  first: "Wear while leveling",
-  soon: "Mid campaign",
-  endgame: "Maps",
-};
-
 function chapterForLevel(level: number): GuideChapter | "levels" {
   if (level >= 60) return "endgame";
   if (level >= 52) return "interludes";
@@ -29,12 +23,10 @@ function chapterForLevel(level: number): GuideChapter | "levels" {
 export function GuideView({
   guide,
   gameClass,
-  variantId,
   initialLevel,
 }: {
   guide: Guide;
   gameClass: GameClass;
-  variantId: string | null;
   initialLevel: number;
 }) {
   const [level, setLevel] = useState(initialLevel);
@@ -62,15 +54,7 @@ export function GuideView({
     );
   }, [guide.id, level, chapter]);
 
-  const names = useMemo(() => {
-    const found = new Set<string>();
-    for (const piece of guide.gear) found.add(piece.name);
-    for (const band of guide.levelBands) for (const item of band.items) found.add(item.name);
-    for (const phase of guide.phases) {
-      for (const step of phase.steps) for (const item of step.items ?? []) found.add(item.name);
-    }
-    return [...found];
-  }, [guide]);
+  const names = useMemo(() => guide.uniques.map((piece) => piece.name), [guide]);
 
   useEffect(() => {
     const query = names.map((name) => encodeURIComponent(name)).join(",");
@@ -88,9 +72,6 @@ export function GuideView({
       .catch(() => setPrices({}));
   }, [names]);
 
-  const variant =
-    guide.variants.find((entry) => entry.ascendancyId === variantId) ??
-    (variantId && variantId !== guide.ascendancyId ? null : null);
   const activeBand = guide.levelBands.find((band) => level >= band.from && level <= band.to) ?? guide.levelBands[0];
   const phases = guide.phases.filter((phase) => chapter !== "levels" && phase.chapter === chapter);
 
@@ -111,7 +92,7 @@ export function GuideView({
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/10 via-black/55 to-black" />
         <div className="relative z-10 flex min-h-[420px] flex-col justify-end p-6 sm:ml-auto sm:w-1/2 sm:justify-center">
-          <Link href={`/class/${gameClass.id}/${variantId || guide.ascendancyId}`} className="text-sm text-muted hover:text-gold">
+          <Link href={`/class/${gameClass.id}/${guide.ascendancyId}`} className="text-sm text-muted hover:text-gold">
             {gameClass.name}
           </Link>
           <p className="mt-3 font-display text-xs tracking-[0.22em] text-gold uppercase">
@@ -123,13 +104,6 @@ export function GuideView({
       </div>
 
       <p className="max-w-3xl text-lg leading-8 text-muted">{guide.summary}</p>
-
-      {variant ? (
-        <aside className="mt-6 border border-gold/40 bg-panel p-4">
-          <h2 className="font-display text-xl text-gold">How {variant.title} differs</h2>
-          <p className="mt-2 leading-7">{variant.differs}</p>
-        </aside>
-      ) : null}
 
       <div className="mt-8 flex flex-wrap items-end gap-6 border border-line bg-panel p-4">
         <label className="text-sm">
@@ -185,11 +159,7 @@ export function GuideView({
                   {band.title}
                   {here ? <span className="ml-3 text-sm tracking-[0.14em] text-ember uppercase">You are here</span> : null}
                 </h2>
-                <dl className="mt-3 grid gap-3 sm:grid-cols-3">
-                  <div>
-                    <dt className="text-xs tracking-[0.16em] text-gold uppercase">Equip</dt>
-                    <dd className="mt-1 leading-6">{band.equip}</dd>
-                  </div>
+                <dl className="mt-3 grid gap-3 sm:grid-cols-2">
                   <div>
                     <dt className="text-xs tracking-[0.16em] text-gold uppercase">Gem</dt>
                     <dd className="mt-1 leading-6">{band.gem}</dd>
@@ -199,11 +169,14 @@ export function GuideView({
                     <dd className="mt-1 leading-6">{band.ignore}</dd>
                   </div>
                 </dl>
-                <div className="mt-4 flex gap-3 overflow-x-auto">
-                  {band.items.map((item) => (
-                    <ItemChip key={`${band.title}-${item.name}`} {...item} price={priceFor(item.name)} />
+                <dl className="mt-4 grid gap-2 sm:grid-cols-2">
+                  {band.armor.map((line) => (
+                    <div key={line.slot}>
+                      <dt className="text-xs tracking-[0.16em] text-gold uppercase">{line.slot}</dt>
+                      <dd className="mt-1 leading-6">{line.lookFor}</dd>
+                    </div>
                   ))}
-                </div>
+                </dl>
               </section>
             );
           })}
@@ -234,13 +207,6 @@ export function GuideView({
                       <div>
                         <h3 className="text-lg text-parchment">{step.title}</h3>
                         <p className="mt-1 leading-7 text-muted">{step.detail}</p>
-                        {step.items && step.items.length > 0 ? (
-                          <div className="mt-3 flex gap-3 overflow-x-auto">
-                            {step.items.map((item) => (
-                              <ItemChip key={`${phase.id}-${item.name}`} {...item} price={priceFor(item.name)} />
-                            ))}
-                          </div>
-                        ) : null}
                       </div>
                     </li>
                   ))}
@@ -251,16 +217,34 @@ export function GuideView({
         </div>
       )}
 
+      <section className="mt-10 border border-line bg-panel p-4">
+        <h2 className="font-display text-3xl">Armour at level {level}</h2>
+        <p className="mt-2 leading-7 text-muted">
+          Wear rares and vendor gear with these stats. Leave a slot empty rather than buying a unique to fill it.
+        </p>
+        <dl className="mt-4 grid gap-3 sm:grid-cols-2">
+          {activeBand.armor.map((line) => (
+            <div key={line.slot} className="border border-line p-3">
+              <dt className="text-xs tracking-[0.16em] text-gold uppercase">{line.slot}</dt>
+              <dd className="mt-1 leading-6">{line.lookFor}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+
       <section className="mt-10">
-        <h2 className="font-display text-3xl">Gear, with pictures</h2>
+        <h2 className="font-display text-3xl">Unique suggestions</h2>
+        <p className="mt-2 max-w-3xl leading-7 text-muted">
+          These are optional. A rare with the stats above is the plan. Wear a unique when it drops and beats that rare.
+          Do not buy one to start the build.
+        </p>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          {guide.gear.map((piece) => (
-            <div key={`${piece.priority}-${piece.name}`} className="flex gap-4 border border-line p-3">
+          {guide.uniques.map((piece) => (
+            <div key={piece.name} className="flex gap-4 border border-line p-3">
               <ItemChip name={piece.name} slot={piece.slot} icon={piece.icon} price={priceFor(piece.name)} />
               <div>
-                <p className="text-xs tracking-[0.16em] text-gold uppercase">{priorityLabel[piece.priority]}</p>
-                <p className="mt-1 text-sm text-muted">Level {piece.level}</p>
-                <p className="mt-2 leading-6">{piece.why}</p>
+                <p className="text-xs tracking-[0.16em] text-gold uppercase">From level {piece.level}</p>
+                <p className="mt-2 leading-6">{piece.note}</p>
               </div>
             </div>
           ))}

@@ -4,12 +4,17 @@ export type ItemRef = {
   icon?: string | null;
 };
 
-export type GearPriority = "first" | "soon" | "endgame";
+export type ArmorLine = {
+  slot: string;
+  lookFor: string;
+};
 
-export type GearPiece = ItemRef & {
-  why: string;
-  priority: GearPriority;
+export type UniqueSuggestion = {
+  name: string;
+  slot: string;
   level: number;
+  note: string;
+  icon?: string | null;
 };
 
 export type LevelBand = {
@@ -19,7 +24,7 @@ export type LevelBand = {
   equip: string;
   gem: string;
   ignore: string;
-  items: ItemRef[];
+  armor: ArmorLine[];
 };
 
 export type GuideStep = {
@@ -40,12 +45,6 @@ export type GuidePhase = {
   steps: GuideStep[];
 };
 
-export type GuideVariant = {
-  ascendancyId: string;
-  title: string;
-  differs: string;
-};
-
 export type GuideLink = {
   label: string;
   url: string;
@@ -64,10 +63,9 @@ export type Guide = {
   fantasy: string;
   links: GuideLink[];
   treeUrl: string;
-  gear: GearPiece[];
+  uniques: UniqueSuggestion[];
   levelBands: LevelBand[];
   phases: GuidePhase[];
-  variants: GuideVariant[];
 };
 
 export type PoeCharacter = {

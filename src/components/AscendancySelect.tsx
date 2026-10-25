@@ -31,9 +31,7 @@ export function AscendancySelect({ gameClass }: { gameClass: GameClass }) {
             >
               <span className="font-display text-2xl text-parchment">{ascendancy.name}</span>
               <span className="mt-1 block text-sm leading-6 text-muted">{ascendancy.blurb}</span>
-              <span className="mt-3 block text-xs tracking-[0.16em] text-gold uppercase">
-                {ascendancy.primary ? "Full written route" : "Same route, with a difference"}
-              </span>
+              <span className="mt-3 block text-xs tracking-[0.16em] text-gold uppercase">Open the routes</span>
             </Link>
           ))}
         </div>
