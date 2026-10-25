@@ -16,10 +16,12 @@
 
 html {
   background: var(--color-ink);
+  overflow-x: hidden;
 }
 
 body {
   min-height: 100vh;
+  overflow-x: hidden;
   background:
     radial-gradient(1200px 500px at 50% -10%, rgba(224, 122, 61, 0.16), transparent 55%),
     var(--color-ink);
