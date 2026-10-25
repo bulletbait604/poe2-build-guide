@@ -86,6 +86,14 @@ if (!timeline.includes("Trial of the Sekhemas")) failures.push("timeline is miss
 if (!timeline.includes("Trial of Chaos")) failures.push("timeline is missing the Trial of Chaos");
 if (!timeline.includes("Balbala")) failures.push("timeline is missing Balbala");
 if (!guideView.includes("Do this now")) failures.push("guide view is missing the current-step marker");
+if (!guideView.includes("campaign path")) failures.push("guide view does not label the passive path");
+if (!timeline.includes("weapon-set passive points")) failures.push("timeline does not explain weapon-set points");
+if (!timeline.includes("It is not mana")) failures.push("timeline does not explain spirit");
+if (!timeline.includes("Djinn Barya")) failures.push("timeline does not explain the Djinn Barya");
+if (timeline.includes("as soon as a gem is offered")) failures.push("timeline still sockets the endgame skill at level 1");
+if (guideView.includes("Use this button by itself")) failures.push("gem row still says to use an empty socket by itself");
+const gemsFile = readFileSync(new URL("../src/content/gems.ts", import.meta.url), "utf8");
+if (gemsFile.includes('"Martial Tempo": "More attack speed')) failures.push("Martial Tempo is still described as a live support");
 
 const counts = new Map();
 for (const match of specs.matchAll(/ascendancyId: "([^"]+)"/g)) {

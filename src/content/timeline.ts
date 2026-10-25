@@ -1,9 +1,11 @@
 import type { BuildSpec } from "@/content/buildSpecs";
 import { armorForBand } from "@/content/armorPlan";
+import { mainSkillReadyAt, requiredLevel } from "@/content/gemFacts";
 import { pointsForBand } from "@/content/passivePlan";
 import type { Loadout, TimelineStep } from "@/lib/types";
 
 const STOPS = [1, 4, 8, 12, 16, 22, 28, 33, 38, 44, 52, 58, 66, 78];
+const SUPPORT_STOPS = [12, 22, 28, 38, 44, 52];
 
 function sentence(text: string) {
   const cut = text.split(/(?<=\.)\s/)[0]?.trim() ?? text.trim();
@@ -36,34 +38,57 @@ function gearLine(spec: BuildSpec, level: number) {
 function passiveLine(spec: BuildSpec, level: number) {
   const plan = pointsForBand(spec, Math.max(1, level - 3), level);
   const point = plan.points[0];
-  return point ? `Next passive: ${sentence(point)}` : "Spend the new point on the highlighted path. Do not path across the tree.";
+  return point
+    ? `Next passive on the class path: ${sentence(point)}`
+    : "Spend the new point on the highlighted path. Do not path across the tree.";
 }
 
-function checksFor(level: number, spec: BuildSpec, loadout: Loadout, supports: string[]) {
+function snap(level: number) {
+  return STOPS.find((stop) => stop >= level) ?? level;
+}
+
+function checksFor(level: number, spec: BuildSpec, loadout: Loadout, readyAt: number) {
   const node = loadout.ascendancy[0] ?? spec.ascendancyPick;
   const second = loadout.ascendancy[1];
-  const supportAt: Record<number, number> = { 12: 0, 22: 1, 28: 2, 38: 3, 44: 4, 52: 5 };
   const checks: string[] = [];
+  const skillLevel = requiredLevel(spec.skill);
+  const helperLevel = requiredLevel(spec.helper);
 
   if (level === 1) {
     checks.push(`Buy the ${spec.weaponNoun} with the highest damage number from the first vendor.`);
-    checks.push(`Socket ${spec.skill} as soon as a gem is offered. That is the only button you need.`);
+    if (readyAt <= 1) {
+      checks.push(`Socket ${spec.skill}. That is the main button.`);
+    } else {
+      const early = sentence(loadout.leveling[0]?.text ?? "Use the weapon's basic attack and any gem the vendor offers at level 1.");
+      const requiredNote = skillLevel === readyAt ? "" : ` The gem's required level is ${skillLevel}.`;
+      checks.push(`Do not socket ${spec.skill} yet. It joins this route at level ${readyAt}.${requiredNote} Until then: ${early}`);
+    }
     checks.push("If the vendor sells boots with movement speed, buy them.");
   } else if (level === 4) {
-    checks.push(`Add ${spec.helper} when you get a second skill gem. It is the second button, not a replacement.`);
+    if (helperLevel <= 4) {
+      checks.push(`Add ${spec.helper} when you get a second skill gem. It is the second button, not a replacement.`);
+    } else {
+      checks.push(`Wait on ${spec.helper}. Its required level is ${helperLevel}.`);
+    }
     checks.push("Life on the body armour. An empty chest is the first thing to fix.");
     checks.push(gearLine(spec, level));
   } else if (level === 8) {
-    checks.push("Kill the Crowbell in the Hunting Grounds. That is +2 weapon-set passive points.");
-    checks.push("If Freythorn is open, finish the rituals and kill the King in the Mists. That is +30 spirit.");
+    checks.push(
+      "Kill the Crowbell in the Hunting Grounds. The reward is +2 weapon-set passive points. Those points only apply while that weapon set is active. They are not the point you get for leveling up.",
+    );
+    checks.push(
+      "If Freythorn is open, finish the rituals and kill the King in the Mists. The reward is +30 spirit. Spirit pays for auras and minions. It is not mana.",
+    );
     checks.push(passiveLine(spec, level));
   } else if (level === 12) {
     checks.push("Return Una's lute for +2 weapon-set points, then kill Count Geonor and sail.");
     checks.push(gearLine(spec, level));
     checks.push(passiveLine(spec, level));
   } else if (level === 16) {
-    checks.push("Kill Balbala, the Traitor, and take the Djinn Barya.");
-    checks.push(`Clear the Trial of the Sekhemas once. That is your first 2 ascendancy points. Take ${sentence(node)}`);
+    checks.push("Kill Balbala, the Traitor, and take the Djinn Barya. That coin opens the Trial of the Sekhemas. It is not a gem.");
+    checks.push(
+      `Clear the Trial of the Sekhemas once. That is your first 2 ascendancy points. Ascendancy points are not passive-tree points. On the ascendancy panel, take ${sentence(node)}`,
+    );
     checks.push(gearLine(spec, level));
   } else if (level === 22) {
     checks.push("Kill Kabala, the Constrictor Queen, for +2 weapon-set points. Bring the relic to the Valley of the Titans.");
@@ -75,7 +100,7 @@ function checksFor(level: number, spec: BuildSpec, loadout: Loadout, supports: s
     checks.push(passiveLine(spec, level));
   } else if (level === 33) {
     checks.push("The Trial of Chaos is in the Chimeral Wetlands. Run it once for the next 2 ascendancy points.");
-    checks.push(second ? `Take ${sentence(second)}` : "Use the new ascendancy node for a whole zone before you take another.");
+    checks.push(second ? `On the ascendancy panel, take ${sentence(second)}` : "Use the new ascendancy node for a whole zone before you take another.");
     checks.push("Kill Blackjaw for +10% fire resistance. Kill Mighty Silverfist if you have not, for +2 weapon-set points.");
   } else if (level === 38) {
     checks.push("Kill Ignagduk, the Bog Witch, and turn the quest in. That is +30 spirit.");
@@ -94,7 +119,7 @@ function checksFor(level: number, spec: BuildSpec, loadout: Loadout, supports: s
     checks.push("Holten is last. Then speak to the Hooded One in Kingsmarch for the last +2 weapon-set points. You should have 24.");
     checks.push(gearLine(spec, level));
   } else if (level === 66) {
-    checks.push("White maps. Fire, cold, and lightning should each be 75% before you push tier.");
+    checks.push("White maps. Fire, cold, and lightning resistance should each read 75% before you push tier.");
     checks.push("Chaos resistance of 30–50% is enough. Do not chase 75% chaos.");
     checks.push(passiveLine(spec, level));
   } else if (level === 78) {
@@ -103,16 +128,15 @@ function checksFor(level: number, spec: BuildSpec, loadout: Loadout, supports: s
     checks.push("Add one support at a time. A new skill name is a different build.");
   }
 
-  const supportIndex = supportAt[level];
-  const support = supportIndex === undefined ? undefined : supports[supportIndex];
-  if (support) {
-    checks.push(`Link ${support} into ${spec.skill}. This is support ${supportIndex + 1}. Read the gem first. If it does not say it supports this skill, take it out.`);
-  }
-
-  return checks.slice(0, 4);
+  return checks;
 }
 
-function levelFrom(row: Loadout["leveling"][number]) {
+function supportReadyAt(index: number, name: string, skillReadyAt: number) {
+  const drip = SUPPORT_STOPS[index] ?? 58;
+  return snap(Math.max(drip, requiredLevel(name), skillReadyAt));
+}
+
+function levelFromRow(row: Loadout["leveling"][number]) {
   const inText = row.text.match(/\blevel (\d+)\b/i);
   if (inText) return Number(inText[1]);
   const single = row.levels.match(/^(\d+)\+?$/);
@@ -123,7 +147,7 @@ function levelFrom(row: Loadout["leveling"][number]) {
 function extras(loadout: Loadout): TimelineStep[] {
   const steps: TimelineStep[] = [];
   for (const row of loadout.leveling) {
-    const level = levelFrom(row);
+    const level = levelFromRow(row);
     if (level === null || level < 2 || level > 95 || STOPS.includes(level)) continue;
     steps.push({
       level,
@@ -136,10 +160,11 @@ function extras(loadout: Loadout): TimelineStep[] {
 
 export function timelineFor(spec: BuildSpec, loadout: Loadout): TimelineStep[] {
   const supports = mainSupports(spec, loadout);
+  const readyAt = mainSkillReadyAt(spec.skill, loadout.overview, loadout.leveling);
   const base = STOPS.map((level) => ({
     level,
     title: titleFor(level),
-    checks: checksFor(level, spec, loadout, supports),
+    checks: checksFor(level, spec, loadout, readyAt),
   }));
   const merged = new Map<number, TimelineStep>();
   for (const step of [...base, ...extras(loadout)]) {
@@ -153,6 +178,27 @@ export function timelineFor(spec: BuildSpec, loadout: Loadout): TimelineStep[] {
       if (!checks.includes(line) && checks.length < 5) checks.push(line);
     }
     existing.checks = checks;
+  }
+  if (readyAt > 1) {
+    const line = `Socket ${spec.skill} now. It is the main button from here.`;
+    const step = merged.get(readyAt);
+    if (!step) {
+      merged.set(readyAt, { level: readyAt, title: titleFor(readyAt), checks: [line] });
+    } else if (!step.checks.some((check) => check.startsWith(`Socket ${spec.skill}`))) {
+      step.checks.unshift(line);
+    }
+  }
+  for (const [index, support] of supports.entries()) {
+    const level = supportReadyAt(index, support, readyAt);
+    const step = merged.get(level);
+    const line = `Link ${support} into ${spec.skill}. This is support ${index + 1}. Its required level is ${requiredLevel(support)}.`;
+    if (!step) {
+      merged.set(level, { level, title: titleFor(level), checks: [line] });
+      continue;
+    }
+    if (!step.checks.some((check) => check.startsWith(`Link ${support} into`)) && step.checks.length < 5) {
+      step.checks.push(line);
+    }
   }
   return [...merged.values()].sort((a, b) => a.level - b.level);
 }

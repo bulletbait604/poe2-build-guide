@@ -30,11 +30,6 @@ const walkOrder = [
 const tabs = ["Now", "Leveling", "Skills", "Gear", "Tree", "Play"] as const;
 type Tab = (typeof tabs)[number];
 
-function short(text: string) {
-  const cut = text.split(/(?<=\.)\s/)[0] ?? text;
-  return cut.length > 170 ? `${cut.slice(0, 167)}…` : cut;
-}
-
 function StepCard({
   step,
   active,
@@ -225,6 +220,7 @@ export function GuideView({
         <section id="now" className="mt-2 space-y-4">
           <p className="max-w-3xl text-muted">
             Do the list on the gold card. Check a line when it is done. The next card is what is coming, not what you do today.
+            Weapon-set points apply only while that weapon set is active. Spirit pays for auras and minions. Ascendancy points are a separate panel from the passive tree.
           </p>
           <StepCard step={current} active done={done} onToggle={toggle} guideId={guide.id} />
           {upcoming ? (
@@ -240,7 +236,7 @@ export function GuideView({
       {tab === "Leveling" ? (
         <section id="leveling" className="mt-2">
           <p className="max-w-3xl text-muted">
-            A new card every few levels. Stay on the gold one. The quest list under the cards is the permanent rewards. Skip a fight that only drops a gem.
+            A new card every few levels. Stay on the gold one. The list under the cards is the same quest rewards, written as the walk, so you do each fight once. Skip a fight that only drops a gem.
           </p>
           <div className="mt-4 space-y-3 border-l border-gold/40 pl-4">
             {guide.timeline.map((step, index) => (
@@ -296,16 +292,16 @@ export function GuideView({
               <div key={row.slot} className="border border-line bg-[#14110e] p-3">
                 <h3 className="font-display text-xl">{row.slot}</h3>
                 <p className="mt-2 text-xs tracking-[0.14em] text-gold uppercase">Acts 1–2</p>
-                <p>{short(row.early)}</p>
+                <p>{row.early}</p>
                 <p className="mt-2 text-xs tracking-[0.14em] text-gold uppercase">Acts 3–4</p>
-                <p>{short(row.late)}</p>
+                <p>{row.late}</p>
                 <p className="mt-2 text-xs tracking-[0.14em] text-gold uppercase">Maps</p>
-                <p>{short(row.maps)}</p>
+                <p>{row.maps}</p>
               </div>
             ))}
           </div>
           <h2 className="mt-8 font-display text-2xl">At level {level}</h2>
-          <p className="mt-1 text-muted">{short(activeBand.gem)}</p>
+          <p className="mt-1 text-muted">{activeBand.gem}</p>
           <GearBoard lines={activeBand.armor} weaponNoun={guide.weaponNoun} defence={guide.defence} />
         </section>
       ) : null}
@@ -314,6 +310,9 @@ export function GuideView({
         <section id="passive" className="mt-2">
           <div className="mb-4 border border-gold bg-panel p-4">
             <p className="text-xs tracking-[0.16em] text-gold uppercase">Spend the next points in this order</p>
+            <p className="mt-2 text-muted">
+              This is the campaign path from your class start on the official 0.5.5 tree. It is the connected walk, not a copied planner tree. Take the nodes in order. A line that says “the next node connected to” means the next node touching the one you just took.
+            </p>
             <p className="mt-2 text-muted">{activeBand.pointsIntro}</p>
             <ol className="mt-2 list-decimal space-y-1 pl-5">
               {activeBand.points.slice(0, 4).map((point) => (

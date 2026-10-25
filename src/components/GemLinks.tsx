@@ -1,9 +1,20 @@
 "use client";
 
+import { gemFact } from "@/content/gemFacts";
 import { gemInfo } from "@/content/gems";
 import type { GemGroup } from "@/lib/types";
 import Image from "next/image";
 import { useState } from "react";
+
+function aloneCopy(name: string) {
+  const fact = gemFact(name);
+  if (fact?.kind === "support" || fact?.kind === "lineage") {
+    const level = typeof fact.level === "number" ? ` Required level ${fact.level}.` : "";
+    const kind = fact.kind === "lineage" ? "lineage support" : "support";
+    return `This is a ${kind}, not a button.${level} Link it into a skill that lists it.`;
+  }
+  return "Press this skill by itself. Add a support only when that gem says it supports this skill.";
+}
 
 function colorFor(damage: string) {
   const text = damage.toLowerCase();
@@ -88,7 +99,7 @@ export function GemLinks({ groups, damage }: { groups: GemGroup[]; damage: strin
                       ))}
                     </div>
                   ) : (
-                    <p className="mb-6 text-sm text-muted">Use this button by itself.</p>
+                    <p className="mb-6 text-sm text-muted">{aloneCopy(skill.name)}</p>
                   )}
                 </div>
                 {skill.supports.length > 0 ? (

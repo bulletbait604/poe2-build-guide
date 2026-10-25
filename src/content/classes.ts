@@ -159,7 +159,7 @@ export const classes: GameClass[] = [
       {
         id: "acolyte-of-chayula",
         name: "Acolyte of Chayula",
-        blurb: "Falling Thunder, Ice Strike, Flicker, or Flames of Chayula.",
+        blurb: "Falling Thunder, Ice Strike, Flicker, or Hand of Chayula.",
         guideId: "acolyte-falling-thunder",
         primary: false,
       },
@@ -221,7 +221,7 @@ export const classes: GameClass[] = [
       {
         id: "disciple-of-varashta",
         name: "Disciple of Varashta",
-        blurb: "Navira, Ruzhan, Kelari, or an Ice Storm. One djinn at a time.",
+        blurb: "Navira, Ruzhan, Kelari, or Icestorm. One djinn at a time.",
         guideId: "disciple-navira",
         primary: false,
       },

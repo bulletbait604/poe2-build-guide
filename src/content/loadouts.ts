@@ -110,7 +110,8 @@ function loadout(parts: Loadout): Loadout {
   return parts;
 }
 
-const attackSupports = ["Rapid Attacks II", "Elemental Armament I", "Lightning Attunement", "Innervate", "Execute", "Deliberation", "Primal Armament II"];
+const arrowSupports = ["Rapid Attacks II", "Elemental Armament I", "Lightning Attunement", "Innervate", "Execute I", "Deliberation"];
+const tornadoSupports = ["Rapid Attacks II", "Elemental Armament I", "Lightning Attunement", "Innervate", "Execute I"];
 
 function lightningArrow(): Loadout {
   return loadout({
@@ -127,16 +128,16 @@ function lightningArrow(): Loadout {
     groups: [
       group(
         "Main attacks",
-        "The Lightning Arrow Deadeye gem panel links this same support row to Lightning Arrow, Mirage Deadeye, and Barrage.",
-        [gem("Lightning Arrow", attackSupports), gem("Mirage Deadeye", attackSupports), gem("Barrage", attackSupports)],
+        "Lightning Arrow takes the attack supports the 0.5.5 gem page allows. Mirage Deadeye does not accept that row, so it stays a button on its own. Barrage only accepts Deliberation from that list.",
+        [gem("Lightning Arrow", arrowSupports), gem("Mirage Deadeye"), gem("Barrage", ["Deliberation"])],
       ),
       group(
         "Single target",
-        "Lightning Rod and Tornado Shot use that same support row on the published panel.",
-        [gem("Lightning Rod", attackSupports), gem("Tornado Shot", attackSupports)],
+        "Lightning Rod takes the same attack supports. Tornado Shot does not accept Deliberation, so that one support stays off it.",
+        [gem("Lightning Rod", arrowSupports), gem("Tornado Shot", tornadoSupports)],
       ),
-      group("Mark", "Voltaic Mark is its own link. These supports sit on the mark.", [
-        gem("Voltaic Mark", ["Mark of Siphoning", "Prolonged Duration I", "Magnified Area I"]),
+      group("Mark", "Voltaic Mark takes the mark supports the gem page allows. Magnified Area is not one of them.", [
+        gem("Voltaic Mark", ["Mark of Siphoning", "Prolonged Duration I"]),
       ]),
       group("Spirit", "Turn these on. They are not linked into the arrow.", [
         gem("Wind Dancer"),
@@ -194,8 +195,8 @@ function iceShot(spec: BuildSpec): Loadout {
         gem("Freezing Salvo"),
         gem("Stormcaller Arrow"),
       ]),
-      group("Utility", "Ice-Tipped Arrows is the one link the Ice Shot page names outright: add Blind II.", [
-        gem("Ice-Tipped Arrows", ["Blind II"]),
+      group("Utility", "Ice-Tipped Arrows stays on the bar. Blind is not a legal support for it on the 0.5.5 gem page, so it is not linked.", [
+        gem("Ice-Tipped Arrows"),
         gem("Escape Shot"),
         gem("Tornado Shot"),
         gem("Frost Bomb"),
@@ -217,7 +218,7 @@ function iceShot(spec: BuildSpec): Loadout {
     ],
     leveling: [
       { levels: "1–13", text: "Bow Shot costs no mana and is the early clear. Frost Bomb for exposure. Escape Shot to freeze and make distance. Lightning Arrow finishes a pack. Stormcaller Arrow is the single-target shot until Snipe." },
-      { levels: "14–30", text: "Add Freezing Salvo. Escape Shot plus Freezing Salvo on bosses. When the boss freezes, Snipe. Ice-Tipped Arrows on cooldown, with Blind II." },
+      { levels: "14–30", text: "Add Freezing Salvo. Escape Shot plus Freezing Salvo on bosses. When the boss freezes, Snipe. Ice-Tipped Arrows on cooldown." },
       { levels: "31+", text: "Ice Shot joins the bar and takes the clear. Keep Snipe for frozen bosses. 20% quality on Ice Shot as soon as you can cut it." },
       { levels: "Maps", text: "Two bows and two quivers. Clear set: extra arrows and a Cadiro's Gambit, only after the bow already kills the pack. Boss set: flat damage, critical chance, gem levels. Attack speed and extra arrows do nothing on that second set." },
     ],
@@ -265,11 +266,10 @@ function lightningSpear(): Loadout {
       ]),
       group("Mark and spirit", "Sniper's Mark takes Mark of Siphoning. Herald of Thunder takes Oisín's Oath once you have that lineage gem.", [
         gem("Sniper's Mark", ["Mark of Siphoning"]),
-        gem("Herald of Thunder", ["Oisín's Oath"]),
+        gem("Herald of Thunder", ["Oisín's Oath", "Precision I"]),
         gem("Wind Dancer"),
         gem("Ghost Dance"),
         gem("Mirage Archer"),
-        gem("Precision"),
       ]),
     ],
     rotation: [
@@ -318,9 +318,9 @@ function twister(spec: BuildSpec): Loadout {
         : [spec.ascendancyPick],
     groups: [
       group("Weapon set I", "Move with Whirling Slash. Twister and Barrage are the damage. War Banner is the Dance with Death speed buff on this set.", [
-        gem("Whirling Slash", ["Rapid Attacks III", "Fist of War III"]),
+        gem("Whirling Slash", ["Rapid Attacks III"]),
         gem("Twister", ["Elemental Armament II", "Ice Bite II", "Concentrated Area", "Projectile Acceleration III", "Rakiata's Flow"]),
-        gem("Barrage", ["Rapid Attacks III"]),
+        gem("Barrage", ["Deliberation"]),
         gem("War Banner"),
       ]),
       group("Weapon set II", "Ice-Tipped Arrows on set II. On set I it does not convert Twister.", [
@@ -330,10 +330,8 @@ function twister(spec: BuildSpec): Loadout {
       ]),
       group("Mark and spirit", "Sniper's Mark uses the mark supports that showed on the Gemling panel.", [
         gem("Sniper's Mark", ["Eternal Mark", "Mark of Siphoning II"]),
-        gem("Wind Dancer"),
+        gem("Wind Dancer", ["Vitality I", "Precision I"]),
         gem("Purity of Ice"),
-        gem("Vitality"),
-        gem("Precision"),
       ]),
       group(
         "Also on the Gemling panel",
@@ -367,18 +365,20 @@ function shieldWall(): Loadout {
     overview:
       "Shield Wall is the clear and the cover. Shockwave Totem slams beside you. Herald of Ash picks up overkill. Lineage gems Ahn's Citadel and Kaom's Madness turn the walls into branching fissures later. They are not required to start.",
     numbers: [cap, chaos, "Life and armour on the shield and the chest. The mace is physical damage.", "Movement speed on boots from Act 1."],
-    ascendancy: ["Take the armour-break or block node after Shield Wall is already the button you press."],
+    ascendancy: [
+      "Take the armour-break or block node after Shield Wall is already the button you press.",
+      "Warbringer only: Warcaller's Bellow is an ascendancy notable, not a gem. It makes warcries explode corpses.",
+    ],
     groups: [
       group("Wall", "The Shield Wall page links these supports to Shield Wall.", [
-        gem("Shield Wall", ["Rapid Attacks II", "Fire Attunement", "Magnified Area II", "Brutality II"]),
+        gem("Shield Wall", ["Rapid Attacks II", "Fire Attunement", "Brutality II"]),
       ]),
-      group("Totem", "Shockwave Totem uses Urgent Totems and Rapid Attacks.", [
-        gem("Shockwave Totem", ["Urgent Totems I", "Rapid Attacks I"]),
+      group("Totem", "Shockwave Totem takes Urgent Totems. Rapid Attacks is not a legal support on that totem.", [
+        gem("Shockwave Totem", ["Urgent Totems I"]),
         gem("Boneshatter"),
       ]),
-      group("Buffs", "Herald of Ash and the warcry. Lineage supports come later.", [
+      group("Buffs", "Herald of Ash is the aura. Ahn's Citadel and Kaom's Madness are lineage supports, not buttons. Warcaller's Bellow is a Warbringer ascendancy notable, so it is not socketed here.", [
         gem("Herald of Ash"),
-        gem("Warcaller's Bellow"),
         gem("Ahn's Citadel"),
         gem("Kaom's Madness"),
       ]),
@@ -442,9 +442,9 @@ function permafrost(): Loadout {
     numbers: [cap, chaos, "Movement speed on boots so you are not reloading in place."],
     ascendancy: ["Sorcery Ward or the culling node. One of them, for a whole zone, then the other."],
     groups: [
-      group("Bolts", "The Permafrost page links Ice Bite and Elemental Armament to Permafrost Bolts, and this support row to Fragmentation Rounds.", [
+      group("Bolts", "Permafrost Bolts keeps Ice Bite and Elemental Armament. Fragmentation Rounds only keeps Close Combat. Concentrated Area, Multishot, and Magnified Area are not legal supports on that gem.", [
         gem("Permafrost Bolts", ["Ice Bite I", "Elemental Armament I"]),
-        gem("Fragmentation Rounds", ["Concentrated Area", "Multishot I", "Magnified Area I", "Close Combat II"]),
+        gem("Fragmentation Rounds", ["Close Combat II"]),
       ]),
       group("Setup", "Grenade, mark, and the two heralds.", [
         gem("Explosive Grenade"),
@@ -487,14 +487,14 @@ function supportingFire(): Loadout {
     groups: [
       group("Before level 36", "This is the campaign crossbow. Freeze, then fragment.", [
         gem("Permafrost Bolts", ["Ice Bite I", "Elemental Armament I"]),
-        gem("Fragmentation Rounds", ["Concentrated Area", "Multishot I", "Magnified Area I"]),
+        gem("Fragmentation Rounds"),
         gem("Frost Bomb"),
         gem("Freezing Mark"),
         gem("Herald of Ice"),
       ]),
       group("After level 36", "Supporting Fire with Fire Attunement ignites the sniper's Gas Arrow. Muster wants minions on the bar. Their damage is not the point, except the sniper early.", [
-        gem("Supporting Fire", ["Fire Attunement", "Vorana's Siege"]),
-        gem("Skeletal Sniper", ["Tecrod's Revenge"]),
+        gem("Supporting Fire", ["Fire Attunement"]),
+        gem("Skeletal Sniper"),
         gem("Skeletal Arsonist", ["Brutus' Brain"]),
         gem("Skeletal Storm Mage"),
         gem("Wolf Pack", ["Infernal Legion I", "Amanamu's Tithe"]),
@@ -528,24 +528,21 @@ function entangle(): Loadout {
   return loadout({
     overview:
       "Entangle roots the pack. You cast it, then the damage skill. Entwined Realities is what lets an Oracle take notables that sit next to keystones. The support row below is the one the Entangle page prints on Entangle.",
-    numbers: [cap, chaos, "Enough mana regeneration that Entangle is not a flask. Clarity is the aura that does that."],
+    numbers: [cap, chaos, "Enough mana regeneration that Entangle is not a flask. Clarity I, linked into Archmage, is the support that does that."],
     ascendancy: ["Entwined Realities, so the notables beside keystones are in range.", "Then the damage node you are already using. One at a time."],
     groups: [
       group("Entangle", "These are the supports the Entangle Oracle page puts on Entangle.", [
         gem("Entangle", ["Accelerated Growth II", "Branching Fissures II", "Rapid Casting II", "Prolonged Duration II", "Living Lightning II", "Considered Casting"]),
       ]),
-      group("Curse and spirit", "Temporal Chains on the pack. The spirit row is Archmage plus the remnant auras.", [
+      group("Curse and spirit", "Temporal Chains is the curse. Archmage is the spirit gem. Clarity I and Vitality I link into Archmage. They are supports, not buttons.", [
         gem("Temporal Chains"),
-        gem("Archmage"),
-        gem("Vitality"),
-        gem("Clarity"),
+        gem("Archmage", ["Clarity I", "Vitality I"]),
         gem("Harmonic Remnants II"),
         gem("Remnant Potency I"),
       ]),
-      group("Lineage", "Later supports, not campaign requirements.", [
+      group("Lineage", "Later supports, not campaign requirements. Blood Transfusion is a passive notable you anoint. It is not a gem, so it is not socketed.", [
         gem("Atalui's Bloodletting"),
         gem("Rakiata's Flow"),
-        gem("Blood Transfusion"),
       ]),
     ],
     rotation: [
@@ -567,23 +564,23 @@ function entangle(): Loadout {
 function grimPillars(): Loadout {
   return loadout({
     overview:
-      "Spell Totem casts Grim Pillars. Early Act 1 is Volcano, Frost Bomb, Contagion, and Essence Drain, with Spell Cascade. Entangle comes next. The totems are the build after that. This is one of the league-starter pages Maxroll ranks at the top of the Oracle list.",
+      "Spell Totem casts Grim Pillars. Early Act 1 is Volcano, Frost Bomb, Contagion, and Essence Drain. Spell Cascade is not a legal support on Volcano, so it is not linked. Entangle comes next. The totems are the build after that.",
     numbers: [cap, chaos, "+levels to spell skills on the weapon or amulet."],
     ascendancy: ["Entwined Realities or the totem node the trial offers first. Use the totem for a zone before a second node."],
     groups: [
       group(
         "Totem",
-        "The Grim Pillars page names these supports on the totem setup. Branching Fissures, Rapid Casting, and Burgeon are the first three to socket.",
-        [gem("Grim Pillars", ["Branching Fissures I", "Rapid Casting I", "Burgeon I", "Lightning Attunement", "Living Lightning", "Magnified Area I", "Concentrated Area"]), gem("Spell Totem")],
+        "Grim Pillars keeps the supports the 0.5.5 gem page allows: Rapid Casting, Lightning Attunement, Magnified Area, and Concentrated Area. Branching Fissures, Burgeon, and Living Lightning are not legal on this gem.",
+        [gem("Grim Pillars", ["Rapid Casting I", "Lightning Attunement", "Magnified Area I", "Concentrated Area"]), gem("Spell Totem")],
       ),
       group("Act 1", "Use these before the totem gem exists.", [
-        gem("Volcano", ["Spell Cascade"]),
+        gem("Volcano"),
         gem("Frost Bomb"),
         gem("Contagion"),
         gem("Essence Drain"),
         gem("Entangle"),
       ]),
-      group("Spirit", "Clarity so the totems do not empty the mana.", [gem("Clarity")]),
+      group("Spirit", "Clarity I regenerates mana. It is a support, not a button. Link it into a persistent skill the gem says it supports. Grim Pillars itself does not accept it.", [gem("Clarity I")]),
     ],
     rotation: [
       "Drop Spell Totem so Grim Pillars starts.",
@@ -592,7 +589,7 @@ function grimPillars(): Loadout {
       "Replace a dead totem before you cast anything else.",
     ],
     leveling: [
-      { levels: "1–14", text: "Volcano, Frost Bomb, Contagion, Essence Drain. Spell Cascade on Volcano." },
+      { levels: "1–14", text: "Volcano, Frost Bomb, Contagion, and Essence Drain. Do not link Spell Cascade to Volcano." },
       { levels: "15–30", text: "Entangle, then Spell Totem and Grim Pillars as soon as both gems exist." },
       { levels: "Maps", text: "The support row, one gem at a time, in the order listed." },
     ],
@@ -607,21 +604,21 @@ function minions(spec: BuildSpec, page: GuideLink): Loadout {
     numbers: [cap, chaos, "+levels to minion skills on the weapon, the amulet, or both.", "Spirit enough to keep the minions you actually use."],
     ascendancy: [spec.ascendancyPick, "One minion node. Use the command skill for a zone before you take another."],
     groups: [
-      group("Minions", "Meat Shield and Elemental Army on the skeletons. Pierce and Wildshards on the sniper, which is the projectile minion.", [
-        gem("Skeletal Sniper", ["Meat Shield II", "Elemental Army", "Pierce III", "Wildshards II"]),
+      group("Minions", "Meat Shield on both skeletons. Elemental Army stays on the storm mage, which accepts it. The sniper does not, so it keeps Meat Shield and Pierce instead.", [
+        gem("Skeletal Sniper", ["Meat Shield II", "Pierce III"]),
         gem("Skeletal Storm Mage", ["Meat Shield II", "Elemental Army"]),
       ]),
       group("Commands and djinn", "Volcano is how the Disciple page summons during the campaign. The djinn are one at a time.", [
-        gem("Volcano", ["Rapid Casting II", "Spell Echo", "Overabundance II", "Long Fuse II", "Upwelling II"]),
-        gem("Kelari"),
-        gem("Ruzhan"),
+        gem("Volcano", ["Rapid Casting II", "Overabundance II"]),
+        gem("Kelari, the Tainted Sands"),
+        gem("Ruzhan, the Blazing Sword"),
       ]),
       group("Marks", "Elemental Weakness and Freezing Mark, with the duration and cost supports from that panel.", [
         gem("Elemental Weakness", ["Prolonged Duration II", "Efficiency II"]),
         gem("Freezing Mark"),
         gem("Frost Bomb"),
       ]),
-      group("Spirit", "Vitality. Add more auras only when the spirit number on your gear can pay for them.", [gem("Vitality")]),
+      group("Spirit", "Vitality I is a support, not a button. None of the minion skills on this bar accept it. Link it only into a persistent skill whose gem text says it supports that skill.", [gem("Vitality I")]),
     ],
     rotation: [
       "Summon. On the Disciple route that summon is Volcano, then the minion command.",
@@ -646,9 +643,10 @@ function coc(spec: BuildSpec, page: GuideLink): Loadout {
     numbers: [cap, chaos, "Critical chance on the weapon so Cast on Critical actually fires.", "Energy shield high enough that CI does not leave you at one hit."],
     ascendancy: [spec.ascendancyPick],
     groups: [
-      group("Trigger", "Frostbolt is the spell you cast. Cast on Critical is the link. Comet is what falls. The support names are the ones on the Disciple gem panel.", [
-        gem("Frostbolt", ["Cast on Critical", "Rapid Casting I", "Spell Cascade", "Ice Bite I"]),
-        gem("Comet", ["Overabundance I", "Magnified Area I"]),
+      group("Trigger", "Cast on Critical is a meta gem, required level 14. This route uses it from level 31. Socket Frostbolt and Comet into it. It is not a support you link onto Frostbolt. Spell Cascade is not legal on Frostbolt. Overabundance is not legal on Comet.", [
+        gem("Cast on Critical"),
+        gem("Frostbolt", ["Rapid Casting I", "Ice Bite I"]),
+        gem("Comet", ["Magnified Area I", "Spell Cascade"]),
       ]),
       group("Also on the bar", "The page names these as their own buttons.", [
         gem("Frost Wall"),
@@ -668,7 +666,7 @@ function coc(spec: BuildSpec, page: GuideLink): Loadout {
     ],
     leveling: [
       { levels: "1–30", text: "Frostbolt and Frost Bomb. Comet by hand on bosses until Cast on Critical exists." },
-      { levels: "31+", text: "Socket Cast on Critical into Frostbolt and put Comet in the trigger." },
+      { levels: "31+", text: "Socket Frostbolt and Comet into Cast on Critical. Cast on Critical is the meta gem, not a support." },
       { levels: "Maps", text: "CI when the shield can carry you. Add the remaining supports one at a time." },
     ],
     gear: esGear("wand", "Cold damage, critical chance, and +levels to cold spells."),
@@ -688,7 +686,7 @@ function arc(): Loadout {
     ascendancy: ["Archon of the Storm", "Invigorating Archon", "Siphon Elements"],
     groups: [
       group("Spells", "Arc is the clear. Orb of Storms is the orb you cast twice. Flame Wall is the infusion setup.", [
-        gem("Arc", ["Arcane Tempo"]),
+        gem("Arc", ["Rapid Casting I"]),
         gem("Orb of Storms"),
         gem("Flame Wall"),
         gem("Frost Bomb", ["Long Fuse II", "Prolonged Duration II"]),
@@ -721,9 +719,9 @@ function essenceDrain(spec: BuildSpec): Loadout {
     numbers: [cap, chaos, "Energy shield on the body and the helmet. A little life still helps while you are not on CI."],
     ascendancy: [spec.ascendancyPick],
     groups: [
-      group("Chaos", "Cast Contagion first. Essence Drain second. Chain, Zenith, and Execute are the supports the Lich page names.", [
-        gem(drainFirst ? "Essence Drain" : "Contagion", drainFirst ? ["Chain", "Zenith II", "Execute III"] : []),
-        gem(drainFirst ? "Contagion" : "Essence Drain", drainFirst ? [] : ["Chain", "Zenith II", "Execute III"]),
+      group("Chaos", "Cast Contagion first. Essence Drain second. Chain I, Zenith II, and Execute III are the supports that gem accepts.", [
+        gem(drainFirst ? "Essence Drain" : "Contagion", drainFirst ? ["Chain I", "Zenith II", "Execute III"] : []),
+        gem(drainFirst ? "Contagion" : "Essence Drain", drainFirst ? [] : ["Chain I", "Zenith II", "Execute III"]),
         gem("Temporal Chains"),
         gem("Flame Wall"),
       ]),
@@ -737,7 +735,7 @@ function essenceDrain(spec: BuildSpec): Loadout {
     ],
     leveling: [
       { levels: "1–12", text: "Contagion and Essence Drain from the first town. Energy shield on the chest." },
-      { levels: "13+", text: "Chain on Essence Drain first, then Zenith, then Execute." },
+      { levels: "13+", text: "Chain I on Essence Drain first, then Zenith II, then Execute III." },
       { levels: "Maps", text: "Temporal Chains and the sniper. Do not add a third damage spell." },
     ],
     gear: esGear("wand", "Chaos damage or +levels to chaos spells."),
@@ -794,8 +792,8 @@ function hollowForm(): Loadout {
     numbers: [cap, chaos, "CI only after the energy shield can take a hit.", "Cooldown recovery so Hollow Form is up often."],
     ascendancy: ["The Hollow Form node first. Then a damage node, after the form is the button you actually press."],
     groups: [
-      group("Form", "Cooldown Recovery sits on Hollow Form. The cold attack supports sit on the hits. Those support names are the ones the Hollow Form page prints.", [
-        gem("Hollow Form", ["Cooldown Recovery I"]),
+      group("Form", "Hollow Form does not accept Cooldown Recovery on the 0.5.5 gem page. Get that stat on gear. The cold-attack supports stay on the hits.", [
+        gem("Hollow Form"),
         gem("Whirling Assault", ["Concentrated Area", "Rage I", "Ice Bite I", "Elemental Armament I", "Magnified Area I"]),
         gem("Ice Strike", ["Ice Bite I", "Elemental Armament I"]),
         gem("Tempest Bell"),
@@ -814,7 +812,7 @@ function hollowForm(): Loadout {
     ],
     leveling: [
       { levels: "1–20", text: "Ice Strike and the bell. Life and a resistance on every piece." },
-      { levels: "21+", text: "Hollow Form and Whirling Assault. Cooldown Recovery on the form." },
+      { levels: "21+", text: "Hollow Form and Whirling Assault. Cooldown recovery comes from gear, not from a support on the form." },
       { levels: "Maps", text: "CI when the shield is ready. Ghost Dance with it." },
     ],
     gear: esGear("quarterstaff", "Cold damage and attack speed. Energy shield on the body once you are near CI."),
@@ -849,8 +847,8 @@ function oilBarrage(): Loadout {
         gem("Whirling Assault"),
         gem("Tempest Bell"),
       ]),
-      group("Charges and marks", "The page prints this Blasphemy link for power charges before your amulet and gloves generate them. Predator's Mark early, then Freezing Mark.", [
-        gem("Blasphemy", ["Repulsion", "Living Lightning II", "Culmination II", "Ailith's Chimes"]),
+      group("Charges and marks", "Blasphemy is the curse aura. Repulsion, Living Lightning, Culmination, and Ailith's Chimes are not legal supports on it. Predator's Mark, then Freezing Mark, are the marks.", [
+        gem("Blasphemy"),
         gem("Freezing Mark"),
         gem("Predator's Mark"),
         gem("Hand of Chayula"),
@@ -985,14 +983,14 @@ function boneshatter(): Loadout {
     groups: [
       group("Hits", "Leap Slam, then Boneshatter, then the hammer follow-up.", [
         gem("Leap Slam"),
-        gem("Boneshatter", ["Martial Tempo"]),
+        gem("Boneshatter", ["Rapid Attacks II"]),
         gem("Rolling Slam"),
       ]),
     ],
     rotation: ["Leap Slam onto the pack.", "Boneshatter the stunned enemy.", "The hammer follow-up.", "Step out. Do not Boneshatter a target that is not stunned."],
     leveling: [
       { levels: "1–14", text: "Rolling Slam or Leap Slam. Armour on the chest." },
-      { levels: "15+", text: "Boneshatter on stunned rares. Martial Tempo in it when the gem says it supports the attack." },
+      { levels: "15+", text: "Boneshatter on stunned rares. Rapid Attacks II in it when the gem says it supports the attack." },
       { levels: "Maps", text: "A higher physical mace. Life on every armour piece." },
     ],
     gear: armourGear("mace", "Physical damage and stun. Attack speed second."),
@@ -1007,7 +1005,7 @@ function rake(): Loadout {
     ascendancy: ["An Amazon node that helps the spear or the bleed, after Rake is already the clear."],
     groups: [
       group("Bleed", "Rake, then Blood Hunt, with Herald of Blood.", [
-        gem("Rake", ["Martial Tempo"]),
+        gem("Rake", ["Rapid Attacks II"]),
         gem("Blood Hunt"),
         gem("Herald of Blood"),
       ]),
@@ -1164,8 +1162,8 @@ const byId: Record<string, (spec: BuildSpec) => Loadout> = {
       overview:
         "Infernal Legion is the lich minion starter on the October 5, 2026 tier list. Infernal Legion goes on a minion you expect to die. The command pattern and the other sockets are the minion row from the Disciple page, which prints them in full. Read the lich page for the ascendancy node.",
       groups: [
-        group("Minions", "Infernal Legion on the minion that is allowed to burn. Meat Shield and Elemental Army from the Disciple minion panel on the sniper.", [
-          gem("Skeletal Sniper", ["Infernal Legion I", "Meat Shield II", "Elemental Army"]),
+        group("Minions", "Infernal Legion on the minion that is allowed to burn. Meat Shield stays on the sniper. Elemental Army is not a legal support on that gem.", [
+          gem("Skeletal Sniper", ["Infernal Legion I", "Meat Shield II"]),
           gem("Skeletal Arsonist", ["Brutus' Brain"]),
         ]),
         ...minions(spec, guide("infernal-legion-lich-build-guide", "Maxroll Infernal Legion Lich")).groups.slice(1),
@@ -1181,7 +1179,7 @@ const byId: Record<string, (spec: BuildSpec) => Loadout> = {
       overview:
         "Demon Calamity is the bear-side Shaman page: you are in the form, and the calamity does the ranged part. Maul and Furious Slam are the melee buttons. The meteor and totem list is the Walking Calamity page, which is the other Shaman starter.",
       groups: [
-        group("Bear", "Maul and Furious Slam while the form is up.", [gem("Maul", ["Martial Tempo"]), gem("Furious Slam"), gem("Walking Calamity"), gem("Herald of Ice")]),
+        group("Bear", "Maul and Furious Slam while the form is up.", [gem("Maul", ["Rapid Attacks II"]), gem("Furious Slam"), gem("Walking Calamity"), gem("Herald of Ice")]),
         ...walkingCalamity().groups,
       ],
       sources: [guide("demon-calamity-bear-shaman-build-guide", "Maxroll Demon Calamity Bear"), ...commonSources],
@@ -1194,9 +1192,10 @@ const byId: Record<string, (spec: BuildSpec) => Loadout> = {
       overview:
         "Spark fills the room. Comet falls when the cast crits. The trigger supports are the ones printed on the Disciple Frostbolt Cast on Critical page, which is the page that lists them. The Gemling page is this ascendancy's route.",
       groups: [
-        group("Trigger", "Spark is the cast. Cast on Critical is the link. Comet is what falls. Those support names come from the Disciple frostbolt panel.", [
-          gem("Spark", ["Cast on Critical", "Arcane Tempo", "Rapid Casting I"]),
-          gem("Comet", ["Overabundance I", "Magnified Area I"]),
+        group("Trigger", "Cast on Critical is the meta gem. Socket Spark and Comet into it. Rapid Casting I stays on Spark. Spell Cascade is legal on Comet, not on Spark.", [
+          gem("Cast on Critical"),
+          gem("Spark", ["Rapid Casting I"]),
+          gem("Comet", ["Magnified Area I", "Spell Cascade"]),
         ]),
         ...base.groups.slice(1),
       ],
@@ -1214,7 +1213,7 @@ const byId: Record<string, (spec: BuildSpec) => Loadout> = {
       ...boneshatter(),
       overview:
         "The October 5, 2026 tier list does not print a Smith of Kitava starter. Earthquake is the slam: drop it, walk off the burst. Keep a normal body with life and armour if you took a Smith body node. A unique chest turns that node off.",
-      groups: [group("Slam", "Earthquake, then a strike to finish.", [gem("Earthquake", ["Martial Tempo"]), gem("Perfect Strike")])],
+      groups: [group("Slam", "Earthquake, then a strike to finish.", [gem("Earthquake", ["Rapid Attacks II"]), gem("Perfect Strike")])],
       sources: commonSources,
       ascendancy: [spec.ascendancyPick],
     }),
@@ -1226,7 +1225,7 @@ const byId: Record<string, (spec: BuildSpec) => Loadout> = {
       groups: [
         group("Bell", "Ice Strike uses Ice Bite and Elemental Armament.", [
           gem("Tempest Bell"),
-          gem("Ice Strike", ["Ice Bite I", "Elemental Armament I", "Martial Tempo"]),
+          gem("Ice Strike", ["Ice Bite I", "Elemental Armament I", "Rapid Attacks II"]),
           gem("Freezing Mark"),
           gem("Herald of Ice"),
         ]),
@@ -1250,8 +1249,8 @@ const byId: Record<string, (spec: BuildSpec) => Loadout> = {
       numbers: [cap, chaos, "Energy shield and life, because Temporal Rift gives back what you had a moment ago."],
       ascendancy: ["Time Freeze, and spend it on bosses.", "Temporal Rift second, for a mistake you already made."],
       groups: [
-        group("Cold", "Frostbolt with Arcane Tempo. Comet on the boss. Arctic Armour stays on.", [
-          gem("Frostbolt", ["Arcane Tempo"]),
+        group("Cold", "Frostbolt with Rapid Casting I. Comet on the boss. Arctic Armour stays on.", [
+          gem("Frostbolt", ["Rapid Casting I"]),
           gem("Comet"),
           gem("Arctic Armour"),
           gem("Frost Bomb"),
@@ -1273,8 +1272,8 @@ const byId: Record<string, (spec: BuildSpec) => Loadout> = {
       numbers: [cap, chaos, "Cast speed on the wand. Movement speed on the boots."],
       ascendancy: [spec.ascendancyPick],
       groups: [
-        group("Spark", "Spark, Frost Bomb, and Orb of Storms. Arcane Tempo in Spark.", [
-          gem("Spark", ["Arcane Tempo"]),
+        group("Spark", "Spark, Frost Bomb, and Orb of Storms. Rapid Casting I in Spark.", [
+          gem("Spark", ["Rapid Casting I"]),
           gem("Frost Bomb"),
           gem("Orb of Storms"),
           gem("Flame Wall"),
@@ -1297,7 +1296,7 @@ const byId: Record<string, (spec: BuildSpec) => Loadout> = {
       ascendancy: ["The wave or bell node first. Use Storm Wave for a zone before a second node."],
       groups: [
         group("Wave", "Storm Wave, the bell, and Hollow Focus.", [
-          gem("Storm Wave", ["Martial Tempo"]),
+          gem("Storm Wave", ["Rapid Attacks II"]),
           gem("Tempest Bell"),
           gem("Hollow Focus", ["Cooldown Recovery I"]),
           gem("Herald of Ice"),
