@@ -55,7 +55,7 @@ export function GemBar({
             <button
               key={gem.key}
               type="button"
-              className="group relative w-28 text-center"
+              className={`group relative w-28 text-center hover:z-30 focus:z-30 ${shown ? "z-30" : "z-10"}`}
               aria-expanded={shown}
               onClick={() => setOpen(shown ? null : gem.key)}
               onMouseEnter={() => setOpen(gem.key)}

@@ -64,7 +64,7 @@ export function GearBoard({
             <button
               key={piece.slot}
               type="button"
-              className={`group relative border bg-ink/70 p-2 text-left ${shown ? "border-gold" : "border-gold/40"} hover:border-gold`}
+              className={`group relative border bg-ink/70 p-2 text-left hover:z-30 focus:z-30 ${shown ? "z-30 border-gold" : "z-10 border-gold/40"} hover:border-gold`}
               aria-expanded={shown}
               onClick={() => setOpen(shown ? null : piece.slot)}
               onMouseEnter={() => setOpen(piece.slot)}
