@@ -63,7 +63,7 @@ function baseName(slot: string, spec: BuildSpec) {
   const noun = spec.weaponNoun;
   const defence = family(spec.defence);
   const defenceName =
-    defence === "es" ? "energy shield (int)" : defence === "evasion" ? "evasion (dex)" : "armour (str)";
+    defence === "es" ? "Energy shield (int)" : defence === "evasion" ? "Evasion (dex)" : "Armour (str)";
   if (/quiver/i.test(slot)) return "A broadhead quiver";
   if (/shield/i.test(slot)) return "A strength shield";
   if (/bow|spear|crossbow|weapon|staff|wand|mace|sceptre|quarterstaff/i.test(slot)) {
@@ -72,10 +72,10 @@ function baseName(slot: string, spec: BuildSpec) {
     if (noun === "bow") return "A bow with the higher tooltip damage";
     return `A ${noun} with the higher tooltip damage`;
   }
-  if (/body/i.test(slot)) return `A ${defenceName} body armour`;
-  if (/helm/i.test(slot)) return `A ${defenceName} helmet`;
-  if (/glove/i.test(slot)) return `A ${defenceName} glove`;
-  if (/boot/i.test(slot)) return `A ${defenceName} boot`;
+  if (/body/i.test(slot)) return `${defenceName} body armour`;
+  if (/helm/i.test(slot)) return `${defenceName} helmet`;
+  if (/glove/i.test(slot)) return `${defenceName} gloves`;
+  if (/boot/i.test(slot)) return `${defenceName} boots`;
   if (/amulet/i.test(slot)) return defence === "es" ? "A lapis amulet" : defence === "evasion" ? "A jade amulet" : "An amber amulet";
   if (/ring/i.test(slot)) return attacker(spec) ? "Two rare rings. Iron Rings until a rare beats the damage." : "Two rare rings";
   if (/belt/i.test(slot)) return "A rare belt";
