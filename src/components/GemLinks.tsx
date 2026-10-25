@@ -45,7 +45,7 @@ export function GemLinks({ groups, damage }: { groups: GemGroup[]; damage: strin
           <div className="mt-4 space-y-4">
             {group.skills.map((skill) => (
               <div key={`${group.label}-${skill.name}`} className="border border-line bg-ink/40 p-3">
-                <div className="flex gap-3 overflow-x-auto pb-1">
+                <div className="flex flex-col gap-3 sm:flex-row sm:overflow-x-auto sm:pb-1">
                   <button
                     type="button"
                     className="group relative w-28 shrink-0 text-center hover:z-30"
@@ -59,7 +59,7 @@ export function GemLinks({ groups, damage }: { groups: GemGroup[]; damage: strin
                     </span>
                   </button>
                   {skill.supports.length > 0 ? (
-                    <div className="flex min-w-0 flex-1 items-start gap-2 border-l border-gold/50 pl-3">
+                    <div className="flex flex-wrap items-start gap-2 border-gold/50 sm:min-w-0 sm:flex-1 sm:flex-nowrap sm:overflow-x-auto sm:border-l sm:pl-3">
                       {skill.supports.map((support) => (
                         <button
                           key={`${skill.name}-${support}`}
