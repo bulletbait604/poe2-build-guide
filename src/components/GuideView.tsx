@@ -7,17 +7,22 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
-const chapters: Array<{ id: GuideChapter | "levels"; label: string }> = [
-  { id: "acts", label: "Acts" },
-  { id: "interludes", label: "Interludes" },
-  { id: "endgame", label: "Endgame" },
-  { id: "levels", label: "Every 5 levels" },
-];
-
 function chapterForLevel(level: number): GuideChapter | "levels" {
   if (level >= 60) return "endgame";
   if (level >= 52) return "interludes";
   return "acts";
+}
+
+const walkOrder = ["act-1", "act-2", "act-3", "act-4", "interlude-1", "interlude-2", "interlude-3", "endgame"];
+
+function bandsFor(id: string, bands: Guide["levelBands"]) {
+  if (id === "act-1") return bands.filter((band) => band.to <= 14);
+  if (id === "act-2") return bands.filter((band) => band.from >= 15 && band.to <= 29);
+  if (id === "act-3") return bands.filter((band) => band.from >= 30 && band.to <= 39);
+  if (id === "act-4") return bands.filter((band) => band.from >= 40 && band.to <= 49);
+  if (id === "interlude-3") return bands.filter((band) => band.from >= 50 && band.to <= 59);
+  if (id === "endgame") return bands.filter((band) => band.from >= 60);
+  return [];
 }
 
 export function GuideView({
@@ -30,17 +35,15 @@ export function GuideView({
   initialLevel: number;
 }) {
   const [level, setLevel] = useState(initialLevel);
-  const [chapter, setChapter] = useState<GuideChapter | "levels">(chapterForLevel(initialLevel));
   const [prices, setPrices] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const raw = localStorage.getItem("poe2-guide-progress");
     if (initialLevel !== 1 || !raw) return;
     try {
-      const saved = JSON.parse(raw) as { guideId?: string; level?: number; chapter?: GuideChapter | "levels" };
+      const saved = JSON.parse(raw) as { guideId?: string; level?: number };
       if (saved.guideId === guide.id && typeof saved.level === "number") {
         setLevel(saved.level);
-        if (saved.chapter) setChapter(saved.chapter);
       }
     } catch {
       localStorage.removeItem("poe2-guide-progress");
@@ -50,9 +53,9 @@ export function GuideView({
   useEffect(() => {
     localStorage.setItem(
       "poe2-guide-progress",
-      JSON.stringify({ guideId: guide.id, level, chapter }),
+      JSON.stringify({ guideId: guide.id, level, chapter: chapterForLevel(level) }),
     );
-  }, [guide.id, level, chapter]);
+  }, [guide.id, level]);
 
   const names = useMemo(() => guide.uniques.map((piece) => piece.name), [guide]);
 
@@ -73,7 +76,9 @@ export function GuideView({
   }, [names]);
 
   const activeBand = guide.levelBands.find((band) => level >= band.from && level <= band.to) ?? guide.levelBands[0];
-  const phases = guide.phases.filter((phase) => chapter !== "levels" && phase.chapter === chapter);
+  const phases = walkOrder
+    .map((id) => guide.phases.find((phase) => phase.id === id))
+    .filter((phase): phase is Guide["phases"][number] => Boolean(phase));
 
   function priceFor(name: string) {
     return prices[name.toLowerCase()] ?? null;
@@ -132,105 +137,78 @@ export function GuideView({
           />
         </label>
         <p className="text-sm text-gold">
-          You are on {activeBand.title}. {guide.skill} is still the skill.
+          You are on {activeBand.title}. Follow the highlighted chapter, then the upgrade card for this level.
         </p>
       </div>
 
-      <div className="mt-4 flex flex-wrap gap-2">
-        {chapters.map((entry) => (
-          <button
-            key={entry.id}
-            type="button"
-            onClick={() => setChapter(entry.id)}
-            className={`border px-4 py-2 text-sm ${chapter === entry.id ? "border-gold bg-gold text-ink" : "border-line text-parchment hover:border-gold"}`}
-          >
-            {entry.label}
-          </button>
+      <nav className="mt-4 flex flex-wrap gap-2">
+        {phases.map((phase) => (
+          <a key={phase.id} href={`#${phase.id}`} className="border border-line px-3 py-2 text-sm text-parchment hover:border-gold">
+            {phase.title.replace(/ ·.*/, "")}
+          </a>
         ))}
-      </div>
+      </nav>
 
-      {chapter === "levels" ? (
-        <div className="mt-6 space-y-4">
-          {guide.levelBands.map((band) => {
-            const here = band.from === activeBand.from;
-            return (
-              <section key={band.title} className={`border p-4 ${here ? "border-gold bg-panel" : "border-line"}`}>
-                <h2 className="font-display text-2xl">
-                  {band.title}
-                  {here ? <span className="ml-3 text-sm tracking-[0.14em] text-ember uppercase">You are here</span> : null}
-                </h2>
-                <dl className="mt-3 grid gap-3 sm:grid-cols-2">
-                  <div>
-                    <dt className="text-xs tracking-[0.16em] text-gold uppercase">Gem</dt>
-                    <dd className="mt-1 leading-6">{band.gem}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-xs tracking-[0.16em] text-gold uppercase">Leave this for later</dt>
-                    <dd className="mt-1 leading-6">{band.ignore}</dd>
-                  </div>
-                </dl>
-                <dl className="mt-4 grid gap-2 sm:grid-cols-2">
-                  {band.armor.map((line) => (
-                    <div key={line.slot}>
-                      <dt className="text-xs tracking-[0.16em] text-gold uppercase">{line.slot}</dt>
-                      <dd className="mt-1 leading-6">{line.lookFor}</dd>
+      <div className="mt-6 space-y-8">
+        {phases.map((phase) => {
+          const here =
+            level >= phase.levelMin &&
+            level <= phase.levelMax &&
+            !phases.some(
+              (other) =>
+                other.levelMin > phase.levelMin &&
+                level >= other.levelMin &&
+                level <= other.levelMax,
+            );
+          const upgrades = bandsFor(phase.id, guide.levelBands);
+          return (
+            <section key={phase.id} id={phase.id} className={`border p-4 ${here ? "border-gold bg-panel" : "border-line"}`}>
+              <h2 className="font-display text-3xl">
+                {phase.title}
+                <span className="ml-3 text-sm text-muted">{phase.levelRange}</span>
+                {here ? <span className="ml-3 text-sm tracking-[0.14em] text-ember uppercase">You are here</span> : null}
+              </h2>
+              <ol className="mt-4 space-y-4">
+                {phase.steps.map((step, index) => (
+                  <li key={step.title} className="grid grid-cols-[2rem_minmax(0,1fr)] gap-3">
+                    <span className="font-display text-gold">{index + 1}</span>
+                    <div>
+                      <h3 className="text-lg text-parchment">{step.title}</h3>
+                      <p className="mt-1 leading-7 text-muted">{step.detail}</p>
                     </div>
-                  ))}
-                </dl>
-              </section>
-            );
-          })}
-        </div>
-      ) : (
-        <div className="mt-6 space-y-5">
-          {phases.map((phase) => {
-            const here =
-              level >= phase.levelMin &&
-              level <= phase.levelMax &&
-              !phases.some(
-                (other) =>
-                  other.levelMin > phase.levelMin &&
-                  level >= other.levelMin &&
-                  level <= other.levelMax,
-              );
-            return (
-              <section key={phase.id} className={`border p-4 ${here ? "border-gold bg-panel" : "border-line"}`}>
-                <h2 className="font-display text-2xl">
-                  {phase.title}
-                  <span className="ml-3 text-sm text-muted">{phase.levelRange}</span>
-                  {here ? <span className="ml-3 text-sm tracking-[0.14em] text-ember uppercase">You are here</span> : null}
-                </h2>
-                <ol className="mt-4 space-y-4">
-                  {phase.steps.map((step, index) => (
-                    <li key={step.title} className="grid grid-cols-[2rem_minmax(0,1fr)] gap-3">
-                      <span className="font-display text-gold">{index + 1}</span>
-                      <div>
-                        <h3 className="text-lg text-parchment">{step.title}</h3>
-                        <p className="mt-1 leading-7 text-muted">{step.detail}</p>
+                  </li>
+                ))}
+              </ol>
+              {upgrades.length > 0 ? (
+                <div className="mt-6 space-y-3">
+                  <h3 className="font-display text-xl text-gold">Upgrades every 5 levels</h3>
+                  {upgrades.map((band) => {
+                    const current = band.from === activeBand.from;
+                    return (
+                      <div key={band.title} className={`border p-3 ${current ? "border-gold" : "border-line"}`}>
+                        <p className="font-display text-lg">
+                          {band.title}
+                          {current ? <span className="ml-3 text-sm tracking-[0.14em] text-ember uppercase">Do this now</span> : null}
+                        </p>
+                        <p className="mt-2 leading-6">{band.gem}</p>
+                        <dl className="mt-3 grid gap-2 sm:grid-cols-2">
+                          {band.armor.map((line) => (
+                            <div key={line.slot}>
+                              <dt className="text-xs tracking-[0.16em] text-gold uppercase">{line.slot}</dt>
+                              <dd className="mt-1 leading-6 text-muted">{line.lookFor}</dd>
+                            </div>
+                          ))}
+                        </dl>
+                        <p className="mt-3 text-sm leading-6 text-muted">{band.ignore}</p>
                       </div>
-                    </li>
-                  ))}
-                </ol>
-              </section>
-            );
-          })}
-        </div>
-      )}
-
-      <section className="mt-10 border border-line bg-panel p-4">
-        <h2 className="font-display text-3xl">Armour at level {level}</h2>
-        <p className="mt-2 leading-7 text-muted">
-          Wear rares and vendor gear with these stats. Leave a slot empty rather than buying a unique to fill it.
-        </p>
-        <dl className="mt-4 grid gap-3 sm:grid-cols-2">
-          {activeBand.armor.map((line) => (
-            <div key={line.slot} className="border border-line p-3">
-              <dt className="text-xs tracking-[0.16em] text-gold uppercase">{line.slot}</dt>
-              <dd className="mt-1 leading-6">{line.lookFor}</dd>
-            </div>
-          ))}
-        </dl>
-      </section>
+                    );
+                  })}
+                </div>
+              ) : null}
+            </section>
+          );
+        })}
+      </div>
 
       <section className="mt-10">
         <h2 className="font-display text-3xl">Unique suggestions</h2>

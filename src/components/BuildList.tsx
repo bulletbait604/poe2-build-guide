@@ -29,8 +29,9 @@ export function BuildList({
       <p className="mt-4 font-display text-xs tracking-[0.28em] text-ember uppercase">{ascendancy.name}</p>
       <h1 className="mt-2 font-display text-4xl text-parchment">Choose a route</h1>
       <p className="mt-3 max-w-2xl leading-7 text-muted">
-        Each route tells you which stats to look for on your armour as you level. Uniques are suggestions for later,
-        not items you need to buy before you start.
+        These are the setups people are playing on this ascendancy in patch 0.5.5. Pick one. The next page walks
+        Act 1 through Act 4, the interludes, and endgame, with an upgrade check every five levels. Uniques are
+        suggestions, not a shopping list.
       </p>
       <p className="mt-3 max-w-2xl text-sm leading-6 text-gold">{ladder.message}</p>
 

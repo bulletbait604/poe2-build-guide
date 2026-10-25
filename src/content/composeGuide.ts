@@ -169,7 +169,7 @@ function buildPhases(spec: BuildSpec): GuidePhase[] {
       { title: "Azmadi", detail: spec.boss },
       {
         title: "This interlude, for this build",
-        detail: `Take the life reward. ${spec.defence} is not a substitute for life.`,
+        detail: `Take the life reward. ${spec.defence} on your gear does not replace life on the chest.`,
       },
     ]),
     phase("interlude-3", "interludes", "Interlude III · Doryani's Contingency", "Levels 55–60", 55, 60, [
