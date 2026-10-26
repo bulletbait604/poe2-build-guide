@@ -41,13 +41,13 @@ function slots(rows: Array<[string, string, string, string]>): GearStage[] {
 function bowGear(weaponEarly: string, weaponMaps: string, extra: Array<[string, string, string, string]> = []): GearStage[] {
   return slots([
     ["Bow", weaponEarly, "Replace any bow that is about five levels old. The tooltip damage number is the check, not the item name.", weaponMaps],
-    ["Quiver", "Life and added damage. Extra arrows wait until the bow already clears.", "Added damage, life, and one resistance.", "Clear quiver: added damage and extra arrows, after the bow hits hard. Boss quiver: flat damage, critical chance, and gem levels. Attack speed does not matter on the boss quiver."],
+    ["Quiver", "Life and added damage.", "Added damage, life, and one resistance.", "Added damage, attack speed, and +1 to Level of all Projectile Skills."],
     ["Body", "Life, then evasion. An empty chest is the first fix.", "Highest life, then evasion.", "Highest evasion chest you can wear, with life. A Greater Iron Rune in the socket if the chest has one."],
-    ["Helmet", "Life or one resistance of about 15–20%.", "Life, evasion, and one resistance.", "Life, evasion, and whichever element is under 75%."],
+    ["Helmet", "Life, or +16-20% to one resistance.", "Life, evasion, and one resistance.", "Life, evasion, and whichever element is under 75%."],
     ["Gloves", "Life. Added damage to attacks only on a pair that already has life.", "Life and attack speed.", "Life, attack speed, then added damage to attacks."],
     ["Boots", bootsEarly, bootsLate, bootsMaps],
-    ["Amulet", "One resistance, or spirit if an aura on the skill tab is still grey.", "Spirit and one resistance. +1 to projectile skills if it appears.", "+levels to projectile skills, then spirit, then life."],
-    ["Rings", "About 20% of one element on each ring, on different elements. Iron Rings are the Act 1 damage rings until a rare beats the damage.", "30–40% fire, cold, and lightning across the jewellery.", `${cap} Attributes so gems are not red. ${chaos}`],
+    ["Amulet", "One resistance, or spirit if a spirit gem on the skill tab is still grey.", "Spirit and one resistance. +1 to projectile skills if it appears.", "+1 to Level of all Projectile Skills, then spirit, then life."],
+    ["Rings", "+16-20% to one resistance on each ring, on different elements. Iron Rings are the Act 1 damage rings until a rare beats the damage.", "+26-30% to one resistance on each ring, on different elements.", `${cap} Attributes so gems are not red. ${chaos}`],
     ["Belt", "Life. Strength if a gem is red.", "Life and one resistance.", "Life, strength, and a resistance."],
     ...extra,
   ]);
@@ -55,13 +55,13 @@ function bowGear(weaponEarly: string, weaponMaps: string, extra: Array<[string, 
 
 function spearGear(): GearStage[] {
   return slots([
-    ["Spear", "Highest physical or lightning damage spear from the vendor. Iron Rings in Act 1 until a rare ring beats them.", "A spear about the level of the zone. Level 51 Seaglass Spear is the hold until Akoyan.", "Flat damage and attack speed. Extra gem levels on the spear beat a small damage roll."],
-    ["Body", "Life, then evasion.", "Life and evasion.", "Life and evasion. +20 spirit from body and amulet together is what takes the campaign's 100 spirit to 120 so Mirage Archer can sit with Lightning Spear."],
+    ["Spear", "Highest physical or lightning damage spear from the vendor. Iron Rings in Act 1 until a rare ring beats them.", "A spear about the level of the zone.", "Flat damage and attack speed. +1 to Level of all Projectile Skills beats a small damage roll."],
+    ["Body", "Life, then evasion.", "Life and evasion.", "Life and evasion."],
     ["Helmet", "Life or one resistance.", "Life and a resistance.", "Life, evasion, and a missing resistance."],
     ["Gloves", "Added damage to attacks, then life.", "Life and attack speed.", "Life, attack speed, added damage."],
     ["Boots", bootsEarly, bootsLate, bootsMaps],
-    ["Amulet", "One resistance.", "Spirit if you are short of the aura reservation.", "Spirit and attributes. The +20 spirit for Mirage Archer can sit here."],
-    ["Rings", "Iron Rings in Act 1. Then about 20% of an element each.", "30–40% of each element.", `${cap} ${chaos}`],
+    ["Amulet", "One resistance.", "Spirit if a spirit gem is still grey.", "Spirit and attributes. Mirage Archer reserves 60 spirit."],
+    ["Rings", "Iron Rings in Act 1. Then +16-20% to one resistance on each ring.", "+26-30% to one resistance on each ring.", `${cap} ${chaos}`],
     ["Belt", "Life.", "Life and a resistance.", "Life, strength, and a resistance."],
   ]);
 }
@@ -74,7 +74,7 @@ function crossbowGear(note: string): GearStage[] {
     ["Gloves", "Life.", "Life and attack speed.", "Life and attack speed."],
     ["Boots", bootsEarly, bootsLate, bootsMaps],
     ["Amulet", "One resistance.", "Life and a resistance.", "Attributes and a resistance."],
-    ["Rings", "About 20% of one element each.", "30–40% of each element.", `${cap} ${chaos}`],
+    ["Rings", "+16-20% to one resistance on each ring.", "+26-30% to one resistance on each ring.", `${cap} ${chaos}`],
     ["Belt", "Life.", "Life and a resistance.", "Life and a resistance."],
   ]);
 }
@@ -88,7 +88,7 @@ function armourGear(weapon: string, weaponMaps: string): GearStage[] {
     ["Gloves", "Life.", "Life and attack speed.", "Life, attack speed, then added damage."],
     ["Boots", bootsEarly, bootsLate, bootsMaps],
     ["Amulet", "One resistance or strength.", "Life and strength.", "Life, strength, and a resistance."],
-    ["Rings", "About 20% of one element each.", "30–40% of each element.", `${cap} ${chaos}`],
+    ["Rings", "+16-20% to one resistance on each ring.", "+26-30% to one resistance on each ring.", `${cap} ${chaos}`],
     ["Belt", "Life and strength.", "Life and strength.", "Life, strength, and a resistance."],
   ]);
 }
@@ -100,8 +100,8 @@ function esGear(weapon: string, weaponMaps: string): GearStage[] {
     ["Helmet", "Energy shield or one resistance.", "Energy shield and a resistance.", "Energy shield and a resistance under 75%."],
     ["Gloves", "Any life or energy shield.", "Cast speed, if the pair already has a defence.", "Cast speed and a resistance."],
     ["Boots", bootsEarly, bootsLate, bootsMaps],
-    ["Amulet", "One resistance, or +1 to spell skills.", "+1 to spell or minion skills, then spirit.", "+gem levels, spirit for auras, then a resistance."],
-    ["Rings", "About 20% of one element each.", "30–40% of each element.", `${cap} ${chaos}`],
+    ["Amulet", "One resistance, or +1 to spell skills.", "+1 to spell or minion skills, then spirit.", "+1 to Level of all Spell Skills, then spirit, then a resistance."],
+    ["Rings", "+16-20% to one resistance on each ring.", "+26-30% to one resistance on each ring.", `${cap} ${chaos}`],
     ["Belt", "Life or energy shield.", "Life and a resistance.", "Life and a resistance."],
   ]);
 }
@@ -120,8 +120,8 @@ function lightningArrow(): Loadout {
     numbers: [
       cap,
       chaos,
-      "About +95 spirit, split between the body and the amulet, for the aura set.",
-      "About 5,000 energy shield before Chaos Inoculation. Skip CI on a small shield.",
+      "Herald of Thunder and Wind Dancer each reserve 30 spirit. Turn them on only when that spirit is free.",
+      "Skip Chaos Inoculation until the energy shield is high.",
       "Movement speed on boots from Act 1.",
     ],
     ascendancy: ["Gathering Winds", "Point Blank", "Endless Munitions", "Mirage Deadeye"],
@@ -149,7 +149,7 @@ function lightningArrow(): Loadout {
     rotation: [
       "Tornado Shot into the pack.",
       "Voltaic Mark on the rare or the boss.",
-      "Stack about 20 Lightning Rods on that target.",
+      "Stack Lightning Rods on that target.",
       "Barrage.",
       "Lightning Arrow into the rods.",
     ],
@@ -157,7 +157,7 @@ function lightningArrow(): Loadout {
       { levels: "1–14", text: "Lightning Arrow as soon as it drops. Freezing Salvo covers bosses until the rod is in the bar. Buy movement-speed boots in Act 1." },
       { levels: "15–30", text: "Lightning Rod in the pack, then Lightning Arrow. Take Gathering Winds at the first trial and use it for a whole zone." },
       { levels: "31–50", text: "Add Tornado Shot and Barrage. Socket Rapid Attacks II first, then one more support from the row at a time." },
-      { levels: "Maps", text: "The full panel above. CI only with about 5,000 energy shield and the resistances already at 75%." },
+      { levels: "Maps", text: "The full panel above. Chaos Inoculation only after the energy shield is high and the resistances are already at 75%." },
     ],
     gear: bowGear(
       "Highest damage bow on the vendor. Added lightning is a bonus, not the requirement.",
@@ -216,7 +216,7 @@ function iceShot(spec: BuildSpec): Loadout {
     leveling: [
       { levels: "1–13", text: "Bow Shot costs no mana and is the early clear. Frost Bomb for exposure. Escape Shot to freeze and make distance. Lightning Arrow finishes a pack. Stormcaller Arrow is the single-target shot until Snipe." },
       { levels: "14–30", text: "Add Freezing Salvo. Escape Shot plus Freezing Salvo on bosses. When the boss freezes, Snipe. Ice-Tipped Arrows on cooldown." },
-      { levels: "31+", text: "Ice Shot joins the bar and takes the clear. Keep Snipe for frozen bosses. 20% quality on Ice Shot as soon as you can cut it." },
+      { levels: "31+", text: "Ice Shot joins the bar and takes the clear. Keep Snipe for frozen bosses. Quality on Ice Shot as soon as you can cut it." },
       { levels: "Maps", text: "Two bows and two quivers. Clear set: extra arrows and a Cadiro's Gambit, only after the bow already kills the pack. Boss set: flat damage, critical chance, gem levels. Attack speed and extra arrows do nothing on that second set." },
     ],
     gear: bowGear(
@@ -236,12 +236,12 @@ function iceShot(spec: BuildSpec): Loadout {
 function lightningSpear(): Loadout {
   return loadout({
     overview:
-      "Lightning Spear clears. Storm Lance is the stake you throw or shoot into. Explosive Spear is the Act 1 button. Sniper's Mark goes on the rare. Mirage Archer waits until gear adds 20 spirit, for 120 total.",
+      "Lightning Spear clears. Storm Lance is the stake you throw or shoot into. Explosive Spear is the Act 1 button. Sniper's Mark goes on the rare. Mirage Archer reserves 60 spirit.",
     numbers: [
       cap,
       chaos,
-      "Campaign spirit is 100. +20 spirit from gear reaches 120 so Mirage Archer can link with Lightning Spear.",
-      "Hold a level 51 Seaglass Spear until Akoyan.",
+      "Campaign spirit is 100. Mirage Archer reserves 60 spirit.",
+      "Seaglass Spear requires level 51.",
       "Iron Rings in Act 1.",
       "Movement speed on boots from Act 1.",
     ],
@@ -273,13 +273,13 @@ function lightningSpear(): Loadout {
       "Levels 1–5: Explosive Spear, Contagion, and Frost Bomb.",
       "From level 5: Lightning Spear. Parry or Disengage to build the frenzy the spear wants.",
       "From level 15: Sniper's Mark on the rare, Storm Lance in the pack, Lightning Spear into the lance.",
-      "Maps: mark, lance, spear. Turn on Mirage Archer once spirit is 120. Eternal Rage can sit on a sceptre with Purity of Lightning, or you swap that spirit to Ghost Dance and Elemental Conflux.",
+      "Maps: mark, lance, spear. Turn on Mirage Archer. It reserves 60 spirit. Eternal Rage can sit on a sceptre with Purity of Lightning, or you swap that spirit to Ghost Dance and Elemental Conflux.",
     ],
     leveling: [
       { levels: "1–4", text: "Explosive Spear into the pack. Contagion if it spreads. Frost Bomb on the boss." },
       { levels: "5–14", text: "Lightning Spear becomes the clear. Parry or Disengage for frenzy. Iron Rings. Movement-speed boots." },
-      { levels: "15–50", text: "Sniper's Mark and Storm Lance. Seaglass Spear at 51 is the hold." },
-      { levels: "Maps", text: "Add the support row one gem at a time. Mirage Archer at 120 spirit." },
+      { levels: "15–50", text: "Sniper's Mark and Storm Lance. Seaglass Spear requires level 51." },
+      { levels: "Maps", text: "Add the support row one gem at a time. Mirage Archer reserves 60 spirit." },
     ],
     gear: spearGear(),
     sources: [guide("lightning-spear-amazon", "Maxroll Lightning Spear Amazon"), ...commonSources],
@@ -699,7 +699,7 @@ function arc(): Loadout {
       "Frost Bomb on a boss, and keep it down.",
     ],
     leveling: [
-      { levels: "1–14", text: "Arc or Spark, plus Frost Bomb. Movement-speed boots. One resistance on each ring toward 20%." },
+      { levels: "1–14", text: "Arc or Spark, plus Frost Bomb. Movement-speed boots. +16-20% to one resistance on each ring." },
       { levels: "15+", text: "The four-step order above. Long Fuse and Prolonged Duration on Frost Bomb." },
       { levels: "Maps", text: "Shaper of Storms first if you do not already have it. Archmage last." },
     ],
@@ -785,7 +785,7 @@ function whirling(): Loadout {
 function hollowForm(): Loadout {
   return loadout({
     overview:
-      "Tap Hollow Form. The copies finish Whirling Assault. Ice Strike hits the Tempest Bell. Chaos Inoculation is a later swap, after the energy shield is high. This is the Martial Artist build at the top of the October 5, 2026 league-starter list.",
+      "Tap Hollow Form. The copies finish Whirling Assault. Ice Strike hits the Tempest Bell. Chaos Inoculation is a later swap, after the energy shield is high. Hollow Form Whirling Assault is an S-tier Martial Artist build on the October 5, 2026 league-starter list.",
     numbers: [cap, chaos, "CI only after the energy shield can take a hit.", "Cooldown recovery so Hollow Form is up often."],
     ascendancy: ["The Hollow Form node first. Then a damage node, after the form is the button you actually press."],
     groups: [
@@ -820,13 +820,13 @@ function hollowForm(): Loadout {
 function oilBarrage(): Loadout {
   return loadout({
     overview:
-      "Oil Barrage spends power charges and fires chaining, forking, nova projectiles across the screen. Early clear is Frozen Locus detonated by the large spike of Glacial Cascade. Herald of Ice at level 10. Hollow Focus spawns bells. Cooldown recovery is mandatory on that bell, because it is how often the bell appears. A body with +50 spirit is what the mapping aura swap asks for.",
+      "Oil Barrage spends power charges and fires chaining, forking, nova projectiles across the screen. Early clear is Frozen Locus detonated by the large spike of Glacial Cascade. Herald of Ice at level 10. Hollow Focus spawns bells. Cooldown recovery is mandatory on that bell, because it is how often the bell appears. A body with +(47-50) to Spirit is what the mapping Blasphemy setup asks for.",
     numbers: [
       cap,
       chaos,
       "Cooldown recovery on gear. Hollow Focus bells spawn faster with it.",
-      "Body armour with +50 spirit for the mapping Blasphemy setup.",
-      "A Changeling Talisman in Act 1. The early form wants a talisman.",
+      "Body armour with +(47-50) to Spirit for the mapping Blasphemy setup.",
+      "Amor Mandragora in Act 1. Changeling Talisman is the level 38 craft made from it.",
     ],
     ascendancy: ["The Martial Artist node that feeds charges or the barrage. One node, then a zone on Oil Barrage, then the next."],
     groups: [
@@ -844,10 +844,9 @@ function oilBarrage(): Loadout {
         gem("Whirling Assault"),
         gem("Tempest Bell"),
       ]),
-      group("Charges and marks", "Blasphemy is the curse aura. Repulsion, Living Lightning, Culmination, and Ailith's Chimes are not legal supports on it. Predator's Mark, then Freezing Mark, are the marks.", [
+      group("Charges and marks", "Blasphemy is the curse. It reserves spirit. Repulsion, Living Lightning, Culmination, and Ailith's Chimes are not legal supports on it. Freezing Mark is the mark.", [
         gem("Blasphemy"),
         gem("Freezing Mark"),
-        gem("Predator's Mark"),
         gem("Hand of Chayula"),
         gem("Refutation"),
       ]),
@@ -860,10 +859,10 @@ function oilBarrage(): Loadout {
       "Hand of Chayula or Refutation on a boss, then the barrage.",
     ],
     leveling: [
-      { levels: "1–9", text: "Glacial Cascade and Frozen Locus. Changeling Talisman. The large spike has to be what hits the locus." },
-      { levels: "10–30", text: "Herald of Ice. Predator's Mark on bosses." },
+      { levels: "1–9", text: "Glacial Cascade and Frozen Locus. Amor Mandragora. The large spike has to be what hits the locus." },
+      { levels: "10–30", text: "Herald of Ice. Freezing Mark on bosses." },
       { levels: "31+", text: "Oil Barrage, Hollow Focus, Devour. Cooldown recovery on the focus." },
-      { levels: "Maps", text: "Optional second setup: Blasphemy and Repulsion, which costs a gem socket and wants +50 spirit on the body." },
+      { levels: "Maps", text: "Optional Blasphemy setup. It costs a gem socket and wants +(47-50) to Spirit on the body. Repulsion is not a legal support on Blasphemy." },
     ],
     gear: armourGear("quarterstaff", "Critical chance or power charge on hit once Oil Barrage is the skill. Cooldown recovery on a suffix."),
     sources: [guide("oil-barrage-martial-artist-build-guide", "Maxroll Oil Barrage"), ...commonSources],
@@ -1157,7 +1156,7 @@ const byId: Record<string, (spec: BuildSpec) => Loadout> = {
     loadout({
       ...minions(spec, guide("infernal-legion-lich-build-guide", "Maxroll Infernal Legion Lich")),
       overview:
-        "Infernal Legion is the lich minion starter on the October 5, 2026 tier list. Infernal Legion goes on a minion you expect to die. The command pattern and the other sockets are the minion row from the Disciple page, which prints them in full. Read the lich page for the ascendancy node.",
+        "Infernal Legion Lich is a B-tier build on the October 5, 2026 tier list. Infernal Legion goes on a minion you expect to die. The command pattern and the other sockets are the minion row from the Disciple page, which prints them in full. Read the lich page for the ascendancy node.",
       groups: [
         group("Minions", "Infernal Legion on the minion that is allowed to burn. Meat Shield stays on the sniper. Elemental Army is not a legal support on that gem.", [
           gem("Skeletal Sniper", ["Infernal Legion I", "Meat Shield II"]),
@@ -1242,7 +1241,7 @@ const byId: Record<string, (spec: BuildSpec) => Loadout> = {
   "chronomancer-arctic-armour": (spec) =>
     loadout({
       overview:
-        "Chronomancer is at the bottom of the October 19, 2026 ascendancy tier list and has no league-starter page of its own. Arctic Armour is the guard. Frostbolt clears. Comet is the boss hit. Time Freeze is for a boss wind-up, not a white pack. Temporal Rift is the undo after you already took the hit.",
+        "Chronomancer is in D tier on the September 19, 2026 ascendancy tier list and has no league-starter page of its own. Arctic Armour is the guard. Frostbolt clears. Comet is the boss hit. Time Freeze is for a boss wind-up, not a white pack. Temporal Rift is the undo after you already took the hit.",
       numbers: [cap, chaos, "Energy shield and life, because Temporal Rift gives back what you had a moment ago."],
       ascendancy: ["Time Freeze, and spend it on bosses.", "Temporal Rift second, for a mistake you already made."],
       groups: [

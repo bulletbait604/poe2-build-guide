@@ -671,10 +671,6 @@
     "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/DecomposeSkill.webp",
     "listedAs": null
   },
-  "[DNT] Crushing Earth": {
-    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/AbsolutionBlast.webp",
-    "listedAs": null
-  },
   "Dark Pact": {
     "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/DeathPactSkill.webp",
     "listedAs": null
@@ -1897,10 +1893,6 @@
   },
   "Behead I": {
     "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/Support/BeheadSupport.webp",
-    "listedAs": null
-  },
-  "Font of Blood": {
-    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/Support/FontOfBloodSupport.webp",
     "listedAs": null
   },
   "Lifetap": {
@@ -3915,16 +3907,8 @@
     "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/Support/MoreDurationSupport.webp",
     "listedAs": null
   },
-  "Frozen Vortex": {
-    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/Support/FrozenVortexSupport.webp",
-    "listedAs": null
-  },
   "Enervation": {
     "icon": "https://cdn.poe2db.tw/image/Art/2DItems/Gems/New/NewSupport/EnervationSupportGem.webp",
-    "listedAs": null
-  },
-  "Chance to Freeze": {
-    "icon": "https://cdn.poe2db.tw/image/Art/2DItems/Gems/Support/ChancetoFlee.webp",
     "listedAs": null
   },
   "Invocation": {
@@ -3943,20 +3927,12 @@
     "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/Support/EnergyBarrierSupport.webp",
     "listedAs": null
   },
-  "Wind Wave": {
-    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/Support/KnockbackWaveSupport.webp",
-    "listedAs": null
-  },
   "Infusion": {
     "icon": "https://cdn.poe2db.tw/image/Art/2DItems/Gems/New/NewSupport/BuffedHeraldSupportGem.webp",
     "listedAs": null
   },
   "Break Endurance": {
     "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/Support/BreakEndurance.webp",
-    "listedAs": null
-  },
-  "Premeditation": {
-    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/Support/EmpoweredDamageSupport.webp",
     "listedAs": null
   },
   "Hinder": {
@@ -3985,10 +3961,6 @@
   },
   "Aftershock III": {
     "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/Support/AftershockSupport.webp",
-    "listedAs": null
-  },
-  "Lasting Ground": {
-    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/Support/GroundEffectDurationSupport.webp",
     "listedAs": null
   },
   "Leverage": {
@@ -4023,20 +3995,8 @@
     "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/Support/ReverberateSupport.webp",
     "listedAs": null
   },
-  "Dazzle": {
-    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/Support/DazzleSupport.webp",
-    "listedAs": null
-  },
   "Unyielding": {
     "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/Support/UnyieldingSupport.webp",
-    "listedAs": null
-  },
-  "Desperation": {
-    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/Support/DesperationSupport.webp",
-    "listedAs": null
-  },
-  "Excoriate": {
-    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/Support/ElementalAssaultSupport.webp",
     "listedAs": null
   },
   "Unbending": {
@@ -4059,18 +4019,6 @@
     "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/Support/AncestralAidSupport.webp",
     "listedAs": null
   },
-  "Rime": {
-    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/Support/WinterblastSupport.webp",
-    "listedAs": null
-  },
-  "Arms Length": {
-    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/Support/ArmsLengthSupport.webp",
-    "listedAs": null
-  },
-  "Charm Bounty": {
-    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/Support/CharmBountySupport.webp",
-    "listedAs": null
-  },
   "Untouchable": {
     "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/Support/UntouchableSupport.webp",
     "listedAs": null
@@ -4085,10 +4033,6 @@
   },
   "Hobble": {
     "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/Support/BloodintheEyesSupport.webp",
-    "listedAs": null
-  },
-  "Volatile Power": {
-    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/Support/VolatilePowerSupport.webp",
     "listedAs": null
   },
   "Unerring Power": {
@@ -4121,10 +4065,6 @@
   },
   "Breachlord's Rift": {
     "icon": "https://cdn.poe2db.tw/image/Art/2DItems/Gems/New/NewSupport/Lineage/BreachlordsRemorse.webp",
-    "listedAs": null
-  },
-  "Predator's Mark": {
-    "icon": "https://cdn.poe2db.tw/image/Art/2DArt/SkillIcons/DruidCrossSlash.webp",
     "listedAs": null
   }
 }

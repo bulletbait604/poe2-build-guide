@@ -44,7 +44,8 @@ for (const phrase of required) {
 for (const phrase of forbidden) {
   if (campaign.includes(phrase)) failures.push(`campaign still mentions ${phrase}`);
 }
-if (!campaign.includes("greater rune")) failures.push("Blind Beast should be described as a greater rune");
+if (!campaign.includes("Sulphite Potion")) failures.push("Blind Beast reward should be the Sulphite Potion from poe2db");
+if (campaign.includes("greater rune")) failures.push("Blind Beast is not a greater rune on the current quest page");
 if (campaign.includes("Blind Beast") && /Blind Beast[^.]*skill points/i.test(campaign)) {
   failures.push("Blind Beast must not be listed as skill points");
 }

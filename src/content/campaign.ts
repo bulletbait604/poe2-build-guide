@@ -328,8 +328,8 @@ export function storyPhases(spec: BuildSpec): GuidePhase[] {
         "Isle of Kin",
         "The Blind Beast",
         "Nobody. Leave the beast.",
-        "A greater rune. Not weapon-set points.",
-        "Cross the island into the Volcanic Warrens and kill Krutog, Lord of Kin. Leave the Blind Beast. That fight is a greater rune.",
+        "A Sulphite Potion and an Uncut Skill Gem. Not weapon-set points.",
+        "Cross the island into the Volcanic Warrens and kill Krutog, Lord of Kin. Leave the Blind Beast if you only want permanent stats. poe2db lists its reward as a Sulphite Potion and an Uncut Skill Gem.",
       ),
       step(
         "Whakapanu",

@@ -54,7 +54,7 @@ function baseName(slot: string, spec: BuildSpec) {
   if (/shield/i.test(slot)) return "A strength shield";
   if (/bow|spear|crossbow|weapon|staff|wand|mace|sceptre|quarterstaff/i.test(slot)) {
     if (noun === "crossbow") return "A crossbow. A level 16 Varnished Crossbow is the usual Act 1–2 step.";
-    if (noun === "spear") return "A spear. A level 51 Seaglass Spear is the hold until Akoyan when this route says so.";
+    if (noun === "spear") return "A spear. Seaglass Spear requires level 51.";
     if (noun === "bow") return "A bow with the higher tooltip damage";
     return `A ${noun} with the higher tooltip damage`;
   }
@@ -102,7 +102,6 @@ function listsFor(slot: string, spec: BuildSpec, gear: GearStage[]): StatLines {
   const gemLeveling = `+1 to Level of all ${word} Skills`;
   const gemEnd = `+3 to Level of all ${word} Skills`;
   const lifeLeveling = es ? "+25-30 maximum Energy Shield" : "+40-59 maximum Life";
-  const lifeEnd = es ? "+91-96 maximum Energy Shield" : "+100-119 maximum Life";
 
   if (/boot/i.test(slot)) {
     return {
@@ -115,7 +114,7 @@ function listsFor(slot: string, spec: BuildSpec, gear: GearStage[]): StatLines {
       ],
       endgame: [
         "30% increased Movement Speed",
-        "+120-149 maximum Life",
+        es ? "+48-60 maximum Energy Shield" : "+120-149 maximum Life",
         "+36-40% Fire Resistance",
         "+36-40% Cold Resistance",
         "+36-40% Lightning Resistance",
@@ -141,7 +140,7 @@ function listsFor(slot: string, spec: BuildSpec, gear: GearStage[]): StatLines {
   if (/helm/i.test(slot)) {
     return {
       leveling: [lifeLeveling, "+11-15% Fire Resistance", "+11-15% Cold Resistance"],
-      endgame: [lifeEnd, "+36-40% Fire Resistance", "+36-40% Cold Resistance"],
+      endgame: [es ? "+61-73 maximum Energy Shield" : "+100-119 maximum Life", "+36-40% Fire Resistance", "+36-40% Cold Resistance"],
       skip: "Skip stun threshold.",
     };
   }
@@ -170,13 +169,13 @@ function listsFor(slot: string, spec: BuildSpec, gear: GearStage[]): StatLines {
     if (caster(spec)) {
       return {
         leveling: [gemLeveling, "(9-12)% increased Cast Speed", spirit ? "+30-33 Spirit" : "+11-15% Fire Resistance"],
-        endgame: [gemEnd, "(25-28)% increased Cast Speed", spirit ? "+57-61 Spirit" : "+36-40% Fire Resistance"],
+        endgame: [gemEnd, "(25-28)% increased Cast Speed", spirit ? "+47-50 Spirit" : "+36-40% Fire Resistance"],
         skip: "Skip item rarity.",
       };
     }
     return {
       leveling: [gemLeveling, spirit ? "+30-33 Spirit" : "+11-15% Fire Resistance", `+5-8 ${attr}`],
-      endgame: [gemEnd, spirit ? "+57-61 Spirit" : "+36-40% Fire Resistance", `+28-30 ${attr}`],
+      endgame: [gemEnd, spirit ? "+47-50 Spirit" : "+36-40% Fire Resistance", `+28-30 ${attr}`],
       skip: "Skip item rarity.",
     };
   }
@@ -291,11 +290,14 @@ function howFor(slot: string, spec: BuildSpec) {
   if (/body/i.test(slot)) {
     return "Vendor a life chest during the acts. In maps, buy it. Trade filter: Body Armour, maximum Life or energy shield, and the defence this build wears. A Greater Iron Rune adds 18% armour, evasion, and energy shield if the chest has a socket.";
   }
+  if (/helm/i.test(slot)) {
+    return "Vendor a helmet with life or energy shield during the acts. In maps, buy the rare with one resistance.";
+  }
   if (/ring/i.test(slot)) {
     return "One element per ring. Trade filter: Ring, one elemental resistance, then chaos resistance on a second search once fire, cold, and lightning are at 75%.";
   }
   if (/amulet/i.test(slot)) {
-    return "Trade filter: Amulet, + to Level of skills, then Spirit if an aura is still grey. Campaign amulets can come from the vendor.";
+    return "Trade filter: Amulet, + to Level of skills, then Spirit if a spirit gem is still grey. Campaign amulets can come from the vendor.";
   }
   if (/belt/i.test(slot)) {
     return "Trade filter: Belt, maximum Life, and one resistance. An attribute suffix only if a gem is still red.";

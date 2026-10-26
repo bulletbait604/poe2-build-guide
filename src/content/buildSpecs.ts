@@ -53,7 +53,7 @@ export const buildSpecs: BuildSpec[] = [
     focus: "A rare bow with attack damage, evasion and life on the body, movement speed on the boots. Freeze is the defence. A unique bow is not.",
     uniques: [
       u("Quill Rain", "Bow", 5, optional),
-      u("Queen of the Forest", "Body", 28, "Movement from evasion, only if it drops and your rare body has less life."),
+      u("Queen of the Forest", "Body", 51, "Movement from evasion, only if it drops and your rare body has less life."),
     ],
   },
   {
@@ -77,7 +77,7 @@ export const buildSpecs: BuildSpec[] = [
     focus: "Highest attack damage on a rare bow. Life and evasion. Do not wait on a unique quiver.",
     uniques: [
       u("Quill Rain", "Bow", 5, optional),
-      u("Drillneck", "Quiver", 55, "A maps quiver if it drops. Flat damage on a rare quiver is the same plan."),
+      u("Drillneck", "Quiver", 55, "A maps quiver if it drops. It pierces and has attack speed. It does not add physical damage."),
     ],
   },
   {
@@ -120,7 +120,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Throw, step, throw. If the flask has no charges, use Gas Arrow until it does.",
     ascendancyPick: "Take the flask node first so the concoction has charges.",
     focus: "Mana flask charges, life, and evasion. The bow can stay a plain rare.",
-    uniques: [u("Goldrim", "Helmet", 1, optional), u("Wanderlust", "Boots", 11, optional)],
+    uniques: [u("Goldrim", "Helmet", 10, optional), u("Wanderlust", "Boots", 11, optional)],
   },
   {
     id: "amazon-lightning-spear",
@@ -162,7 +162,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Twister through the boss, step aside, Whirling Slash only to cross a slam.",
     ascendancyPick: "Take the projectile node so Twister travels farther.",
     focus: "Attack speed on a rare spear. Evasion, life, movement speed. No unique required.",
-    uniques: [u("Chainsting", "Spear", 1, optional), u("Queen of the Forest", "Body", 28, optional)],
+    uniques: [u("Chainsting", "Spear", 10, optional), u("Queen of the Forest", "Body", 51, optional)],
   },
   {
     id: "spirit-walker-twister",
@@ -204,7 +204,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Companion on the boss, you at the edge. Twister when the companion is down.",
     ascendancyPick: "Take the companion node when you reach it. Do not wear bad gear just to count idols.",
     focus: "Life on your body even after the companion arrives. A usable rare spear until then.",
-    uniques: [u("Blackbraid", "Body", 1, optional), u("Surefooted Sigil", "Amulet", 1, optional)],
+    uniques: [u("Blackbraid", "Body", 4, optional), u("Surefooted Sigil", "Amulet", 8, optional)],
   },
   {
     id: "ritualist-rake",
@@ -225,7 +225,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Rake, step, rake. Drink when you are hit.",
     ascendancyPick: "Take Blood Boil and leave it on. One charm node is the second pick.",
     focus: "Physical damage on a rare spear. Life and evasion. An empty charm slot is better than a bought charm.",
-    uniques: [u("Chainsting", "Spear", 1, optional), u("Carnage Heart", "Amulet", 20, optional)],
+    uniques: [u("Chainsting", "Spear", 10, optional), u("Carnage Heart", "Amulet", 20, optional)],
   },
   {
     id: "ritualist-spearfield",
@@ -267,7 +267,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Roll across the swing, then Boneshatter when the boss is stunned. Do not trade hits.",
     ascendancyPick: "Take the stun or slam node first, then go back to rolling.",
     focus: "Armour and life on the chest and helmet. Physical damage on a rare two-hand mace. Movement speed on the boots so the roll is not your only escape.",
-    uniques: [u("Hrimnor's Hymn", "Mace", 1, optional), u("Blackbraid", "Body", 1, optional)],
+    uniques: [u("Hrimnor's Hymn", "Mace", 4, optional), u("Blackbraid", "Body", 4, optional)],
   },
   {
     id: "titan-earthquake",
@@ -309,7 +309,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Totem before you open the fight. Slam, move, replace the totem when it breaks.",
     ascendancyPick: "Take Ancestral Spirits first and use the totem for a whole zone.",
     focus: "Armour, life, and a mace with physical damage. The totem is a skill.",
-    uniques: [u("Hrimnor's Hymn", "Mace", 1, optional), u("Blackbraid", "Body", 1, optional)],
+    uniques: [u("Hrimnor's Hymn", "Mace", 4, optional), u("Blackbraid", "Body", 4, optional)],
   },
   {
     id: "warbringer-shield-wall",
@@ -351,7 +351,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Temper before the fight. Strike, move, temper again when the heat falls off.",
     ascendancyPick: "Take Temper Weapon first. A body-armour node wants a normal chest with life and armour.",
     focus: "A normal body with life and armour. Fire resistance on the jewellery. Physical damage on the mace.",
-    uniques: [u("Hrimnor's Hymn", "Mace", 1, "Fine on the weapon. Do not put a unique on the body if you took a Smith body node."), u("Trampletoe", "Boots", 27, optional)],
+    uniques: [u("Hrimnor's Hymn", "Mace", 4, "The mace is fine. Smith of Kitava can only use a normal body armour."), u("Trampletoe", "Boots", 27, optional)],
   },
   {
     id: "smith-molten-blast",
@@ -393,7 +393,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Unload the bolts, then reload while the boss swings at where you were.",
     ascendancyPick: "Take Sorcery Ward or the culling node. One of them. Use it for a zone before the second.",
     focus: "Damage and reload on a rare crossbow. Life on the body. Movement speed so you are not reloading in place.",
-    uniques: [u("Rampart Raptor", "Crossbow", 1, optional), u("Mist Whisper", "Crossbow", 38, optional)],
+    uniques: [u("Rampart Raptor", "Crossbow", 4, optional), u("Mist Whisper", "Crossbow", 38, optional)],
   },
   {
     id: "witchhunter-grenades",
@@ -414,7 +414,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Grenade at the feet, move, throw again from range. Reload while you are not the target.",
     ascendancyPick: "Take Sorcery Ward so a bad grenade does not end the run.",
     focus: "Fire resistance, life, movement speed, and a crossbow with damage.",
-    uniques: [u("Wanderlust", "Boots", 11, optional), u("Goldrim", "Helmet", 1, optional)],
+    uniques: [u("Wanderlust", "Boots", 11, optional), u("Goldrim", "Helmet", 10, optional)],
   },
   {
     id: "tactician-stormblast",
@@ -431,11 +431,11 @@ export const buildSpecs: BuildSpec[] = [
     damage: "lightning damage",
     summary: "Start on Galvanic Shards. Add Stormblast Bolts for bosses when the gem appears. Supporting Fire shoots when you command it. This is the Tactician route people league-start.",
     fantasy: "A mercenary whose clear is a shard spray and whose boss button is a stack of bolts.",
-    pack: "Shards while you walk. Command Supporting Fire into the pack. Save Storm Blast for the rare.",
+    pack: "Shards while you walk. Command Supporting Fire into the pack. Save Stormblast Bolts for the rare.",
     boss: "Preload bolts if you can, detonate, move, reload. Artillery covers the reload.",
     ascendancyPick: "Take Supporting Fire and use the command for a whole act.",
     focus: "A rare crossbow with damage. Life. Movement speed. Do not buy a unique crossbow to unlock the bolts.",
-    uniques: [u("Rampart Raptor", "Crossbow", 1, optional), u("The Last Lament", "Crossbow", 78, "Maps only, and only if it kills faster than your rare.")],
+    uniques: [u("Rampart Raptor", "Crossbow", 4, optional), u("The Last Lament", "Crossbow", 78, "Maps only, and only if it kills faster than your rare.")],
   },
   {
     id: "tactician-grenades",
@@ -456,7 +456,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Grenade at the feet, volley, move. Do not throw the second one on top of yourself.",
     ascendancyPick: "Take Supporting Fire before any banner node.",
     focus: "Fire resistance, life, and a crossbow with damage.",
-    uniques: [u("Mist Whisper", "Crossbow", 38, optional), u("Blackbraid", "Body", 1, optional)],
+    uniques: [u("Mist Whisper", "Crossbow", 38, optional), u("Blackbraid", "Body", 4, optional)],
   },
   {
     id: "gemling-twister",
@@ -477,7 +477,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Twister, move, slash across the slam. If the boss lives, the gem level or the weapon is behind.",
     ascendancyPick: "Take the quality or gem-level node first.",
     focus: "Enough attributes to turn the gem on. Attack speed on a rare spear. Life on the armour.",
-    uniques: [u("Skysliver", "Spear", 16, optional), u("Goldrim", "Helmet", 1, "Only if you are short a resistance. Attributes on a rare helmet may be better.")],
+    uniques: [u("Skysliver", "Spear", 16, optional), u("Goldrim", "Helmet", 10, "Only if you are short a resistance. Attributes on a rare helmet may be better.")],
   },
   {
     id: "gemling-grenades",
@@ -498,7 +498,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Same pair from range. Reload off to the side.",
     ascendancyPick: "Take quality first. A higher-quality grenade is the upgrade, not a new skill.",
     focus: "Fire resistance, life, reload speed, and the attributes the gems ask for.",
-    uniques: [u("Rampart Raptor", "Crossbow", 1, optional), u("Wanderlust", "Boots", 11, optional)],
+    uniques: [u("Rampart Raptor", "Crossbow", 4, optional), u("Wanderlust", "Boots", 11, optional)],
   },
   {
     id: "invoker-ice-strike",
@@ -519,7 +519,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Bell at the feet, strike the bell, step out. Replace the bell when it breaks.",
     ascendancyPick: "Take the cold node if the staff is adding cold. Take the lightning node only if the staff is actually lightning.",
     focus: "Attack damage on a rare staff. Evasion and energy shield. Life on the body, because the bell is melee.",
-    uniques: [u("Pillar of the Caged God", "Quarterstaff", 1, "Only if you will take attribute nodes. A higher-damage rare replaces it."), u("Ghostmarch", "Boots", 16, optional)],
+    uniques: [u("Pillar of the Caged God", "Quarterstaff", 4, "Only if you will take attribute nodes. A higher-damage rare replaces it."), u("Ghostmarch", "Boots", 16, optional)],
   },
   {
     id: "invoker-falling-thunder",
@@ -540,7 +540,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Thunder, step off the slam, thunder again.",
     ascendancyPick: "Take Elemental Expression, then small attribute nodes when they are next to you.",
     focus: "Lightning on the staff, energy shield and evasion, a little of each attribute.",
-    uniques: [u("Matsya", "Quarterstaff", 20, optional), u("Goldrim", "Helmet", 1, optional)],
+    uniques: [u("Matsya", "Quarterstaff", 20, optional), u("Goldrim", "Helmet", 10, optional)],
   },
   {
     id: "martial-artist-whirling",
@@ -582,7 +582,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Stack charges on adds or the palm, then thunder the boss. Step out before you charge again.",
     ascendancyPick: "Take the charge or Hollow Form node after Falling Thunder is the button you actually press.",
     focus: "Attack damage, energy shield, and life. Charges are the scaling, not a unique.",
-    uniques: [u("Matsya", "Quarterstaff", 20, optional), u("Pillar of the Caged God", "Quarterstaff", 1, "Only with attribute nodes.")],
+    uniques: [u("Matsya", "Quarterstaff", 20, optional), u("Pillar of the Caged God", "Quarterstaff", 4, "Only with attribute nodes.")],
   },
   {
     id: "acolyte-falling-thunder",
@@ -603,7 +603,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Breach, thunder, move. Flames between slams, not during them.",
     ascendancyPick: "Take Into the Breach first. Skip a darkness node if you can no longer see the swing you need to dodge.",
     focus: "Life or energy shield, attack damage on a rare staff, chaos resistance if you find it.",
-    uniques: [u("Eye of Chayula", "Amulet", 5, optional), u("Ghostwrithe", "Body", 1, "Energy shield if it drops. A rare body with life can be safer.")],
+    uniques: [u("Eye of Chayula", "Amulet", 35, optional), u("Ghostwrithe", "Body", 1, "Energy shield if it drops. A rare body with life can be safer.")],
   },
   {
     id: "acolyte-ice",
@@ -624,7 +624,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Same bell. Do not ignore a slam because darkness is full.",
     ascendancyPick: "Take Into the Breach. Take darkness only if you can still read the fight.",
     focus: "Life on the body, energy shield on a second piece, attack damage on the staff.",
-    uniques: [u("Eye of Chayula", "Amulet", 5, optional), u("The Blood Thorn", "Quarterstaff", 38, optional)],
+    uniques: [u("Eye of Chayula", "Amulet", 35, optional), u("The Blood Thorn", "Quarterstaff", 38, optional)],
   },
   {
     id: "infernalist-skeletal-sniper",
@@ -687,7 +687,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Keep Essence Drain up. Flask when life falls, not when the bar is empty.",
     ascendancyPick: "Take Life Remnants first so the casts pay you back.",
     focus: "Life on the body, helmet, and belt. Do not wear a unique that removes life.",
-    uniques: [u("Carnage Heart", "Amulet", 20, "Only if the life roll beats your rare amulet."), u("Dream Fragments", "Ring", 12, "Skip it if the ring has no life.")],
+    uniques: [u("Carnage Heart", "Amulet", 20, "It has 20% reduced maximum Life. Use it only if the attributes matter more than that life."), u("Dream Fragments", "Ring", 12, "Skip it if the ring has no life.")],
   },
   {
     id: "blood-mage-bonestorm",
@@ -708,7 +708,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Short Bonestorms. Flask between them. Do not channel until you are nearly dead.",
     ascendancyPick: "Take Life Remnants before any node that spends more life.",
     focus: "Life on every armour piece. Spell damage on a rare wand.",
-    uniques: [u("Carnage Heart", "Amulet", 20, optional), u("Goldrim", "Helmet", 1, "Resists only. Life on the helmet still matters more.")],
+    uniques: [u("Carnage Heart", "Amulet", 20, optional), u("Goldrim", "Helmet", 10, "Resists only. Life on the helmet still matters more.")],
   },
   {
     id: "lich-plants",
@@ -897,7 +897,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Maul, slam to make space, maul again. Flask when you are hit.",
     ascendancyPick: "Take an armour or rage node after Maul already kills a pack. Skip a spell node.",
     focus: "Life and armour on the chest, helmet, and boots. Movement speed so you can leave.",
-    uniques: [u("Blackbraid", "Body", 1, optional), u("Trampletoe", "Boots", 27, optional)],
+    uniques: [u("Blackbraid", "Body", 4, optional), u("Trampletoe", "Boots", 27, optional)],
   },
   {
     id: "shaman-volcano",
@@ -939,7 +939,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Keep Essence Drain on the boss. Repeat the cast the vision shows.",
     ascendancyPick: "Take Fateful Vision and follow it for a whole zone before a second node.",
     focus: "Spell damage on a rare staff. Life and armour. Chaos resistance if you find it.",
-    uniques: [u("Amor Mandragora", "Talisman", 1, optional), u("Goldrim", "Helmet", 1, optional)],
+    uniques: [u("Amor Mandragora", "Talisman", 1, optional), u("Goldrim", "Helmet", 10, optional)],
   },
   {
     id: "oracle-wolf",
@@ -960,7 +960,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Shred to build the combo, Lunar Assault, step out. Flask if the freeze did not land.",
     ascendancyPick: "Take Fateful Vision and obey the attack it shows. Skip a spell node.",
     focus: "Life and armour on the chest and helmet. Movement speed on the boots. Freeze is why this survives melee.",
-    uniques: [u("Blackbraid", "Body", 1, optional), u("Horns of Bynden", "Helmet", 1, optional)],
+    uniques: [u("Blackbraid", "Body", 4, optional), u("Horns of Bynden", "Helmet", 1, optional)],
   },
   {
     id: "deadeye-gas-arrow",
@@ -1002,7 +1002,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Twister through the boss, step off the line, throw again. Slash across a slam, then leave.",
     ascendancyPick: "Take Endless Munitions so the twister covers more ground.",
     focus: "Attack damage on a rare spear. Evasion and life. Movement speed. Do not buy a unique spear to start.",
-    uniques: [u("Skysliver", "Spear", 16, optional), u("Queen of the Forest", "Body", 28, "Only if it drops and your rare body has less life.")],
+    uniques: [u("Skysliver", "Spear", 16, optional), u("Queen of the Forest", "Body", 51, "Only if it drops and your rare body has less life.")],
   },
   {
     id: "pathfinder-explosive-concoction",
@@ -1023,7 +1023,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Throw, step, throw. If the flask has no charges, use Gas Arrow until it does.",
     ascendancyPick: "Take the flask node first so the bottle comes back.",
     focus: "Flask charges and life. Evasion on the body. Movement speed on the boots. A unique bow can wait.",
-    uniques: [u("Goldrim", "Helmet", 1, optional), u("Wanderlust", "Boots", 1, optional)],
+    uniques: [u("Goldrim", "Helmet", 10, optional), u("Wanderlust", "Boots", 11, optional)],
   },
   {
     id: "pathfinder-high-velocity",
@@ -1044,7 +1044,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Keep poison on the boss. Velocity round when it stands still. Flask early.",
     ascendancyPick: "Take the poison or flask node and use it for a whole zone before a second node.",
     focus: "Damage on a rare crossbow. Life, evasion, and chaos resistance if you find it.",
-    uniques: [u("Mist Whisper", "Crossbow", 30, optional), u("Goldrim", "Helmet", 1, optional)],
+    uniques: [u("Mist Whisper", "Crossbow", 30, optional), u("Goldrim", "Helmet", 10, optional)],
   },
   {
     id: "amazon-rake",
@@ -1065,7 +1065,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Rake until it bleeds, Blood Hunt, step out. Do not stand in a slam to keep attacking.",
     ascendancyPick: "Take the crit or bleed node and use Rake for a whole zone before a second node.",
     focus: "Physical damage on the spear. Evasion and life. Movement speed so the bleed ticks while you move.",
-    uniques: [u("Saitha's Spear", "Spear", 30, optional), u("The Blood Thorn", "Spear", 16, optional)],
+    uniques: [u("Saitha's Spear", "Spear", 33, optional), u("The Blood Thorn", "Quarterstaff", 16, optional)],
   },
   {
     id: "amazon-glacial-lance",
@@ -1086,7 +1086,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Lance, step, lance. Storm Lance when the boss stops. Do not channel in a slam.",
     ascendancyPick: "Take the projectile or crit node so the lance covers more than one target.",
     focus: "Damage on a rare spear. Evasion, life, and cold resistance on the armour.",
-    uniques: [u("Skysliver", "Spear", 16, optional), u("Goldrim", "Helmet", 1, optional)],
+    uniques: [u("Skysliver", "Spear", 16, optional), u("Goldrim", "Helmet", 10, optional)],
   },
   {
     id: "spirit-walker-lightning-spear",
@@ -1128,7 +1128,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Spear at the feet, move, Twister while it arms. Throw again from the side.",
     ascendancyPick: "Take the node that empowers one throw, and spend it on the spear, not a basic attack.",
     focus: "Damage on a rare spear. Fire resistance, life, and movement speed.",
-    uniques: [u("Splinter of Lorrata", "Spear", 16, optional), u("Goldrim", "Helmet", 1, optional)],
+    uniques: [u("Splinter of Lorrata", "Spear", 16, optional), u("Goldrim", "Helmet", 10, optional)],
   },
   {
     id: "ritualist-explosive-spear",
@@ -1149,7 +1149,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Rake to open, spear when it stops, move. A charm is not a second health bar.",
     ascendancyPick: "Take the charm node and keep the charm you already have socketed.",
     focus: "Damage on the spear. Life and evasion. Fire resistance. The charm slot is a found charm.",
-    uniques: [u("Carnage Heart", "Amulet", 8, optional), u("Goldrim", "Helmet", 1, optional)],
+    uniques: [u("Carnage Heart", "Amulet", 8, optional), u("Goldrim", "Helmet", 10, optional)],
   },
   {
     id: "ritualist-lightning-spear",
@@ -1191,7 +1191,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Wall, Boneshatter, move. Recast the wall before you stand in a slam.",
     ascendancyPick: "Take the stun or hit-pool node and use Boneshatter on stunned enemies.",
     focus: "Armour on the body and shield. Physical damage on the mace. Life. A unique mace can wait.",
-    uniques: [u("Dunkelhalt", "Shield", 18, optional), u("Hrimnor's Hymn", "Mace", 30, optional)],
+    uniques: [u("Dunkelhalt", "Buckler", 18, optional), u("Hrimnor's Hymn", "Mace", 30, optional)],
   },
   {
     id: "titan-supercharged-slam",
@@ -1212,7 +1212,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Slam when it stops. Boneshatter after the stun. Do not charge the slam in a ground effect.",
     ascendancyPick: "Take the stun node so the slam's follow-up actually lands.",
     focus: "A heavier rare mace, armour on the chest, life on the helmet. Movement speed so you leave after the slam.",
-    uniques: [u("Marohi Erqi", "Mace", 28, optional), u("Hrimnor's Hymn", "Mace", 30, optional)],
+    uniques: [u("Marohi Erqi", "Mace", 60, optional), u("Hrimnor's Hymn", "Mace", 30, optional)],
   },
   {
     id: "warbringer-earthquake",
@@ -1233,7 +1233,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Totem beside the boss, Earthquake under it, circle. Do not stand on your own fissure.",
     ascendancyPick: "Take the totem node first and keep the spirit up in every zone.",
     focus: "Armour and life. Physical damage on the mace. The totem is the second weapon.",
-    uniques: [u("Hrimnor's Hymn", "Mace", 30, optional), u("Trampletoe", "Boots", 16, optional)],
+    uniques: [u("Hrimnor's Hymn", "Mace", 30, optional), u("Trampletoe", "Boots", 27, optional)],
   },
   {
     id: "warbringer-earthshatter",
@@ -1254,7 +1254,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Spikes at the feet, cry when it is still, move off the spikes. Recast if it walked away.",
     ascendancyPick: "Take the warcry or totem node and use the cry every pack, not only on bosses.",
     focus: "Armour, life, and a rare mace with physical damage. Attack speed helps the spikes land.",
-    uniques: [u("Trephina", "Mace", 30, optional), u("Blackbraid", "Body", 1, optional)],
+    uniques: [u("Trephina", "Mace", 30, optional), u("Blackbraid", "Body", 4, optional)],
   },
   {
     id: "smith-volcanic-fissure",
@@ -1275,7 +1275,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Fissure under the boss, strike, move. Do not channel on the fissure.",
     ascendancyPick: "Take the fire or body node. If the node wants your chest, do not wear a unique chest.",
     focus: "Fire resistance, life, and armour on a normal or rare body. Damage on the mace.",
-    uniques: [u("Hrimnor's Hymn", "Mace", 30, optional), u("Goldrim", "Helmet", 1, optional)],
+    uniques: [u("Hrimnor's Hymn", "Mace", 30, optional), u("Goldrim", "Helmet", 10, optional)],
   },
   {
     id: "smith-supercharged-slam",
@@ -1296,7 +1296,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Blast to start, slam when it stops, circle. Recast temper if the node asks you to.",
     ascendancyPick: "Take the temper or fire node and use it on the mace you are actually swinging.",
     focus: "A rare mace, a normal or rare body with life, fire resistance on the rest.",
-    uniques: [u("Marohi Erqi", "Mace", 28, optional), u("Trampletoe", "Boots", 16, optional)],
+    uniques: [u("Marohi Erqi", "Mace", 60, optional), u("Trampletoe", "Boots", 27, optional)],
   },
   {
     id: "witchhunter-permafrost",
@@ -1317,7 +1317,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Freeze, fragmentation, move, reload off to the side. Do not reload in the slam.",
     ascendancyPick: "Take Sorcery Ward or the culling node and keep using the same two ammos.",
     focus: "Damage and reload on a rare crossbow. Life, armour, and cold resistance.",
-    uniques: [u("Mist Whisper", "Crossbow", 30, optional), u("Goldrim", "Helmet", 1, optional)],
+    uniques: [u("Mist Whisper", "Crossbow", 30, optional), u("Goldrim", "Helmet", 10, optional)],
   },
   {
     id: "witchhunter-high-velocity",
@@ -1338,7 +1338,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Grenade, bolt, move, reload. Do not empty the magazine in one place.",
     ascendancyPick: "Take the culling or ward node so the bolt finishes a rare that is almost dead.",
     focus: "Physical damage and reload speed. Life and armour. Fire resistance for your own grenade.",
-    uniques: [u("Rampart Raptor", "Crossbow", 30, optional), u("The Last Lament", "Crossbow", 40, optional)],
+    uniques: [u("Rampart Raptor", "Crossbow", 30, optional), u("The Last Lament", "Crossbow", 77, optional)],
   },
   {
     id: "tactician-ballista",
@@ -1359,7 +1359,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Ballista to the side, grenade under the boss, reload behind the turret.",
     ascendancyPick: "Take the banner or Supporting Fire node and keep the ballista inside it.",
     focus: "Damage on a rare crossbow. Life, armour, and fire resistance.",
-    uniques: [u("Rampart Raptor", "Crossbow", 30, optional), u("Goldrim", "Helmet", 1, optional)],
+    uniques: [u("Rampart Raptor", "Crossbow", 30, optional), u("Goldrim", "Helmet", 10, optional)],
   },
   {
     id: "tactician-fragmentation",
@@ -1380,7 +1380,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Freeze, fragment, reload. Replace the banner if you walked out of it.",
     ascendancyPick: "Take the pin or banner node and fight inside the banner.",
     focus: "Reload speed and damage on the crossbow. Armour, life, cold resistance.",
-    uniques: [u("Mist Whisper", "Crossbow", 30, optional), u("Wanderlust", "Boots", 1, optional)],
+    uniques: [u("Mist Whisper", "Crossbow", 30, optional), u("Wanderlust", "Boots", 11, optional)],
   },
   {
     id: "gemling-perfect-strike",
@@ -1401,7 +1401,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Strike, step, slam. If the hit is small, the gem level or your attributes are behind.",
     ascendancyPick: "Take the gem-level node and put it on Perfect Strike before a second skill.",
     focus: "Enough attributes to socket the gems. Armour, life, and damage on a rare mace.",
-    uniques: [u("Hrimnor's Hymn", "Mace", 30, optional), u("Pillar of the Caged God", "Staff", 1, "Only if the attributes help you socket the gems.")],
+    uniques: [u("Hrimnor's Hymn", "Mace", 30, optional), u("Pillar of the Caged God", "Quarterstaff", 4, "Only if the attributes help you socket the gems.")],
   },
   {
     id: "gemling-earthshatter",
@@ -1422,7 +1422,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Spikes at the feet, slam to cross a swing, recast the spikes if it moved.",
     ascendancyPick: "Take the quality or gem-level node and keep it on Earthshatter.",
     focus: "Attributes for the gem, armour, life, and attack speed on a rare mace.",
-    uniques: [u("Trephina", "Mace", 30, optional), u("Blackbraid", "Body", 1, optional)],
+    uniques: [u("Trephina", "Mace", 30, optional), u("Blackbraid", "Body", 4, optional)],
   },
   {
     id: "invoker-storm-wave",
@@ -1443,7 +1443,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Bell, hit the bell, wave while it is down. Do not stand in the boss to keep the combo.",
     ascendancyPick: "Take the elemental node that matches the wave, and use that element for the act.",
     focus: "Damage and attack speed on a rare staff. Evasion, life, lightning resistance.",
-    uniques: [u("Pillar of the Caged God", "Staff", 1, optional), u("Dream Fragments", "Ring", 1, optional)],
+    uniques: [u("Pillar of the Caged God", "Quarterstaff", 4, optional), u("Dream Fragments", "Ring", 12, optional)],
   },
   {
     id: "invoker-tempest-flurry",
@@ -1464,7 +1464,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Flurry from the side, step out when the charge ends, charge again. Bell if you have it.",
     ascendancyPick: "Take the elemental avatar that matches lightning and stay on that element.",
     focus: "Attack speed on the staff. Evasion and life. Do not path across the tree for one notable.",
-    uniques: [u("Matsya", "Staff", 30, optional), u("Dream Fragments", "Ring", 1, optional)],
+    uniques: [u("Matsya", "Quarterstaff", 30, optional), u("Dream Fragments", "Ring", 12, optional)],
   },
   {
     id: "martial-artist-shattering-palm",
@@ -1485,7 +1485,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Palm until it is frozen or staggered, thunder, step out. Do not spend thunder on an empty combo.",
     ascendancyPick: "Take Hollow Form or the bell node and use the palm for a whole zone before a second node.",
     focus: "Evasion, life, and cold resistance. A staff only when it hits harder than your hands.",
-    uniques: [u("Dream Fragments", "Ring", 1, optional), u("Foxshade", "Body", 28, optional)],
+    uniques: [u("Dream Fragments", "Ring", 12, optional), u("Foxshade", "Body", 28, optional)],
   },
   {
     id: "martial-artist-volcanic-fissure",
@@ -1506,7 +1506,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Fissure under it, whirl across a slam, fissure again from the side.",
     ascendancyPick: "Take Hollow Form first if you do not have a staff that hits harder than your hands.",
     focus: "Fire resistance, evasion, and life. Weapon damage only when the staff is an upgrade.",
-    uniques: [u("Pillar of the Caged God", "Staff", 1, optional), u("Goldrim", "Helmet", 1, optional)],
+    uniques: [u("Pillar of the Caged God", "Quarterstaff", 4, optional), u("Goldrim", "Helmet", 10, optional)],
   },
   {
     id: "acolyte-flicker",
@@ -1548,7 +1548,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Flames, thunder from the side, flask. Do not stand in a slam you cannot see.",
     ascendancyPick: "Take the chaos node. Leave darkness for later, or skip it.",
     focus: "Life, evasion, and chaos resistance. Damage on a rare staff. No required unique.",
-    uniques: [u("Eye of Chayula", "Amulet", 45, "Optional, and not for the campaign."), u("Dream Fragments", "Ring", 1, optional)],
+    uniques: [u("Eye of Chayula", "Amulet", 45, "Optional, and not for the campaign."), u("Dream Fragments", "Ring", 12, optional)],
   },
   {
     id: "infernalist-bonestorm",
@@ -1569,7 +1569,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Keep a corpse near the boss, storm it, move. Recast Unearth if the storm has nothing to chew.",
     ascendancyPick: "Take the infernal or spell node and keep Bonestorm as the button.",
     focus: "Cast speed and spell damage on a rare wand. Energy shield and life. Fire resistance.",
-    uniques: [u("The Dark Defiler", "Wand", 30, optional), u("Ghostwrithe", "Body", 16, optional)],
+    uniques: [u("The Dark Defiler", "Sceptre", 30, optional), u("Ghostwrithe", "Body", 16, optional)],
   },
   {
     id: "infernalist-demon-form",
@@ -1590,7 +1590,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Form, Fireball, cancel the form when the flask is the only thing keeping you up.",
     ascendancyPick: "Take a minion or spell node first. Demon Form is the second node, after the acts are already clearing.",
     focus: "Life and energy shield before you ever turn the form on. Fire damage on a rare wand.",
-    uniques: [u("Lifesprig", "Wand", 1, optional), u("Goldrim", "Helmet", 1, optional)],
+    uniques: [u("Lifesprig", "Wand", 2, optional), u("Goldrim", "Helmet", 10, optional)],
   },
   {
     id: "blood-mage-bleed-bow",
@@ -1611,7 +1611,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Snipe while it is still, Rain of Arrows while Snipe is down. Flask early. Life remnants first.",
     ascendancyPick: "Take Life Remnants first. The bow does not replace life on your gear.",
     focus: "Life on the body, helmet, gloves, and boots. Physical damage on a rare bow.",
-    uniques: [u("Widowhail", "Bow", 16, optional), u("Drillneck", "Quiver", 55, "A found quiver. A rare with physical damage replaces it.")],
+    uniques: [u("Widowhail", "Bow", 16, optional), u("Drillneck", "Quiver", 55, "It pierces and has attack speed. It does not add physical damage. A rare quiver is the damage piece.")],
   },
   {
     id: "blood-mage-detonate-dead",
@@ -1632,7 +1632,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Corpse beside the boss, detonate, move. Flask before the blast if you are close.",
     ascendancyPick: "Take Life Remnants first. Skip a node that spends your life until the flask can pay it back.",
     focus: "Life on every slot. Fire resistance. Spell damage on a rare wand.",
-    uniques: [u("Lifesprig", "Wand", 1, optional), u("Goldrim", "Helmet", 1, optional)],
+    uniques: [u("Lifesprig", "Wand", 2, optional), u("Goldrim", "Helmet", 10, optional)],
   },
   {
     id: "lich-minions",
@@ -1653,7 +1653,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Snipers on the boss, Gas Arrow if they lose line of sight, then move so they can see it again.",
     ascendancyPick: "Take the minion or energy-shield node. The shield node only helps if the body has energy shield.",
     focus: "Spirit and minion level on a rare sceptre. Energy shield on the body. Life is still allowed. Do not buy a unique to start.",
-    uniques: [u("Bones of Ullr", "Boots", 16, optional), u("Vis Mortis", "Body", 45, "Maps only, and only if it drops with more spirit than your rare.")],
+    uniques: [u("Bones of Ullr", "Boots", 16, optional), u("Vis Mortis", "Body", 58, "Maps only. Minions have Unholy Might and 50% reduced maximum Life. It also rolls energy shield and mana. It does not grant spirit.")],
   },
   {
     id: "lich-dark-effigy",
@@ -1674,7 +1674,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Effigy to the side, Essence Drain on the boss, move. Do not stand between the effigy and the boss.",
     ascendancyPick: "Take the energy-shield node only after the body has energy shield on it.",
     focus: "Energy shield and chaos resistance. Spell damage on a rare wand.",
-    uniques: [u("The Dark Defiler", "Wand", 30, optional), u("Necromantle", "Body", 28, optional)],
+    uniques: [u("The Dark Defiler", "Sceptre", 30, optional), u("Necromantle", "Body", 28, optional)],
   },
   {
     id: "stormweaver-fireball",
@@ -1695,7 +1695,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Wall on the boss, Fireball, circle. Recast the wall when it drops.",
     ascendancyPick: "Take the fire or cast-speed node and stay on fire for the act.",
     focus: "Cast speed and fire damage on a rare wand. Energy shield, life, and fire resistance.",
-    uniques: [u("Lifesprig", "Wand", 1, optional), u("Goldrim", "Helmet", 1, optional)],
+    uniques: [u("Lifesprig", "Wand", 2, optional), u("Goldrim", "Helmet", 10, optional)],
   },
   {
     id: "stormweaver-ball-lightning",
@@ -1716,7 +1716,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Orb under the boss, ball, move. Do not stand in the orb.",
     ascendancyPick: "Take the lightning node and keep both skills on lightning.",
     focus: "Cast speed, lightning damage, energy shield, and lightning resistance.",
-    uniques: [u("Threaded Light", "Wand", 16, optional), u("Dream Fragments", "Ring", 1, optional)],
+    uniques: [u("Threaded Light", "Focus", 16, optional), u("Dream Fragments", "Ring", 12, optional)],
   },
   {
     id: "chronomancer-ice-nova",
@@ -1737,7 +1737,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Bolt, nova, step. Time Freeze only when the boss starts a long swing.",
     ascendancyPick: "Take Time Freeze and save it for the boss. The nova does not need it.",
     focus: "Cold damage and cast speed on a rare wand. Energy shield and cold resistance.",
-    uniques: [u("Lifesprig", "Wand", 1, optional), u("Dream Fragments", "Ring", 1, optional)],
+    uniques: [u("Lifesprig", "Wand", 2, optional), u("Dream Fragments", "Ring", 12, optional)],
   },
   {
     id: "chronomancer-frost-bomb",
@@ -1758,7 +1758,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Wall between you and the slam, bomb, Time Freeze if the swing is long.",
     ascendancyPick: "Take Temporal Rift or Time Freeze, and use the one you took before you take the other.",
     focus: "Energy shield, cold resistance, and cast speed. A rare wand.",
-    uniques: [u("Goldrim", "Helmet", 1, optional), u("Dream Fragments", "Ring", 1, optional)],
+    uniques: [u("Goldrim", "Helmet", 10, optional), u("Dream Fragments", "Ring", 12, optional)],
   },
   {
     id: "disciple-kelari",
@@ -1779,7 +1779,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Command on the boss, Spark from the side, command again when it is ready.",
     ascendancyPick: "Take Kelari and no other djinn. One command is the whole ascendancy.",
     focus: "Lightning damage and cast speed. Energy shield. The djinn does not drop as an item.",
-    uniques: [u("Threaded Light", "Wand", 16, optional), u("Dream Fragments", "Ring", 1, optional)],
+    uniques: [u("Threaded Light", "Focus", 16, optional), u("Dream Fragments", "Ring", 12, optional)],
   },
   {
     id: "disciple-ice-storm",
@@ -1800,7 +1800,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Storm on the boss, bolt, circle the edge. Recast the storm when it falls.",
     ascendancyPick: "Take the cold djinn and use the storm for a whole zone before a second command.",
     focus: "Energy shield and cold resistance. Cold damage on a rare wand.",
-    uniques: [u("Lifesprig", "Wand", 1, optional), u("Goldrim", "Helmet", 1, optional)],
+    uniques: [u("Lifesprig", "Wand", 2, optional), u("Goldrim", "Helmet", 10, optional)],
   },
   {
     id: "shaman-meteor",
@@ -1842,7 +1842,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Roots on the boss, storm, circle. Do not stand in the storm.",
     ascendancyPick: "Take the storm or nature node and keep both skills for a whole act.",
     focus: "Lightning resistance, armour, life, and lightning damage on the staff.",
-    uniques: [u("The Raven's Flock", "Staff", 30, optional), u("Amor Mandragora", "Talisman", 1, optional)],
+    uniques: [u("The Raven's Flock", "Staff", 65, optional), u("Amor Mandragora", "Talisman", 1, optional)],
   },
   {
     id: "oracle-bone-cage",
@@ -1863,7 +1863,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Cage, step out, cast again when the vision shows it. Do not stand in the cage.",
     ascendancyPick: "Take Fateful Vision and follow it for a whole zone before a crit node.",
     focus: "Spell damage on a rare staff. Life, armour, and physical damage reduction if you find it.",
-    uniques: [u("Amor Mandragora", "Talisman", 1, optional), u("Goldrim", "Helmet", 1, optional)],
+    uniques: [u("Amor Mandragora", "Talisman", 1, optional), u("Goldrim", "Helmet", 10, optional)],
   },
   {
     id: "oracle-tornado",
@@ -1884,6 +1884,6 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Tornado on the boss, circle, Raise Shield if it walked out. Repeat the cast the vision shows.",
     ascendancyPick: "Take Fateful Vision and obey it. Skip a node that wants a different form.",
     focus: "Armour, life, and spell damage on a rare staff. Movement speed so you are not inside the tornado.",
-    uniques: [u("Amor Mandragora", "Talisman", 1, optional), u("Blackbraid", "Body", 1, optional)],
+    uniques: [u("Amor Mandragora", "Talisman", 1, optional), u("Blackbraid", "Body", 4, optional)],
   },
 ];
