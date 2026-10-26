@@ -3,6 +3,7 @@ import { buildSpecs } from "../src/content/buildSpecs";
 import { extraSpecs } from "../src/content/extraSpecs";
 import { composeGuide } from "../src/content/composeGuide";
 import { gemFact } from "../src/content/gemFacts";
+import { gemInfo } from "../src/content/gems";
 import supports from "../src/content/gemSupports.json";
 
 const allowed = supports as Record<string, string[]>;
@@ -63,17 +64,24 @@ for (const spec of specs) {
   }
   if (guide.gearCards.length < 6) failures.push(`${spec.id} gear cards are missing slots`);
   for (const card of guide.gearCards) {
-    if (!card.base.trim() || !card.why.trim() || !card.how.trim()) {
-      failures.push(`${spec.id} ${card.slot} card is missing the base, the reason, or how to get it`);
+    if (!card.base.trim() || !card.why.trim() || !card.how.trim() || !card.skip.trim()) {
+      failures.push(`${spec.id} ${card.slot} card is missing the base, the reason, the skip line, or how to get it`);
     }
-    if (!card.affixes.some((affix) => affix.rank === "Must")) {
-      failures.push(`${spec.id} ${card.slot} has no must-have affix`);
+    if (!card.icon.startsWith("https://")) failures.push(`${spec.id} ${card.slot} is missing an image`);
+    for (const [name, lines] of [
+      ["leveling", card.leveling],
+      ["endgame", card.endgame],
+    ] as const) {
+      const numeric = lines.filter((line) => /\d/.test(line));
+      if (numeric.length < 3) failures.push(`${spec.id} ${card.slot} ${name} has fewer than 3 numeric stat lines`);
     }
-    for (const affix of card.affixes) {
-      if (affix.kind !== "Prefix" && affix.kind !== "Suffix") failures.push(`${spec.id} ${card.slot} ${affix.name} has no prefix or suffix`);
-      for (const value of [affix.leveling, affix.earlyMaps, affix.endgame]) {
-        if (!/\d/.test(value)) failures.push(`${spec.id} ${card.slot} ${affix.name} is missing a number`);
-      }
+  }
+  for (const piece of guide.uniques) {
+    if (!piece.icon?.startsWith("https://")) failures.push(`${spec.id} unique ${piece.name} is missing an image`);
+  }
+  for (const phase of guide.phases) {
+    for (const step of phase.steps) {
+      if (!step.image?.startsWith("https://")) failures.push(`${spec.id} ${step.quest} is missing a zone image`);
     }
   }
 
@@ -84,6 +92,14 @@ for (const spec of specs) {
     for (const skill of group.skills) {
       if (seen.has(skill.name)) failures.push(`${spec.id} lists ${skill.name} twice in ${group.label}`);
       seen.add(skill.name);
+      if (!gemInfo(skill.name, "skill").icon?.startsWith("https://")) {
+        failures.push(`${spec.id} gem ${skill.name} is missing an image`);
+      }
+      for (const support of skill.supports) {
+        if (!gemInfo(support, "support").icon?.startsWith("https://")) {
+          failures.push(`${spec.id} support ${support} is missing an image`);
+        }
+      }
       const fact = gemFact(skill.name);
       if (!fact) failures.push(`${spec.id} uses unknown gem ${skill.name}`);
       else if ((fact.kind === "support" || fact.kind === "lineage") && skill.supports.length) {

@@ -1,107 +1,167 @@
-import { cardIcon } from "@/content/gearCards";
-import type { GearAffix, GearCard, GearTotal } from "@/lib/types";
+"use client";
+
+import type { GearCard, GearTotal } from "@/lib/types";
 import Image from "next/image";
+import { useState } from "react";
 
-const rankOrder: Record<GearAffix["rank"], number> = { Must: 0, Nice: 1, Ignore: 2 };
-
-function ordered(affixes: GearAffix[]) {
-  return [...affixes].sort((a, b) => rankOrder[a.rank] - rankOrder[b.rank]);
+function pick(cards: GearCard[], used: Set<string>, pattern: RegExp) {
+  const card = cards.find((row) => !used.has(row.slot) && pattern.test(row.slot));
+  if (card) used.add(card.slot);
+  return card ?? null;
 }
 
-function Rank({ rank }: { rank: GearAffix["rank"] }) {
-  const tone =
-    rank === "Must" ? "border-gold text-gold" : rank === "Nice" ? "border-line text-parchment" : "border-line text-muted";
-  return <span className={`inline-block border px-1.5 py-0.5 text-[10px] tracking-[0.14em] uppercase ${tone}`}>{rank}</span>;
+function dollSlots(cards: GearCard[]) {
+  const used = new Set<string>();
+  const weapon = pick(cards, used, /^(bow|spear|crossbow|weapon|staff|wand|mace|sceptre|quarterstaff)$/i);
+  const offhand = pick(cards, used, /quiver|shield/i);
+  const grid = [
+    weapon,
+    pick(cards, used, /helm/i),
+    offhand,
+    pick(cards, used, /glove/i),
+    pick(cards, used, /body/i),
+    pick(cards, used, /amulet/i),
+    pick(cards, used, /ring/i),
+    pick(cards, used, /boot/i),
+    pick(cards, used, /belt/i),
+  ];
+  const extra = cards.filter((row) => !used.has(row.slot));
+  return { grid, extra };
 }
 
-export function GearCards({
-  cards,
-  totals,
-  spec,
+function Lines({ title, lines, active }: { title: string; lines: string[]; active: boolean }) {
+  return (
+    <div className={active ? "border border-gold bg-panel p-3" : "border border-line p-3"}>
+      <p className="text-xs tracking-[0.16em] text-gold uppercase">{active ? `${title} · now` : title}</p>
+      <ul className="mt-2 list-disc space-y-1 pl-4 text-sm text-parchment">
+        {lines.map((line) => (
+          <li key={line}>{line}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function SlotButton({
+  card,
+  selected,
+  level,
+  onOpen,
 }: {
-  cards: GearCard[];
-  totals: GearTotal[];
-  spec: { weaponNoun: string; defence: string };
+  card: GearCard;
+  selected: boolean;
+  level: number;
+  onOpen: (slot: string) => void;
 }) {
+  const lines = level < 60 ? card.leveling : card.endgame;
+  return (
+    <button
+      type="button"
+      onMouseEnter={() => onOpen(card.slot)}
+      onFocus={() => onOpen(card.slot)}
+      onClick={() => onOpen(card.slot)}
+      className={`group relative flex flex-col items-center gap-1 border bg-black p-1 ${selected ? "border-gold" : "border-line hover:border-gold"}`}
+    >
+      <span className="relative h-14 w-14 sm:h-16 sm:w-16">
+        <Image src={card.icon} alt="" fill className="object-contain" sizes="64px" />
+      </span>
+      <span className="w-full truncate text-center text-[10px] tracking-[0.12em] text-parchment uppercase">{card.slot}</span>
+      <span className="pointer-events-none absolute bottom-full left-1/2 z-30 mb-2 hidden w-56 -translate-x-1/2 border border-gold bg-ink p-2 text-left shadow-lg group-hover:block">
+        <span className="block text-[10px] tracking-[0.14em] text-gold uppercase">{level < 60 ? "Leveling" : "Endgame"}</span>
+        <ul className="mt-1 list-disc space-y-0.5 pl-4 text-xs text-parchment">
+          {lines.map((line) => (
+            <li key={line}>{line}</li>
+          ))}
+        </ul>
+        <span className="mt-1 block text-xs text-muted">{card.skip}</span>
+      </span>
+    </button>
+  );
+}
+
+export function GearCards({ cards, totals, level }: { cards: GearCard[]; totals: GearTotal[]; level: number }) {
+  const [open, setOpen] = useState(cards[0]?.slot ?? "");
+  const selected = cards.find((card) => card.slot === open) ?? cards[0];
+  const { grid, extra } = dollSlots(cards);
+  const levelingNow = level < 60;
+
   return (
     <div>
-      <div className="overflow-x-auto border border-line">
-        <table className="w-full min-w-[720px] text-left text-sm">
-          <caption className="border-b border-line px-3 py-2 text-left font-display text-xl text-parchment">
-            What the whole character should add up to
-          </caption>
-          <thead className="text-xs tracking-[0.14em] text-gold uppercase">
-            <tr>
-              <th className="px-3 py-2 font-normal">Target</th>
-              <th className="px-3 py-2 font-normal">Leveling</th>
-              <th className="px-3 py-2 font-normal">Early maps</th>
-              <th className="px-3 py-2 font-normal">Endgame</th>
-            </tr>
-          </thead>
-          <tbody>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <div className={levelingNow ? "border border-gold bg-panel p-3" : "border border-line p-3"}>
+          <p className="text-xs tracking-[0.16em] text-gold uppercase">{levelingNow ? "Leveling · now" : "Leveling"}</p>
+          <ul className="mt-2 list-disc space-y-1 pl-4 text-sm">
             {totals.map((row) => (
-              <tr key={row.label} className="border-t border-line align-top">
-                <th className="px-3 py-2 font-normal text-parchment">{row.label}</th>
-                <td className="px-3 py-2 text-muted">{row.leveling}</td>
-                <td className="px-3 py-2 text-muted">{row.earlyMaps}</td>
-                <td className="px-3 py-2 text-muted">{row.endgame}</td>
-              </tr>
+              <li key={row.label}>
+                <span className="text-parchment">{row.label}. </span>
+                <span className="text-muted">{row.leveling}</span>
+              </li>
             ))}
-          </tbody>
-        </table>
+          </ul>
+        </div>
+        <div className={levelingNow ? "border border-line p-3" : "border border-gold bg-panel p-3"}>
+          <p className="text-xs tracking-[0.16em] text-gold uppercase">{levelingNow ? "Endgame" : "Endgame · now"}</p>
+          <ul className="mt-2 list-disc space-y-1 pl-4 text-sm">
+            {totals.map((row) => (
+              <li key={row.label}>
+                <span className="text-parchment">{row.label}. </span>
+                <span className="text-muted">{row.endgame}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
 
-      <div className="mt-4 grid gap-3">
-        {cards.map((card) => (
-          <article key={card.slot} className="border border-line bg-[#14110e] p-3">
+      <div className="mt-4 grid items-start gap-4 lg:grid-cols-[292px_minmax(0,1fr)]">
+        <div>
+          <div className="grid grid-cols-3 gap-2">
+            {grid.map((card, index) =>
+              card ? (
+                <SlotButton key={card.slot} card={card} selected={selected?.slot === card.slot} level={level} onOpen={setOpen} />
+              ) : (
+                <span key={`empty-${index}`} className="min-h-[76px] border border-dashed border-line/60 bg-black/30" />
+              ),
+            )}
+          </div>
+          {extra.length ? (
+            <div className="mt-2 grid grid-cols-3 gap-2">
+              {extra.map((card) => (
+                <SlotButton key={card.slot} card={card} selected={selected?.slot === card.slot} level={level} onOpen={setOpen} />
+              ))}
+            </div>
+          ) : null}
+        </div>
+
+        {selected ? (
+          <article className="border border-line bg-[#14110e] p-3">
             <div className="flex gap-3">
               <span className="relative h-16 w-16 shrink-0 border border-gold/40 bg-black">
-                <Image src={cardIcon(card.slot, spec)} alt="" fill className="object-contain p-1" sizes="64px" />
+                <Image src={selected.icon} alt="" fill className="object-contain p-1" sizes="64px" />
               </span>
               <div>
-                <h3 className="font-display text-2xl text-parchment">{card.slot}</h3>
-                <p className="text-parchment">{card.base}</p>
-                <p className="mt-1 text-sm text-muted">{card.why}</p>
+                <h3 className="font-display text-2xl text-parchment">{selected.slot}</h3>
+                <p className="text-parchment">{selected.base}</p>
+                <p className="mt-1 text-sm text-muted">{selected.why}</p>
               </div>
             </div>
-            <div className="mt-3 overflow-x-auto">
-              <table className="w-full min-w-[680px] text-left text-sm">
-                <thead className="text-xs tracking-[0.14em] text-gold uppercase">
-                  <tr>
-                    <th className="py-1 pr-3 font-normal">Affix</th>
-                    <th className="py-1 pr-3 font-normal">Kind</th>
-                    <th className="py-1 pr-3 font-normal">Rank</th>
-                    <th className="py-1 pr-3 font-normal">Leveling</th>
-                    <th className="py-1 pr-3 font-normal">Early maps</th>
-                    <th className="py-1 font-normal">Endgame</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {ordered(card.affixes).map((affix) => (
-                    <tr key={`${affix.name}-${affix.rank}`} className="border-t border-line/70 align-top">
-                      <td className="py-2 pr-3 text-parchment">{affix.name}</td>
-                      <td className="py-2 pr-3 text-muted">{affix.kind}</td>
-                      <td className="py-2 pr-3">
-                        <Rank rank={affix.rank} />
-                      </td>
-                      <td className="py-2 pr-3 text-muted">{affix.leveling}</td>
-                      <td className="py-2 pr-3 text-muted">{affix.earlyMaps}</td>
-                      <td className="py-2 text-muted">{affix.endgame}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="mt-3 grid gap-2 sm:grid-cols-2">
+              <Lines title="Leveling" lines={selected.leveling} active={levelingNow} />
+              <Lines title="Endgame" lines={selected.endgame} active={!levelingNow} />
             </div>
-            <p className="mt-3 text-sm text-parchment">
+            <p className="mt-3 text-sm text-muted">
+              <span className="text-gold">Skip. </span>
+              {selected.skip}
+            </p>
+            <p className="mt-2 text-sm text-parchment">
               <span className="text-gold">How to get it. </span>
-              {card.how}
+              {selected.how}
             </p>
             <p className="mt-1 text-sm text-muted">
               <span className="text-parchment">While leveling. </span>
-              {card.note}
+              {selected.note}
             </p>
           </article>
-        ))}
+        ) : null}
       </div>
     </div>
   );

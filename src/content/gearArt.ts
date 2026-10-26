@@ -77,6 +77,7 @@ function family(defence: string): SetName {
 }
 
 export function gearIcon(slot: string, weaponNoun: string, defence: string) {
+  if (/jewel/i.test(slot)) return `${root}/Jewels/RubyJewel.webp`;
   if (slot === "Weapon") return weapons[weaponNoun] ?? weapons.mace;
   const piece = (slot === "Jewelry" ? "Ring" : slot) as Piece;
   return sets[family(defence)][piece] ?? sets.str.Body;
