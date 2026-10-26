@@ -17,7 +17,8 @@ export function gemFact(name: string): GemFact | undefined {
 /** poe2db Uncut Skill Gem tier. This is not the level the route puts the skill on the bar. */
 export function gemTier(name: string): number | null {
   // The catalog number is not an Uncut Skill Gem tier. The gem reserves spirit instead.
-  if (name === "Skeletal Sniper") return null;
+  // Persistent or ascendancy-granted. poe2db does not list an Uncut Skill Gem Tier.
+  if (name === "Skeletal Sniper" || name === "Supporting Fire") return null;
   const level = facts[name]?.level;
   return typeof level === "number" ? level : null;
 }

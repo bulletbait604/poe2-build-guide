@@ -22,7 +22,9 @@ import type { GearCard, GearStage, GearTotal } from "@/lib/types";
 // Flat energy shield on boots and gloves stops at +(48-60) item level 54. Helmets stop at +(61-73) item level 60.
 // Only a body reaches +(91-96) at item level 79. (27-42)% and (101-110)% increased Energy Shield are body DefencesPercent mods.
 // Spirit prefixes Lady's through Queen's are on body armour and amulets.
-// Resistance suffixes of the Whelpling through of Tzteosh use the same item levels on those pages.
+// Fire, cold, and lightning resistance use the same roll text and different item levels.
+// Fire steps at 12, 24, 36, and 48. Cold steps at 14, 26, 38, and 50. Lightning steps at 13, 25, 37, and 49.
+// From item level 60 the three match: 31-35, then 36-40 at 71 and 41-45 at 82.
 
 function family(defence: string) {
   const text = defence.toLowerCase();
@@ -45,7 +47,8 @@ function wantsSpirit(gear: GearStage[]) {
 
 function skillWord(spec: BuildSpec) {
   if (caster(spec) && spec.skill !== "Maul") return "Spell";
-  if (spec.skill === "Rake" || spec.skill === "Whirling Slash" || spec.skill === "Maul" || spec.skill === "Spear Stab") return "Melee";
+  if (spec.damage.toLowerCase().includes("minion")) return "Minion";
+  if (spec.skill === "Rake" || spec.skill === "Blood Hunt" || spec.skill === "Whirling Slash" || spec.skill === "Maul" || spec.skill === "Spear Stab") return "Melee";
   if (!attacker(spec)) return "Minion";
   if (spec.weaponNoun === "bow" || spec.weaponNoun === "spear" || spec.weaponNoun === "crossbow") return "Projectile";
   return "Melee";
@@ -170,7 +173,7 @@ function listsFor(slot: string, spec: BuildSpec, gear: GearStage[]): StatLines {
   }
   if (/quiver/i.test(slot)) {
     return {
-      leveling: ["(5-7)% increased Attack Speed", "Adds (1-2) to 3 Physical Damage to Attacks", "+5-8 Dexterity"],
+      leveling: ["(5-7)% increased Attack Speed", "Adds 1 to 3 Physical Damage to Attacks", "+5-8 Dexterity"],
       endgame: ["+1 to Level of all Projectile Skills", "(14-16)% increased Attack Speed", "(11-13)% increased Attack Speed"],
       skip: "A quiver rolls +1 to Level of all Projectile Skills. It does not roll +2 or +3.",
     };
@@ -213,12 +216,17 @@ function listsFor(slot: string, spec: BuildSpec, gear: GearStage[]): StatLines {
     };
   }
   if (noun === "spear" || /spear/i.test(slot)) {
+    const meleeSpear = spec.skill === "Rake" || spec.skill === "Blood Hunt" || spec.skill === "Whirling Slash" || spec.skill === "Spear Stab";
+    const minionSpear = spec.damage.toLowerCase().includes("minion");
     return {
       leveling: ["(40-49)% increased Physical Damage", "(5-7)% increased Attack Speed", "Adds (1-2) to (4-5) Physical Damage"],
-      endgame: ["(170-179)% increased Physical Damage", "(155-169)% increased Physical Damage", spec.skill === "Rake" || spec.skill === "Whirling Slash" ? "+4 to Level of all Melee Skills" : "+4 to Level of all Projectile Skills"],
-      skip: spec.skill === "Rake"
-        ? "Rake is a melee Strike (poe2db: Attack, AoE, Melee, Strike, Physical). From item level 18 the gem roll is +1 to Level of all Melee Skills, not Projectile. Skip these rolls: increased Rarity of Items found, Critical Hit Chance. Don't spend currency on a unique; wear one only if it drops and beats your current item."
-        : "Skip these rolls: increased Rarity of Items found, Critical Hit Chance. Don't spend currency on a unique; wear one only if it drops and beats your current item.",
+      endgame: ["(170-179)% increased Physical Damage", "(155-169)% increased Physical Damage", minionSpear ? "(26-28)% increased Attack Speed" : meleeSpear ? "+4 to Level of all Melee Skills" : "+4 to Level of all Projectile Skills"],
+      skip:
+        spec.skill === "Rake" || spec.skill === "Blood Hunt"
+          ? "Rake and Blood Hunt are melee Strikes (poe2db: Attack, AoE, Melee, Strike, Physical). From item level 18 the gem roll is +1 to Level of all Melee Skills. The spear also rolls +1 to Level of all Projectile Skills at the same item level. Skip these rolls: increased Rarity of Items found, Critical Hit Chance. Don't spend currency on a unique; wear one only if it drops and beats your current item."
+          : spec.damage.toLowerCase().includes("minion")
+            ? "Skip these rolls: increased Rarity of Items found, Critical Hit Chance. Don't spend currency on a unique; wear one only if it drops and beats your current item. +1 to Level of all Minion Skills is a sceptre roll from item level 2, or an amulet roll from item level 5. A spear does not roll it."
+            : "Skip these rolls: increased Rarity of Items found, Critical Hit Chance. Don't spend currency on a unique; wear one only if it drops and beats your current item.",
     };
   }
   if (noun === "wand" || /wand/i.test(slot)) {
@@ -249,9 +257,9 @@ function listsFor(slot: string, spec: BuildSpec, gear: GearStage[]): StatLines {
     };
   }
   return {
-    leveling: ["(40-49)% increased Physical Damage", "(5-7)% increased Attack Speed", "Adds (1-2) to (4-5) Physical Damage"],
+    leveling: ["(40-49)% increased Physical Damage", "(5-7)% increased Attack Speed", "Adds (1-2) to (4-5) Physical Damage", "Adds (2-3) to (5-7) Physical Damage"],
     endgame: ["(170-179)% increased Physical Damage", "(155-169)% increased Physical Damage", "+4 to Level of all Melee Skills"],
-    skip: "Skip these rolls: increased Rarity of Items found, Critical Hit Chance. Don't spend currency on a unique; wear one only if it drops and beats your current item. Use a one-hand mace plus a shield, or a two-hand mace with the shield slot empty. Do not equip both.",
+    skip: "Skip these rolls: increased Rarity of Items found, Critical Hit Chance. Don't spend currency on a unique; wear one only if it drops and beats your current item. Use a one-hand mace plus a shield, or a two-hand mace with the shield slot empty. Do not equip both. The one-hand added-physical line is (1-2) to (4-5) at item level 1. The two-hand line is (2-3) to (5-7) at item level 1. A one-hand mace rolls +4 to Level of all Melee Skills at item level 81. A two-hand mace rolls +5 to Level of all Melee Skills at item level 81.",
   };
 }
 

@@ -7,6 +7,8 @@ import { composeGuide } from "../src/content/composeGuide";
 import { instructsUse, pressLine } from "../src/content/earlySkill";
 import { mainSkillReadyAt } from "../src/content/gemFacts";
 import { loadoutFor } from "../src/content/loadouts";
+import { statsForLevel } from "../src/content/statLines";
+import { weaponStats } from "../src/content/shopping";
 
 const banned: Array<[RegExp, string]> = [
   [/highest damage/i, "highest damage"],
@@ -166,6 +168,46 @@ function walk(dir: string) {
 }
 
 walk(new URL("../src/content", import.meta.url).pathname);
+
+const level12 = statsForLevel({ defence: "evasion" }, 12);
+if (!level12.includes("+11-15% Fire Resistance") || !level12.includes("+6-10% Cold Resistance") || !level12.includes("+6-10% Lightning Resistance")) {
+  failures.push(`level 12 resistances are ${level12.join(", ")}`);
+}
+const level52 = statsForLevel({ defence: "armour" }, 52);
+if (!level52.includes("+85-99 maximum Life") || !level52.includes("+21-24 Strength")) {
+  failures.push(`level 52 band is ${level52.join(", ")}`);
+}
+const level78 = statsForLevel({ defence: "armour" }, 78);
+if (level78.includes("+200-214 maximum Life") || !level78.includes("+100-119 maximum Life")) {
+  failures.push(`shared level 78 life is ${level78.join(", ")}`);
+}
+const bow1 = weaponStats("bow", 1).join(" ");
+const mace1 = weaponStats("mace", 1).join(" ");
+if (!bow1.includes("Adds (1-2) to (4-5) Physical Damage") || bow1.includes("Adds (4-6) to (7-11)")) {
+  failures.push(`level 1 bow rolls are ${bow1}`);
+}
+if (!mace1.includes("Adds (2-3) to (5-7) Physical Damage") || mace1.includes("Adds (5-8) to (10-15)")) {
+  failures.push(`level 1 mace rolls are ${mace1}`);
+}
+
+const nodeFor: Record<string, string> = {
+  "tactician-grenades": "Unleash Hell!",
+  "gemling-grenades": "Advanced Thaumaturgy",
+  "ritualist-rake": "Corrupted Lifeforce",
+  "ritualist-blood-hunt": "Corrupted Lifeforce",
+  "spirit-walker-lightning-spear": "Primal Bounty",
+  "ritualist-lightning-spear": "Intricate Sigils",
+  "amazon-glacial-lance": "Penetrate",
+  "invoker-tempest-bell": "I am the Blizzard",
+  "titan-shield-wall": "Crushing Impacts",
+};
+for (const spec of specs) {
+  const expected = nodeFor[spec.id];
+  if (!expected) continue;
+  const loadout = loadoutFor(spec);
+  const route = [spec.ascendancyPick, loadout.overview, ...loadout.ascendancy, ...loadout.leveling.map((row) => row.text)].join("\n");
+  if (!route.includes(expected)) failures.push(`${spec.id} does not name ${expected}`);
+}
 
 if (failures.length) {
   console.error(failures.join("\n"));

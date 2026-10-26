@@ -117,6 +117,9 @@ const affixes = new Set(
 (14-19)% increased Cast Speed
 (155-169)% increased Physical Damage
 (17-19)% increased Attack Speed
+(20-22)% increased Attack Speed
+(23-25)% increased Attack Speed
+(209-238)% increased Spell Damage
 (25-28)% increased Cast Speed
 (26-28)% increased Attack Speed
 (26-39) to (44-66) added Physical Damage
@@ -164,6 +167,7 @@ const affixes = new Set(
 (9-12)% increased Cast Speed
 +1 to Level of all Melee Skills
 +1 to Level of all Minion Skills
++2 to Level of all Minion Skills
 +1 to Level of all Projectile Skills
 +1 to Level of all Spell Skills
 +10-17 maximum Energy Shield

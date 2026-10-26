@@ -92,13 +92,37 @@ const ENERGY: Array<[number, string]> = [
   [79, "+91-96 maximum Energy Shield"],
 ];
 
-// poe2db FireResistance. Cold and lightning are written with the same numbers. Those two suffixes were not exported as their own tables.
-const RESIST: Array<[number, string]> = [
+// poe2db resistance suffixes. The roll text matches. The item level does not.
+// Fire steps at 12, 24, 36, 48. Cold steps at 14, 26, 38, 50. Lightning steps at 13, 25, 37, 49.
+// From item level 60 the three suffixes share 31-35, then 36-40 at 71 and 41-45 at 82.
+const FIRE: Array<[number, string]> = [
   [1, "6-10"],
   [12, "11-15"],
   [24, "16-20"],
   [36, "21-25"],
   [48, "26-30"],
+  [60, "31-35"],
+  [71, "36-40"],
+  [82, "41-45"],
+];
+
+const COLD: Array<[number, string]> = [
+  [1, "6-10"],
+  [14, "11-15"],
+  [26, "16-20"],
+  [38, "21-25"],
+  [50, "26-30"],
+  [60, "31-35"],
+  [71, "36-40"],
+  [82, "41-45"],
+];
+
+const LIGHTNING: Array<[number, string]> = [
+  [1, "6-10"],
+  [13, "11-15"],
+  [25, "16-20"],
+  [37, "21-25"],
+  [49, "26-30"],
   [60, "31-35"],
   [71, "36-40"],
   [82, "41-45"],
@@ -133,18 +157,26 @@ export function energyAt(level: number, slot: AffixSlot = "shared") {
   return tierAt(Math.min(level, ENERGY_CAP[slot]), ENERGY);
 }
 
+export function resistAt(level: number) {
+  return {
+    fire: tierAt(level, FIRE),
+    cold: tierAt(level, COLD),
+    lightning: tierAt(level, LIGHTNING),
+  };
+}
+
 export function statsForLevel(input: { defence: string }, level: number): string[] {
   const attr = attributeName(input.defence);
   const energy = wantsEnergy(input.defence);
-  const resist = tierAt(level, RESIST);
+  const resist = resistAt(level);
   // Shared lists stop at the ring life cap and the boot energy-shield cap.
   // +(200-214) life is body armour only. +(91-96) energy shield is body armour only.
   return [
     tierAt(level, MOVE),
     energy ? energyAt(level, "shared") : lifeAt(level, "shared"),
-    `+${resist}% Fire Resistance`,
-    `+${resist}% Cold Resistance`,
-    `+${resist}% Lightning Resistance`,
+    `+${resist.fire}% Fire Resistance`,
+    `+${resist.cold}% Cold Resistance`,
+    `+${resist.lightning}% Lightning Resistance`,
     `+${tierAt(level, ATTR)} ${attr}`,
   ];
 }

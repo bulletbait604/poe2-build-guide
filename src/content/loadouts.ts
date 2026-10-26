@@ -256,14 +256,14 @@ function lightningSpear(spec: BuildSpec): Loadout {
       cap,
       chaos,
       "Campaign spirit is 100. Mirage Archer reserves 60 spirit.",
-      "Seaglass Spear requires level 51.",
+      "Seaglass Spear requires level 51, 29 Strength, 71 Dexterity, and 50 Intelligence.",
       "Iron Rings in Act 1.",
       "10% increased Movement Speed on the level 1 boots from Renly in Clearfell Encampment.",
     ],
     ascendancy:
       spec.ascendancyId === "amazon"
         ? [
-            "Take the first Amazon node that adds a projectile or a frenzy tool, and use Lightning Spear for a whole zone before the next node.",
+            "Take Penetrate or Elemental Surge. Both are Amazon nodes. Use Lightning Spear for a whole zone before the next node.",
             "Lineage supports on the spear, when you own them: Garukhan's Resolve, Rakiata's Flow, Rigwald's Ferocity.",
           ]
         : [spec.ascendancyPick],
@@ -296,7 +296,7 @@ function lightningSpear(spec: BuildSpec): Loadout {
     leveling: [
       { levels: "1–4", text: "Explosive Spear into the pack. Contagion if it spreads. Frost Bomb on the boss." },
       { levels: "5–14", text: "At level 5, Lightning Spear takes the clear. It is a Tier 3 gem, usable from level 3, and this route waits for the level 5 Ironhead Spear. Parry or Disengage feed frenzy. Iron Rings. Movement-speed boots." },
-      { levels: "15–50", text: "Sniper's Mark and Storm Lance. Seaglass Spear requires level 51." },
+      { levels: "15–50", text: "Sniper's Mark and Storm Lance. Seaglass Spear requires level 51, 29 Strength, 71 Dexterity, and 50 Intelligence." },
       { levels: "Maps", text: "Add the support row one gem at a time. Mirage Archer reserves 60 spirit." },
     ],
     gear: spearGear(),
@@ -426,7 +426,7 @@ function grenades(spec: BuildSpec): Loadout {
     numbers: [cap, chaos, "Fire resistance on the jewellery, because you are standing near the blast.", "10% increased Movement Speed on the level 1 boots from Renly in Clearfell Encampment. You reload while you walk."],
     ascendancy:
       spec.ascendancyId === "witchhunter"
-        ? ["Sorcery Ward first, so a bad grenade does not end the zone."]
+        ? ["Take Obsessive Rituals first. It grants Sorcery Ward, so a bad grenade does not end the zone."]
         : [spec.ascendancyPick],
     groups: [
       group(
@@ -461,7 +461,7 @@ function permafrost(): Loadout {
   return loadout({
     overview: "Permafrost Bolts freeze the pack. Fragmentation Rounds explode the frozen ones. Grenades are for rares. Freezing Mark opens a boss.",
     numbers: [cap, chaos, "Movement speed on boots so you are not reloading in place."],
-    ascendancy: ["Sorcery Ward or the culling node. One of them, for a whole zone, then the other."],
+    ascendancy: ["Take Obsessive Rituals or Pitiless Killer. Obsessive Rituals grants Sorcery Ward. Pitiless Killer is Culling Strike. One of them, for a whole zone, then the other."],
     groups: [
       group("Bolts", "Permafrost Bolts keeps Ice Bite and Elemental Armament. Fragmentation Rounds only keeps Close Combat. Concentrated Area, Multishot, and Magnified Area are not legal supports on that gem.", [
         gem("Permafrost Bolts", ["Ice Bite I", "Elemental Armament I"]),
@@ -504,7 +504,7 @@ function supportingFire(): Loadout {
       "One of each minion, unless a note below says otherwise.",
       "Uul-Netol's Embrace is a support gem, if you use it.",
     ],
-    ascendancy: ["Take the Tactician node that buffs the attack you are using. After the swap, that attack is Supporting Fire."],
+    ascendancy: ["Take Unleash Hell!. It grants Supporting Fire. After level 36 that command is the attack. Whoever Pays Best is the banner node, and it comes after."],
     groups: [
       group("Before level 36", "This is the campaign crossbow. Freeze, then fragment.", [
         gem("Permafrost Bolts", ["Ice Bite I", "Elemental Armament I"]),
@@ -536,7 +536,7 @@ function supportingFire(): Loadout {
     ],
     leveling: [
       { levels: "1–15", text: "Permafrost Bolts on a Makeshift Crossbow. At level 4 the crossbow base is a Tense Crossbow. Movement-speed boots. Life and resistances. A Varnished Crossbow requires level 16, so it is not the level 1 weapon." },
-      { levels: "16–35", text: "Stay on Permafrost Bolts and Fragmentation Rounds. At level 16, buy a Varnished Crossbow. Supporting Fire is a Tier 1 gem, and this route still waits for the level 36 respec. Keep saving gold." },
+      { levels: "16–35", text: "Stay on Permafrost Bolts and Fragmentation Rounds. At level 16, buy a Varnished Crossbow. Supporting Fire is not an Uncut Skill Gem. poe2db lists no Uncut Skill Gem Tier for it. Unleash Hell! grants it, and this route still waits for the level 36 respec. Keep saving gold." },
       { levels: "36", text: "Respec into Supporting Fire at level 36. About 21,700 gold. One of each minion." },
       { levels: "Maps", text: "Skeletal Arsonist stays low level, from a level 5 or level 7 uncut, once Brutus' Brain is in. Her Declaration lets you swap the Brute for a Reaver." },
     ],
@@ -622,7 +622,14 @@ function grimPillars(): Loadout {
 function minions(spec: BuildSpec, page: GuideLink): Loadout {
   return loadout({
     overview: `${spec.name} summons, then commands. The socket row below is the one printed on the Disciple of Varashta minion guide. ${page.label} is this ascendancy's own page. +levels to minion skills on the gear is the stat that matters.`,
-    numbers: [cap, chaos, "+levels to minion skills on the weapon, the amulet, or both.", "Spirit enough to keep the minions you actually use."],
+    numbers: [
+      cap,
+      chaos,
+      spec.weaponNoun === "spear"
+        ? "+1 to Level of all Minion Skills is an amulet roll from item level 5, or a sceptre roll from item level 2. A spear does not roll it."
+        : "+levels to minion skills on the weapon, the amulet, or both.",
+      "Spirit enough to keep the minions you actually use.",
+    ],
     ascendancy: [spec.ascendancyPick, "One minion node. Use the command skill for a zone before you take another."],
     groups: [
       group("Minions", "Meat Shield on both skeletons. Elemental Army stays on the storm mage, which accepts it. The sniper does not, so it keeps Meat Shield and Pierce instead.", [
@@ -825,7 +832,7 @@ function hollowForm(): Loadout {
     overview:
       "Tap Hollow Form. The copies finish Whirling Assault. Ice Strike hits the Tempest Bell. Chaos Inoculation is a later swap, after the energy shield is high. Hollow Form Whirling Assault is an S-tier Martial Artist build on the October 5, 2026 league-starter list.",
     numbers: [cap, chaos, "CI only after the energy shield can take a hit.", "Cooldown recovery so Hollow Form is up often."],
-    ascendancy: ["The Hollow Form node first. Then a damage node, after the form is the button you actually press."],
+    ascendancy: ["Take Hollow Form Technique. It grants Hollow Form. Then a damage node, after the form is the button you actually press."],
     groups: [
       group("Form", "Hollow Form does not accept Cooldown Recovery on the 0.5.5 gem page. Get that stat on gear. The cold-attack supports stay on the hits.", [
         gem("Hollow Form"),
@@ -1309,8 +1316,14 @@ const byId: Record<string, (spec: BuildSpec) => Loadout> = {
     loadout({
       ...hollowForm(),
       overview:
-        "Drop Tempest Bell, then Ice Strike the bell. The wave covers the pack. This is an Invoker route. Take the first node on the Invoker panel after both skills are on the bar.",
+        "Drop Tempest Bell, then Ice Strike the bell. The wave covers the pack. This is an Invoker route. Take I am the Blizzard... after both skills are on the bar. It grants 10% of Damage as extra Cold Damage.",
+      numbers: [cap, chaos, "Life on the body before a damage unique.", "10% increased Movement Speed on the level 1 boots from Renly in Clearfell Encampment."],
       ascendancy: [spec.ascendancyPick],
+      rotation: [
+        "Drop Tempest Bell.",
+        "Ice Strike the bell. The wave covers the pack.",
+        "Freezing Mark on a boss, then the same two buttons.",
+      ],
       leveling: [
         { levels: "1–20", text: "Ice Strike on the left mouse button and Tempest Bell. Life and a resistance on every piece. Buy a Wrapped Quarterstaff from Renly in Clearfell Encampment." },
         { levels: "21+", text: "Keep Ice Strike on the bell. Cooldown recovery comes from gear." },
@@ -1325,7 +1338,7 @@ const byId: Record<string, (spec: BuildSpec) => Loadout> = {
           gem("Herald of Ice"),
         ]),
       ],
-      sources: [guide("hollow-form-whirling-assault-martial-artist-build-guide", "Maxroll Hollow Form, for the bell and Ice Strike links"), ...commonSources],
+      sources: [guide("hollow-form-whirling-assault-martial-artist-build-guide", "Maxroll, for the Ice Strike and bell links"), ...commonSources],
     }),
   "blood-mage-dark-effigy": (spec) =>
     loadout({

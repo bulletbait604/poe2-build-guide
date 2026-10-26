@@ -82,6 +82,14 @@ export function pressLine(spec: BuildSpec, loadout: Loadout, level: number) {
   const now = skillAt(spec, loadout, level);
   const hollow = /Hollow Palm/i.test(`${loadout.overview} ${loadout.leveling.map((row) => row.text).join(" ")}`);
   const hands = hollow && level < 21 ? " Both hand slots stay empty until level 21. Hollow Palm Technique turns off if a weapon is equipped." : "";
+  if (spec.skill === "Supporting Fire") {
+    const grant =
+      "Supporting Fire is not an Uncut Skill Gem. poe2db lists no Uncut Skill Gem Tier for it. Tactician's Unleash Hell! grants it.";
+    if (level < ready) {
+      return `Use ${now} on the left mouse button. ${grant} This route switches at level ${ready}. ${SOCKET_HELP}${hands}`;
+    }
+    return `Use Supporting Fire on the left mouse button. ${grant} ${SOCKET_HELP}${hands}`;
+  }
   if (spec.skill === "Skeletal Sniper") {
     const opener = minionOpener(spec);
     const reservation =

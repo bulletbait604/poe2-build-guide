@@ -4,7 +4,7 @@
 // https://poe2db.tw/us/Bows and the matching pages for each weapon and armour class.
 // Rare-mod numbers are the single tiers already checked in statLines.ts.
 
-import { energyAt, lifeAt, type AffixSlot } from "@/content/statLines";
+import { energyAt, lifeAt, resistAt, type AffixSlot } from "@/content/statLines";
 
 type Base = { name: string; level: number; detail: string };
 
@@ -34,7 +34,7 @@ const SPEAR: Base[] = [
   { name: "Barbed Spear", level: 33, detail: "physical damage 20-38, 1.50 attacks per second, requires 20 Strength and 47 Dexterity" },
   { name: "Broad Spear", level: 40, detail: "physical damage 32-48, 1.40 attacks per second, requires 26 Strength and 55 Dexterity" },
   { name: "Crossblade Spear", level: 45, detail: "physical damage 25-52, 1.60 attacks per second, requires 26 Strength and 63 Dexterity" },
-  { name: "Seaglass Spear", level: 51, detail: "physical damage 29-53, 1.60 attacks per second, requires 29 Strength and 71 Dexterity" },
+  { name: "Seaglass Spear", level: 51, detail: "physical damage 29-53, 1.60 attacks per second, requires 29 Strength, 71 Dexterity, and 50 Intelligence" },
   { name: "Sword Spear", level: 52, detail: "physical damage 30-56, 1.60 attacks per second, requires 29 Strength and 72 Dexterity" },
   { name: "Helix Spear", level: 65, detail: "physical damage 37-68, 1.60 attacks per second, requires 36 Strength and 89 Dexterity" },
   { name: "Orichalcum Spear", level: 67, detail: "physical damage 46-62, 1.60 attacks per second, requires 41 Strength and 104 Dexterity" },
@@ -547,24 +547,51 @@ const PHYS_PERCENT: TaggedRoll[] = [
   { ilvl: 82, text: "(170-179)% increased Physical Damage" },
 ];
 
+// poe2db PhysicalDamage on bows, spears, and one-hand maces.
 const FLAT_ONE_HAND: TaggedRoll[] = [
   { ilvl: 1, text: "Adds (1-2) to (4-5) Physical Damage" },
   { ilvl: 8, text: "Adds (4-6) to (7-11) Physical Damage" },
   { ilvl: 16, text: "Adds (6-9) to (11-16) Physical Damage" },
+  { ilvl: 33, text: "Adds (8-12) to (14-21) Physical Damage" },
+  { ilvl: 46, text: "Adds (10-15) to (18-26) Physical Damage" },
+  { ilvl: 54, text: "Adds (13-20) to (23-35) Physical Damage" },
+  { ilvl: 60, text: "Adds (16-24) to (28-42) Physical Damage" },
+  { ilvl: 65, text: "Adds (21-31) to (36-53) Physical Damage" },
+  { ilvl: 75, text: "Adds (26-39) to (44-66) Physical Damage" },
 ];
 
+// poe2db PhysicalDamage on crossbows, quarterstaves, two-hand maces, and talismans.
 const FLAT_TWO_HAND: TaggedRoll[] = [
   { ilvl: 1, text: "Adds (2-3) to (5-7) Physical Damage" },
   { ilvl: 8, text: "Adds (5-8) to (10-15) Physical Damage" },
   { ilvl: 16, text: "Adds (8-12) to (15-22) Physical Damage" },
+  { ilvl: 33, text: "Adds (11-17) to (20-30) Physical Damage" },
+  { ilvl: 46, text: "Adds (14-21) to (25-37) Physical Damage" },
+  { ilvl: 54, text: "Adds (19-29) to (33-49) Physical Damage" },
+  { ilvl: 60, text: "Adds (23-35) to (39-59) Physical Damage" },
+  { ilvl: 65, text: "Adds (29-44) to (50-75) Physical Damage" },
+  { ilvl: 75, text: "Adds (37-55) to (63-94) Physical Damage" },
 ];
 
-const ATTACK_SPEED: TaggedRoll[] = [
+// Bows and crossbows stop at item level 37. Spears, maces, and quarterstaves continue.
+const ATTACK_SPEED_BOW: TaggedRoll[] = [
   { ilvl: 1, text: "(5-7)% increased Attack Speed" },
   { ilvl: 11, text: "(8-10)% increased Attack Speed" },
   { ilvl: 22, text: "(11-13)% increased Attack Speed" },
   { ilvl: 30, text: "(14-16)% increased Attack Speed" },
+  { ilvl: 37, text: "(17-19)% increased Attack Speed" },
 ];
+
+const ATTACK_SPEED_MELEE: TaggedRoll[] = [
+  ...ATTACK_SPEED_BOW,
+  { ilvl: 45, text: "(20-22)% increased Attack Speed" },
+  { ilvl: 60, text: "(23-25)% increased Attack Speed" },
+  { ilvl: 77, text: "(26-28)% increased Attack Speed" },
+];
+
+function plusGem(kind: "Projectile" | "Melee" | "Spell" | "Minion", start: 1 | 2, levels: number[]) {
+  return levels.map((ilvl, index) => ({ ilvl, text: `+${start + index} to Level of all ${kind} Skills` }));
+}
 
 const PHYS_IDEAL = [
   "Ideal at item level 75: (155-169)% increased Physical Damage.",
@@ -575,75 +602,159 @@ function fromLine(row: TaggedRoll | undefined) {
   return row ? `From item level ${row.ilvl}: ${row.text}.` : "";
 }
 
-export function weaponRollPlan(noun: string, level: number): { now: string[]; later: string[]; ideal: string[] } {
+const GEM_LEVELS = [18, 36, 55, 81];
+
+export function weaponRollPlan(noun: string, level: number): { now: string[]; later: string[]; ideal: string[]; gem: string } {
   const key = weaponKind(noun);
   const martial = key === "bow" || key === "spear" || key === "crossbow" || key === "quarterstaff" || key === "mace";
   if (martial) {
-    const flat = key === "crossbow" || key === "quarterstaff" ? FLAT_TWO_HAND : FLAT_ONE_HAND;
-    const gem: TaggedRoll[] =
+    const twoHandFlat = key === "crossbow" || key === "quarterstaff";
+    const speed = key === "bow" || key === "crossbow" ? ATTACK_SPEED_BOW : ATTACK_SPEED_MELEE;
+    const gem =
       key === "crossbow"
-        ? [{ ilvl: 18, text: "+2 to Level of all Projectile Skills" }]
+        ? plusGem("Projectile", 2, GEM_LEVELS)
         : key === "quarterstaff"
-          ? [{ ilvl: 18, text: "+2 to Level of all Melee Skills" }]
+          ? plusGem("Melee", 2, GEM_LEVELS)
           : key === "mace"
-            ? [{ ilvl: 18, text: "+1 to Level of all Melee Skills" }]
-            : [{ ilvl: 18, text: "+1 to Level of all Projectile Skills" }];
-    const now = [best(PHYS_PERCENT, level), best(flat, level), best(ATTACK_SPEED, level)].flatMap((row) => (row ? [row.text] : []));
-    const later = [nextRoll(PHYS_PERCENT, level), nextRoll(flat, level), nextRoll(gem, level)].map(fromLine).filter(Boolean);
-    return { now, later, ideal: PHYS_IDEAL };
+            ? plusGem("Melee", 1, GEM_LEVELS)
+            : plusGem("Projectile", 1, GEM_LEVELS);
+    const gemTwoHand = key === "mace" ? plusGem("Melee", 2, GEM_LEVELS) : key === "spear" ? plusGem("Melee", 1, GEM_LEVELS) : [];
+    const flat = twoHandFlat ? best(FLAT_TWO_HAND, level) : best(FLAT_ONE_HAND, level);
+    const flatTwo = key === "mace" ? best(FLAT_TWO_HAND, level) : undefined;
+    // One-hand and two-hand maces are different mods. Each stays its own line so a level 1
+    // card can show (1-2)-(4-5) and (2-3)-(5-7) without gluing them into one sentence.
+    const now = [best(PHYS_PERCENT, level)?.text, flat?.text, flatTwo?.text, best(speed, level)?.text].filter((row): row is string => Boolean(row));
+    const currentGem = best(gem, level);
+    const currentTwo = best(gemTwoHand, level);
+    const gemText =
+      key === "spear"
+        ? [currentTwo ? `Melee ${currentTwo.text}` : "", currentGem ? `Projectile ${currentGem.text}` : ""].filter(Boolean).join(". ")
+        : [currentGem ? `One-hand ${currentGem.text}` : "", currentTwo ? `Two-hand ${currentTwo.text}` : ""].filter(Boolean).join(". ");
+    const later = [
+      nextRoll(PHYS_PERCENT, level),
+      nextRoll(twoHandFlat ? FLAT_TWO_HAND : FLAT_ONE_HAND, level),
+      key === "mace" ? nextRoll(FLAT_TWO_HAND, level) : undefined,
+      nextRoll(speed, level),
+      nextRoll(gem, level),
+      nextRoll(gemTwoHand, level),
+    ]
+      .map(fromLine)
+      .filter(Boolean);
+    const shownGem = key === "mace" || key === "spear" ? gemText : currentGem?.text ?? "";
+    return { now, later, ideal: PHYS_IDEAL, gem: shownGem };
   }
   if (key === "wand") {
     const spell: TaggedRoll[] = [
       { ilvl: 1, text: "(25-34)% increased Spell Damage" },
       { ilvl: 8, text: "(35-44)% increased Spell Damage" },
+      { ilvl: 16, text: "(45-54)% increased Spell Damage" },
+      { ilvl: 33, text: "(55-64)% increased Spell Damage" },
+      { ilvl: 46, text: "(65-74)% increased Spell Damage" },
+      { ilvl: 60, text: "(75-89)% increased Spell Damage" },
+      { ilvl: 70, text: "(90-104)% increased Spell Damage" },
+      { ilvl: 80, text: "(105-119)% increased Spell Damage" },
     ];
     const cast: TaggedRoll[] = [
       { ilvl: 1, text: "(9-12)% increased Cast Speed" },
       { ilvl: 15, text: "(13-16)% increased Cast Speed" },
+      { ilvl: 30, text: "(17-20)% increased Cast Speed" },
+      { ilvl: 45, text: "(21-24)% increased Cast Speed" },
+      { ilvl: 60, text: "(25-28)% increased Cast Speed" },
+      { ilvl: 70, text: "(29-32)% increased Cast Speed" },
+      { ilvl: 80, text: "(33-35)% increased Cast Speed" },
     ];
-    const gem: TaggedRoll[] = [{ ilvl: 5, text: "+1 to Level of all Spell Skills" }];
+    const gem: TaggedRoll[] = [
+      { ilvl: 5, text: "+1 to Level of all Spell Skills" },
+      { ilvl: 25, text: "+2 to Level of all Spell Skills" },
+      { ilvl: 55, text: "+3 to Level of all Spell Skills" },
+      { ilvl: 78, text: "+4 to Level of all Spell Skills" },
+    ];
     const now = [best(spell, level), best(cast, level), { ilvl: 1, text: "+5-8 Intelligence" }].flatMap((row) => (row ? [row.text] : []));
     return {
       now,
       later: [nextRoll(spell, level), nextRoll(cast, level), nextRoll(gem, level)].map(fromLine).filter(Boolean),
       ideal: ["Ideal at item level 78: +4 to Level of all Spell Skills.", "Ideal at item level 80: (33-35)% increased Cast Speed."],
+      gem: best(gem, level)?.text ?? "",
     };
   }
   if (key === "staff") {
     const spell: TaggedRoll[] = [
       { ilvl: 1, text: "(50-68)% increased Spell Damage" },
       { ilvl: 8, text: "(69-88)% increased Spell Damage" },
+      { ilvl: 16, text: "(89-108)% increased Spell Damage" },
+      { ilvl: 33, text: "(109-128)% increased Spell Damage" },
+      { ilvl: 46, text: "(129-148)% increased Spell Damage" },
+      { ilvl: 60, text: "(149-188)% increased Spell Damage" },
+      { ilvl: 70, text: "(189-208)% increased Spell Damage" },
+      { ilvl: 80, text: "(209-238)% increased Spell Damage" },
     ];
     const cast: TaggedRoll[] = [
       { ilvl: 1, text: "(14-19)% increased Cast Speed" },
       { ilvl: 15, text: "(20-25)% increased Cast Speed" },
+      { ilvl: 30, text: "(26-31)% increased Cast Speed" },
+      { ilvl: 45, text: "(32-37)% increased Cast Speed" },
+      { ilvl: 60, text: "(38-43)% increased Cast Speed" },
+      { ilvl: 70, text: "(44-49)% increased Cast Speed" },
+      { ilvl: 80, text: "(50-52)% increased Cast Speed" },
     ];
-    const gem: TaggedRoll[] = [{ ilvl: 5, text: "+2 to Level of all Spell Skills" }];
+    const gem: TaggedRoll[] = [
+      { ilvl: 5, text: "+2 to Level of all Spell Skills" },
+      { ilvl: 25, text: "+3 to Level of all Spell Skills" },
+      { ilvl: 55, text: "+4 to Level of all Spell Skills" },
+      { ilvl: 78, text: "+(5-6) to Level of all Spell Skills" },
+    ];
     const now = [best(spell, level), best(cast, level), { ilvl: 1, text: "+5-8 Intelligence" }].flatMap((row) => (row ? [row.text] : []));
     return {
       now,
       later: [nextRoll(spell, level), nextRoll(cast, level), nextRoll(gem, level)].map(fromLine).filter(Boolean),
       ideal: ["Ideal at item level 78: +(5-6) to Level of all Spell Skills.", "Ideal at item level 80: (50-52)% increased Cast Speed."],
+      gem: best(gem, level)?.text ?? "",
     };
   }
   if (key === "sceptre") {
-    const damage: TaggedRoll[] = [{ ilvl: 1, text: "Allies in your Presence deal (25-34)% increased Damage" }];
-    const gem: TaggedRoll[] = [{ ilvl: 2, text: "+1 to Level of all Minion Skills" }];
-    const speed: TaggedRoll[] = [{ ilvl: 5, text: "Allies in your Presence have (5-7)% increased Attack Speed" }];
-    const ally = "Allies in your Presence deal (1-2) to (3-4) added Attack Physical Damage";
-    const now = [best(damage, level)?.text, "+5-8 Intelligence", level >= 2 ? "+1 to Level of all Minion Skills" : ally].filter((row): row is string => Boolean(row));
+    const damage: TaggedRoll[] = [
+      { ilvl: 1, text: "Allies in your Presence deal (25-34)% increased Damage" },
+      { ilvl: 8, text: "Allies in your Presence deal (35-44)% increased Damage" },
+      { ilvl: 16, text: "Allies in your Presence deal (45-54)% increased Damage" },
+      { ilvl: 33, text: "Allies in your Presence deal (55-64)% increased Damage" },
+      { ilvl: 46, text: "Allies in your Presence deal (65-74)% increased Damage" },
+      { ilvl: 60, text: "Allies in your Presence deal (75-89)% increased Damage" },
+      { ilvl: 70, text: "Allies in your Presence deal (90-104)% increased Damage" },
+      { ilvl: 82, text: "Allies in your Presence deal (105-119)% increased Damage" },
+    ];
+    const gem: TaggedRoll[] = [
+      { ilvl: 2, text: "+1 to Level of all Minion Skills" },
+      { ilvl: 25, text: "+2 to Level of all Minion Skills" },
+      { ilvl: 55, text: "+3 to Level of all Minion Skills" },
+      { ilvl: 78, text: "+4 to Level of all Minion Skills" },
+    ];
+    const speed: TaggedRoll[] = [
+      { ilvl: 5, text: "Allies in your Presence have (5-7)% increased Attack Speed" },
+      { ilvl: 20, text: "Allies in your Presence have (8-10)% increased Attack Speed" },
+      { ilvl: 35, text: "Allies in your Presence have (11-13)% increased Attack Speed" },
+      { ilvl: 55, text: "Allies in your Presence have (14-16)% increased Attack Speed" },
+    ];
+    const ally = best(
+      [
+        { ilvl: 1, text: "Allies in your Presence deal (1-2) to (3-4) added Attack Physical Damage" },
+        { ilvl: 8, text: "Allies in your Presence deal (2-3) to (4-6) added Attack Physical Damage" },
+      ],
+      level,
+    );
+    const now = [best(damage, level)?.text, "+5-8 Intelligence", level >= 2 ? best(gem, level)?.text : ally?.text].filter((row): row is string => Boolean(row));
     return {
       now: now.slice(0, 3),
-      later: [nextRoll(gem, level), nextRoll(speed, level)].map(fromLine).filter(Boolean),
+      later: [nextRoll(damage, level), nextRoll(gem, level), nextRoll(speed, level)].map(fromLine).filter(Boolean),
       ideal: [
         "Ideal at item level 55: Allies in your Presence have (14-16)% increased Attack Speed.",
         "Ideal at item level 78: +4 to Level of all Minion Skills.",
       ],
+      gem: best(gem, level)?.text ?? "",
     };
   }
   const now = [best(PHYS_PERCENT, level), best(FLAT_ONE_HAND, level), { text: "+5-8 Strength", ilvl: 1 }]
     .flatMap((row) => (row ? [row.text] : []));
-  return { now, later: [fromLine(nextRoll(PHYS_PERCENT, level))].filter(Boolean), ideal: PHYS_IDEAL };
+  return { now, later: [fromLine(nextRoll(PHYS_PERCENT, level))].filter(Boolean), ideal: PHYS_IDEAL, gem: "" };
 }
 
 function ignoreWeapon(noun: string) {
@@ -657,7 +768,7 @@ function ignoreWeapon(noun: string) {
 }
 
 export function weaponStats(noun: string, level: number) {
-  return weaponRollPlan(noun, level).now.slice(0, 3);
+  return weaponRollPlan(noun, level).now;
 }
 
 export function weaponText(noun: string, level: number, attack = false) {
@@ -673,7 +784,7 @@ export function weaponText(noun: string, level: number, attack = false) {
   const off = shield ? `The shield at this level is ${withArticle(shield.name)} (${shield.detail}).` : "";
   const bowNext = key === "bow" ? "A Shortbow needs level 5 and 12 Dexterity. A Recurve Bow needs level 16 and 31 Dexterity." : "";
   const bear = attack
-    ? "Maul is a Bear-form melee Strike (poe2db: Attack, Shapeshift, Bear, AoE, Melee, Strike, Requires Talismans). Shop attack and melee rolls. Skip spell damage and +to spell skills. The numbers are the quarterstaff attack ladder, used when this weapon rolls them. A separate talisman modifier table is not copied here."
+    ? "Maul is a Bear-form melee Strike (poe2db: Attack, Shapeshift, Bear, AoE, Melee, Strike, Requires Talismans). Shop attack and melee rolls. Skip spell damage and +to spell skills. The talisman attack ladder matches the quarterstaff ladder: the same physical percent, added physical, melee gem level, and attack speed tiers."
     : "";
   return [
     `Buy ${withArticle(noun)} from ${place(shop)}.`,
@@ -683,6 +794,7 @@ export function weaponText(noun: string, level: number, attack = false) {
     hand,
     off,
     "Acceptable rolls are the list under this line. A roll is legal only when the item's item level, shown by holding Alt and hovering the item, is at least the level named below.",
+    rolls.gem ? `The gem roll at this item level is ${rolls.gem}.` : "",
     ...(level > 1 ? rolls.later : []),
     ...(level >= 60 ? rolls.ideal : []),
     ignoreWeapon(key),
@@ -714,9 +826,8 @@ function poolLine(defence: string, level: number, slot: AffixSlot) {
 }
 
 function resistLine(level: number) {
-  const tier =
-    level < 12 ? "6-10" : level < 24 ? "11-15" : level < 36 ? "16-20" : level < 48 ? "21-25" : level < 60 ? "26-30" : level < 71 ? "31-35" : level < 82 ? "36-40" : "41-45";
-  return `+${tier}% Fire Resistance, +${tier}% Cold Resistance, and +${tier}% Lightning Resistance`;
+  const resist = resistAt(level);
+  return `+${resist.fire}% Fire Resistance, +${resist.cold}% Cold Resistance, and +${resist.lightning}% Lightning Resistance`;
 }
 
 function moveLine(level: number) {
