@@ -1,7 +1,13 @@
 import type { BuildSpec } from "@/content/buildSpecs";
 import { gearIcon } from "@/content/gearArt";
 import { baseLabel, howToBuy, weaponText } from "@/content/shopping";
-import { attributeName, statsForLevel } from "@/content/statLines";
+import {
+  attributeName,
+  BELT_ATTRIBUTE_TOP,
+  GLOVE_ATTRIBUTE_TOP,
+  hybridEvasionEnergyAt,
+  statsForLevel,
+} from "@/content/statLines";
 import type { GearCard, GearStage, GearTotal } from "@/lib/types";
 
 // Rare affix tiers read from poe2db on 2026-10-25 (patch 0.5.x data on the item pages):
@@ -26,11 +32,11 @@ import type { GearCard, GearStage, GearTotal } from "@/lib/types";
 // Fire steps at 12, 24, 36, and 48. Cold steps at 14, 26, 38, and 50. Lightning steps at 13, 25, 37, and 49.
 // From item level 60 the three match: 31-35, then 36-40 at 71 and 41-45 at 82.
 
-function family(defence: string) {
+function defenceKind(defence: string): "es" | "eves" | "life" {
   const text = defence.toLowerCase();
-  if (text.includes("energy")) return "es";
-  if (text.includes("evasion")) return "evasion";
-  return "armour";
+  if (text.includes("evasion") && text.includes("energy")) return "eves";
+  if (text.includes("energy") && !text.includes("life")) return "es";
+  return "life";
 }
 
 function caster(spec: BuildSpec) {
@@ -86,13 +92,26 @@ type StatLines = { leveling: string[]; endgame: string[]; skip: string };
 
 function listsFor(slot: string, spec: BuildSpec, gear: GearStage[]): StatLines {
   const spirit = wantsSpirit(gear);
-  const es = family(spec.defence) === "es";
+  const kind = defenceKind(spec.defence);
+  const es = kind === "es";
+  const eves = kind === "eves";
   const attr = attributeName(spec.defence);
   const word = skillWord(spec);
   const gemEnd = `+3 to Level of all ${word} Skills`;
   const lifeLeveling = es ? "+10-17 maximum Energy Shield" : "+10-19 maximum Life";
+  const hybridLeveling = hybridEvasionEnergyAt(1, "body");
+  const hybridHands = hybridEvasionEnergyAt(46, "gloves");
+  const hybridHelmet = hybridEvasionEnergyAt(54, "helmet");
+  const hybridBody = hybridEvasionEnergyAt(75, "body");
 
   if (/boot/i.test(slot)) {
+    if (eves) {
+      return {
+        leveling: ["10% increased Movement Speed", "+10-19 maximum Life", hybridLeveling, "+6-10% Fire Resistance"],
+        endgame: ["35% increased Movement Speed", "+120-149 maximum Life", hybridHands, "+36-40% Fire Resistance"],
+        skip: "The energy shield on these boots is the combined evasion and energy shield mod. It stops at item level 46. Intelligence boots roll +48-60 maximum Energy Shield at item level 54.",
+      };
+    }
     return {
       leveling: [
         "10% increased Movement Speed",
@@ -112,6 +131,13 @@ function listsFor(slot: string, spec: BuildSpec, gear: GearStage[]): StatLines {
     };
   }
   if (/body/i.test(slot)) {
+    if (eves) {
+      return {
+        leveling: ["+10-19 maximum Life", hybridLeveling, "+6-10% Fire Resistance"],
+        endgame: ["+200-214 maximum Life", hybridBody, "(101-110) % increased Evasion and Energy Shield"],
+        skip: "Life on this body reaches +200-214 at item level 80. The combined evasion and energy shield mod reaches its top at item level 75. Intelligence body armour rolls +91-96 maximum Energy Shield at item level 79.",
+      };
+    }
     return {
       leveling: [lifeLeveling, "+6-10% Fire Resistance", "+6-10% Cold Resistance"],
       endgame: [
@@ -123,6 +149,13 @@ function listsFor(slot: string, spec: BuildSpec, gear: GearStage[]): StatLines {
     };
   }
   if (/helm/i.test(slot)) {
+    if (eves) {
+      return {
+        leveling: ["+10-19 maximum Life", hybridLeveling, "+6-10% Fire Resistance"],
+        endgame: ["+150-174 maximum Life", hybridHelmet, "+36-40% Fire Resistance"],
+        skip: "The combined evasion and energy shield mod on a helmet stops at item level 54.",
+      };
+    }
     return {
       leveling: [lifeLeveling, "+6-10% Fire Resistance", "+6-10% Cold Resistance"],
       endgame: [es ? "+61-73 maximum Energy Shield" : "+150-174 maximum Life", "+36-40% Fire Resistance", "+36-40% Cold Resistance"],
@@ -130,17 +163,24 @@ function listsFor(slot: string, spec: BuildSpec, gear: GearStage[]): StatLines {
     };
   }
   if (/glove/i.test(slot)) {
+    if (eves) {
+      return {
+        leveling: [attacker(spec) ? "(5-7)% increased Attack Speed" : "+6-10% Fire Resistance", "+10-19 maximum Life", hybridLeveling],
+        endgame: [attacker(spec) ? "(14-16)% increased Attack Speed" : "+36-40% Fire Resistance", hybridHands, "+120-149 maximum Life", GLOVE_ATTRIBUTE_TOP],
+        skip: "Dexterity on gloves reaches +34-36 at item level 81. Strength and Intelligence on gloves stop at +31-33, item level 74. The combined evasion and energy shield mod stops at item level 46.",
+      };
+    }
     if (attacker(spec)) {
       return {
         leveling: ["(5-7)% increased Attack Speed", es ? "+10-17 maximum Energy Shield" : "+10-19 maximum Life", "+6-10% Fire Resistance"],
-        endgame: ["(14-16)% increased Attack Speed", es ? "+48-60 maximum Energy Shield" : "+120-149 maximum Life", "+36-40% Fire Resistance"],
-        skip: "Skip item rarity.",
+        endgame: ["(14-16)% increased Attack Speed", es ? "+48-60 maximum Energy Shield" : "+120-149 maximum Life", GLOVE_ATTRIBUTE_TOP],
+        skip: "Dexterity on gloves reaches +34-36 at item level 81. Strength and Intelligence on gloves stop at +31-33, item level 74. Skip item rarity.",
       };
     }
     return {
       leveling: ["+6-10% Fire Resistance", es ? "+10-17 maximum Energy Shield" : "+10-19 maximum Life", `+5-8 ${attr}`],
-      endgame: ["+36-40% Fire Resistance", es ? "+48-60 maximum Energy Shield" : "+120-149 maximum Life", `+31-33 ${attr}`],
-      skip: "Skip item rarity. Cast speed is an amulet roll.",
+      endgame: ["+36-40% Fire Resistance", es ? "+48-60 maximum Energy Shield" : "+120-149 maximum Life", GLOVE_ATTRIBUTE_TOP],
+      skip: "Dexterity on gloves reaches +34-36 at item level 81. Strength and Intelligence on gloves stop at +31-33, item level 74. Skip item rarity. Cast speed is an amulet roll.",
     };
   }
   if (/ring/i.test(slot)) {
@@ -151,24 +191,35 @@ function listsFor(slot: string, spec: BuildSpec, gear: GearStage[]): StatLines {
     };
   }
   if (/amulet/i.test(slot)) {
+    if (es || eves) {
+      return {
+        leveling: caster(spec)
+          ? ["(9-12)% increased Cast Speed", "+8-14 maximum Energy Shield", "+6-10% Fire Resistance"]
+          : ["+8-14 maximum Energy Shield", "+6-10% Fire Resistance", `+5-8 ${attr}`],
+        endgame: caster(spec)
+          ? [gemEnd, "(25-28)% increased Cast Speed", "+80-89 maximum Energy Shield"]
+          : [gemEnd, "+80-89 maximum Energy Shield", spirit ? "+47-50 Spirit" : "+36-40% Fire Resistance"],
+        skip: "Amulet energy shield is its own ladder. +8-14 is item level 1. +80-89 needs item level 80. The body roll +91-96 does not exist on an amulet.",
+      };
+    }
     if (caster(spec)) {
       return {
         leveling: ["(9-12)% increased Cast Speed", "+6-10% Fire Resistance", `+5-8 ${attr}`],
         endgame: [gemEnd, "(25-28)% increased Cast Speed", spirit ? "+47-50 Spirit" : "+36-40% Fire Resistance"],
-        skip: "Skip item rarity.",
+        skip: "Skip item rarity. Attributes on an amulet stop at +31-33, item level 74.",
       };
     }
     return {
       leveling: ["+6-10% Fire Resistance", "+10-19 maximum Life", `+5-8 ${attr}`],
-      endgame: [gemEnd, spirit ? "+47-50 Spirit" : "+36-40% Fire Resistance", `+28-30 ${attr}`],
-      skip: "Skip item rarity.",
+      endgame: [gemEnd, spirit ? "+47-50 Spirit" : "+36-40% Fire Resistance", `+31-33 ${attr}`],
+      skip: "Attributes on an amulet stop at +31-33, item level 74. Skip item rarity.",
     };
   }
   if (/belt/i.test(slot)) {
     return {
-      leveling: ["+10-19 maximum Life", "+6-10% Fire Resistance", `+5-8 ${attr}`],
-      endgame: [es ? "+36-40% Fire Resistance" : "+150-174 maximum Life", es ? "+150-174 maximum Life" : "+36-40% Fire Resistance", `+28-30 ${attr}`],
-      skip: "Skip flat armour on the belt.",
+      leveling: ["+10-19 maximum Life", "+6-10% Fire Resistance", "+5-8 Strength"],
+      endgame: ["+150-174 maximum Life", "+36-40% Fire Resistance", BELT_ATTRIBUTE_TOP],
+      skip: "Belts roll Strength only. +34-36 to Strength needs item level 81. Dexterity and Intelligence do not roll on a belt.",
     };
   }
   if (/quiver/i.test(slot)) {

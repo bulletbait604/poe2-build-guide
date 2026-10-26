@@ -204,6 +204,11 @@ def main() -> None:
         "Gloves_str",
         "Gloves_dex",
         "Gloves_int",
+        "Gloves_str_dex",
+        "Gloves_dex_int",
+        "Helmets_str_dex",
+        "Helmets_dex_int",
+        "Helmets_str_int",
         "Rings",
         "Amulets",
         "Belts",
@@ -330,15 +335,19 @@ def main() -> None:
             illegal.append({"guide": row["guide"], "skill": row["skill"], "illegal": bad})
 
     stat_hits = []
+    # Character-sheet goals. They are not a single item mod, so the modifier pages do not contain them.
+    sheet_targets = {"50% Chaos Resistance"}
     mod_text = {row["slug"]: row.get("text", "") for row in results["mods"] if row["status"] == 200}
     for line in FACTS["statLines"]:
-        if not re.search(r"\d", line):
+        if not re.search(r"\d", line) or line in sheet_targets:
             continue
         def flatten(text: str) -> str:
             text = text.replace("–", "-").replace("—", "-")
             text = re.sub(r"\s*-\s*", "-", text)
             text = text.replace("(", "").replace(")", "")
             text = text.replace(" to ", " ")
+            # poe2db prints "6 — 10) % to Fire Resistance". Guide lines print "+6-10% Fire Resistance".
+            text = re.sub(r"\s+%", "%", text)
             return re.sub(r"\s+", " ", text)
 
         compact = flatten(line)

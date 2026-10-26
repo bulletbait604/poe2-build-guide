@@ -102,6 +102,20 @@ function armourGear(weapon: string, weaponMaps: string, defence = "armour"): Gea
   ]);
 }
 
+function hybridEvasionGear(weapon: string, weaponMaps: string): GearStage[] {
+  const spec: ShopSpec = { weaponNoun: weapon, defence: "evasion and energy shield", speed: "attack speed" };
+  return slots([
+    row("Weapon", spec, weaponMaps),
+    row("Body", spec, "Evasion while leveling. Energy shield on the same evasion-and-energy-shield bases once Chaos Inoculation is the plan."),
+    row("Helmet", spec),
+    row("Gloves", spec),
+    row("Boots", spec),
+    row("Amulet", spec),
+    row("Rings", spec, `${cap} ${chaos}`),
+    row("Belt", spec),
+  ]);
+}
+
 function esGear(weapon: string, weaponMaps: string): GearStage[] {
   const noun = weapon.includes("sceptre") ? "sceptre" : weapon.includes("wand") ? "wand" : weapon;
   const spec: ShopSpec = {
@@ -822,7 +836,7 @@ function whirling(): Loadout {
       { levels: "21+", text: "Herald of Ash, the bell, Storm Wave. At level 21 a quarterstaff can replace empty hands when its damage is higher. Hollow Palm Technique turns off if either hand is filled." },
       { levels: "Maps", text: "The lineage gems. Ghost Dance if you have the spirit." },
     ],
-    gear: armourGear("quarterstaff", "Attack speed and physical or elemental damage. Hollow Palm only while it still kills faster than a staff."),
+    gear: hybridEvasionGear("quarterstaff", "Attack speed and physical or elemental damage. Hollow Palm only while it still kills faster than a staff."),
     sources: [guide("whirling-assault-martial-artist-build-guide", "Maxroll Whirling Assault"), ...commonSources],
   });
 }
@@ -857,7 +871,7 @@ function hollowForm(): Loadout {
       { levels: "21+", text: "Hollow Form and Whirling Assault. Cooldown recovery comes from gear, not from a support on the form." },
       { levels: "Maps", text: "CI when the shield is ready. Ghost Dance with it." },
     ],
-    gear: esGear("quarterstaff", "Cold damage and attack speed. Energy shield on the body once you are near CI."),
+    gear: hybridEvasionGear("quarterstaff", "Cold damage and attack speed. Evasion while leveling. Energy shield on the same bases once you are near CI."),
     sources: [guide("hollow-form-whirling-assault-martial-artist-build-guide", "Maxroll Hollow Form Whirling Assault"), ...commonSources],
   });
 }
@@ -1176,7 +1190,10 @@ function comet(spec: BuildSpec): Loadout {
 
 function generic(spec: BuildSpec): Loadout {
   const support = spec.support.startsWith("a support") || spec.support.startsWith("one ") ? [] : [spec.support];
-  const defence = spec.defence.includes("energy")
+  const defenceText = spec.defence.toLowerCase();
+  const defence = defenceText.includes("evasion") && defenceText.includes("energy")
+    ? hybridEvasionGear(spec.weaponNoun, spec.weaponStat)
+    : defenceText.includes("energy")
     ? esGear(spec.weaponNoun, spec.weaponStat)
     : spec.weaponNoun.includes("crossbow")
       ? crossbowGear(spec.weaponStat)

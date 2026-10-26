@@ -111,6 +111,15 @@ const affixes = new Set(
 (1-2)% increased Intelligence
 (1-2)% increased Strength
 (101-110)% increased Energy Shield
+(101-110) % increased Evasion and Energy Shield
++(6-10) to Evasion Rating +(5-8) to maximum Energy Shield
++(65-78) to Evasion Rating +(22-25) to maximum Energy Shield
++(79-94) to Evasion Rating +(26-29) to maximum Energy Shield
++(142-161) to Evasion Rating +(43-48) to maximum Energy Shield
++8-14 maximum Energy Shield
++80-89 maximum Energy Shield
++34-36 Dexterity
++34-36 Strength
 (11-13)% increased Attack Speed
 (14-16)% increased Attack Speed
 (14-16)% increased Attack Speed for allies in your Presence
