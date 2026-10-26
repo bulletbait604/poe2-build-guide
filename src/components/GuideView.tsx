@@ -1,10 +1,10 @@
 "use client";
 
-import { GearBoard } from "@/components/GearBoard";
 import { GearCards } from "@/components/GearCards";
 import { GemLinks } from "@/components/GemLinks";
 import { ItemChip } from "@/components/ItemChip";
 import { TreeMap } from "@/components/TreeMap";
+import { ascendancyIcon, classIcon } from "@/content/ascendancyArt";
 import type { GameClass } from "@/content/classes";
 import type { Guide, GuideChapter, TimelineStep } from "@/lib/types";
 import Image from "next/image";
@@ -63,11 +63,18 @@ function StepCard({
                   checked={checked}
                   onChange={() => onToggle(key)}
                 />
-                <span className={checked ? "text-muted line-through" : "text-parchment"}>
-                  <span className="block text-xs tracking-[0.12em] text-gold uppercase">
-                    {check.act} · {check.zone} · {check.quest}
+                <span className={`flex items-start gap-2 ${checked ? "text-muted line-through" : "text-parchment"}`}>
+                  {check.image ? (
+                    <span className="relative mt-0.5 h-8 w-8 shrink-0 border border-line bg-black">
+                      <Image src={check.image} alt="" fill className="object-contain p-0.5" sizes="32px" />
+                    </span>
+                  ) : null}
+                  <span>
+                    <span className="block text-xs tracking-[0.12em] text-gold uppercase">
+                      {check.act} · {check.zone} · {check.quest}
+                    </span>
+                    {check.text}
                   </span>
-                  {check.text}
                 </span>
               </label>
             </li>
@@ -157,6 +164,9 @@ export function GuideView({
   const currentIndex = guide.timeline.reduce((found, step, index) => (step.level <= level ? index : found), 0);
   const current = guide.timeline[currentIndex];
   const upcoming = guide.timeline[currentIndex + 1];
+  const ascendancyName = gameClass.ascendancies.find((row) => row.id === guide.ascendancyId)?.name ?? "";
+  const portrait = classIcon(gameClass.name);
+  const ascendancyArt = ascendancyIcon(ascendancyName);
 
   function priceFor(name: string) {
     return prices[name.toLowerCase()] ?? null;
@@ -175,7 +185,19 @@ export function GuideView({
           <p className="mt-1 text-xs tracking-[0.18em] text-gold uppercase">
             Patch {guide.patch} · {guide.updated}
           </p>
-          <h1 className="mt-1 font-display text-4xl text-parchment">{guide.name}</h1>
+          <div className="mt-2 flex items-center gap-3">
+            {portrait ? (
+              <span className="relative h-10 w-10 shrink-0 border border-gold/40 bg-black">
+                <Image src={portrait} alt="" fill className="object-contain p-1" sizes="40px" />
+              </span>
+            ) : null}
+            {ascendancyArt ? (
+              <span className="relative h-10 w-10 shrink-0 border border-gold/40 bg-black">
+                <Image src={ascendancyArt} alt="" fill className="object-contain p-1" sizes="40px" />
+              </span>
+            ) : null}
+            <h1 className="font-display text-4xl text-parchment">{guide.name}</h1>
+          </div>
           <p className="mt-2 max-w-2xl text-muted">{guide.summary}</p>
         </div>
       </header>
@@ -266,12 +288,21 @@ export function GuideView({
                 <ol className="mt-3 space-y-3">
                   {phase.steps.map((step, index) => (
                     <li key={step.title}>
-                      <p className="text-parchment">
-                        {index + 1}. {step.title}
-                      </p>
-                      <p className="mt-1 text-xs tracking-[0.12em] text-gold uppercase">
-                        {step.act} · {step.zone} · {step.quest}
-                      </p>
+                      <div className="flex items-start gap-2">
+                        {step.image ? (
+                          <span className="relative mt-0.5 h-8 w-8 shrink-0 border border-line bg-black">
+                            <Image src={step.image} alt="" fill className="object-contain p-0.5" sizes="32px" />
+                          </span>
+                        ) : null}
+                        <div>
+                          <p className="text-parchment">
+                            {index + 1}. {step.title}
+                          </p>
+                          <p className="mt-1 text-xs tracking-[0.12em] text-gold uppercase">
+                            {step.act} · {step.zone} · {step.quest}
+                          </p>
+                        </div>
+                      </div>
                       <p className="mt-1 text-sm text-muted">{step.detail}</p>
                       <p className="mt-1 text-sm">
                         <span className="text-gold">Talk to. </span>
@@ -308,18 +339,11 @@ export function GuideView({
       {tab === "Gear" ? (
         <section id="gear" className="mt-2">
           <p className="max-w-3xl text-muted">
-            Read across one row to compare leveling, early maps, and endgame. Must is the roll you shop for. Nice is the extra. Ignore is the roll that looks good and does not matter. The picture under the table is the same list for level {level}.
+            Hover or click a slot. The list is the stats to shop for, highest first. The gold list matches level {level}. {activeBand.gem}
           </p>
           <div className="mt-4">
-            <GearCards
-              cards={guide.gearCards}
-              totals={guide.gearTotals}
-              spec={{ weaponNoun: guide.weaponNoun, defence: guide.defence }}
-            />
+            <GearCards cards={guide.gearCards} totals={guide.gearTotals} level={level} />
           </div>
-          <h2 className="mt-8 font-display text-2xl">At level {level}</h2>
-          <p className="mt-1 text-muted">{activeBand.gem}</p>
-          <GearBoard lines={activeBand.armor} weaponNoun={guide.weaponNoun} defence={guide.defence} />
         </section>
       ) : null}
 

@@ -213,5 +213,10 @@
     "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9VbmlxdWVzL1N1cmVmb290ZWRTaWdpbCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/78449612a8/SurefootedSigil.png",
     "baseType": "Jade Amulet",
     "slotHint": "Amulet"
+  },
+  "Changeling Talisman": {
+    "icon": "https://cdn.poe2db.tw/image/Art/2DItems/Offhand/Talismans/ChangelingTalisman.webp",
+    "baseType": "Changeling Talisman",
+    "slotHint": "[Talisman]"
   }
 }

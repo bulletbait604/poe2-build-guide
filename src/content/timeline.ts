@@ -1,5 +1,6 @@
 import type { BuildSpec } from "@/content/buildSpecs";
 import { gearLineForLevel } from "@/content/gearCards";
+import { stepImage } from "@/content/zoneArt";
 import { mainSkillReadyAt, requiredLevel } from "@/content/gemFacts";
 import { pointsForBand } from "@/content/passivePlan";
 import type { Loadout, StepCheck, TimelineStep } from "@/lib/types";
@@ -26,7 +27,7 @@ function titleFor(level: number) {
 }
 
 function check(text: string, act: string, zone: string, quest: string, gear = false): StepCheck {
-  return { text, act, zone, quest, gear };
+  return { text, act, zone, quest, gear, image: stepImage(zone, quest) };
 }
 
 function mainSupports(spec: BuildSpec, loadout: Loadout) {
