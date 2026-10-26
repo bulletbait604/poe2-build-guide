@@ -1,4 +1,5 @@
 import type { BuildSpec } from "@/content/buildSpecs";
+import { statsForLevel } from "@/content/statLines";
 import { stepImage } from "@/content/zoneArt";
 import type { GuidePhase, GuideStep } from "@/lib/types";
 
@@ -40,7 +41,7 @@ function step(
   npc: string,
   reward: string,
   detail: string,
-  gear?: string,
+  gear?: string | string[],
 ): GuideStep {
   return { title, act, zone, quest, npc, reward, detail, gear, image: stepImage(zone, quest) };
 }
@@ -55,14 +56,10 @@ export function storyPhases(spec: BuildSpec): GuidePhase[] {
       ? "Take Kaom's lesson. It is 30% increased armour, evasion, and energy shield."
       : "Take Rakiata's lesson. Armour also applies to elemental damage, evasion grants deflection, and energy shield starts recharging faster. Take Kaom's lesson instead if you are stacking armour.";
 
-  const earlyGear =
-    "Boots: 10% increased Movement Speed (Runner's, item level 1) and +(10–29) to maximum Life. Body: +(20–39) to maximum Life. Rings: about 20% fire, 20% cold, and 20% lightning.";
-  const act2Gear =
-    "Boots: 15% increased Movement Speed (Sprinter's, item level 16). Body: +(40–69) life. Each element 30–40%.";
-  const act3Gear =
-    "Boots: 20% increased Movement Speed (Stallion's, item level 33). Body life +(60–99). Each element over 40%.";
-  const act4Gear =
-    "Boots: 25% increased Movement Speed (Gazelle's, item level 46). Push fire, cold, and lightning toward 75% before an interlude.";
+  const earlyGear = statsForLevel(spec, 8);
+  const act2Gear = statsForLevel(spec, 22);
+  const act3Gear = statsForLevel(spec, 36);
+  const act4Gear = statsForLevel(spec, 48);
 
   return [
     phase("act-1", "acts", "Act 1", "Levels 1–14", 1, 14, [
@@ -74,7 +71,7 @@ export function storyPhases(spec: BuildSpec): GuidePhase[] {
         "Nobody to turn this in to. The road opens Clearfell Encampment.",
         "The way into Clearfell. No permanent stat.",
         `Kill the Bloated Miller in the Riverbank. That opens Clearfell Encampment. ${fight}`,
-        "Weapon: the highest damage " + spec.weaponNoun + " from the first vendor. Boots: 10% increased Movement Speed if a pair is listed.",
+        statsForLevel(spec, 1),
       ),
       step(
         "Clearfell",
@@ -332,7 +329,7 @@ export function storyPhases(spec: BuildSpec): GuidePhase[] {
         "The Blind Beast",
         "Nobody. Leave the beast.",
         "A greater rune. Not weapon-set points.",
-        "Cross the island into the Volcanic Warrens and kill Krutog, Lord of Kin. He is a weapon piece. Leave the Blind Beast. That fight is a greater rune. The skill points are not on this island.",
+        "Cross the island into the Volcanic Warrens and kill Krutog, Lord of Kin. Leave the Blind Beast. That fight is a greater rune.",
       ),
       step(
         "Whakapanu",
@@ -407,8 +404,8 @@ export function storyPhases(spec: BuildSpec): GuidePhase[] {
         "Clearing the Way",
         "Risu, in the Khari Bazaar, gives the Book of Specialisation.",
         "+2 weapon-set passive points. poe2db lists this quest as Act 6. It is this interlude.",
-        "Do this interlude first. It gets harder if you outlevel it. Quest log: Clearing the Way. Kill Akthi, the Final Sting, and Anundr, the Sandworm, in the Khari Crossing, then speak to Risu. That is +2 weapon-set points.",
-        "Resistances drop as soon as you enter an interlude. Recap fire, cold, and lightning toward 75% before you zone in. Boots stay at 25% or more movement speed.",
+        "Do this interlude first. It gets harder if you outlevel it. Resistances drop when you enter. Quest log: Clearing the Way. Kill Akthi, the Final Sting, and Anundr, the Sandworm, in the Khari Crossing, then speak to Risu. That is +2 weapon-set points.",
+        ["75% Fire Resistance", "75% Cold Resistance", "75% Lightning Resistance", "25% increased Movement Speed"],
       ),
       step(
         "The Molten Shrine",
@@ -494,7 +491,7 @@ export function storyPhases(spec: BuildSpec): GuidePhase[] {
         "The Hooded One, in Kingsmarch, after all three interludes.",
         "Book of Specialisation: the last +2 weapon-set points. You should have 24.",
         "Return to Kingsmarch after all three interludes and speak to the Hooded One to finish Siege of Oriath. poe2db lists that quest under Act 4. It is this turn-in, not a second copy of the Act 4 boat. That is the last +2 weapon-set points. You should have 24 from the campaign.",
-        "75% fire, 75% cold, and 75% lightning before you open a map. Boots: 30% increased Movement Speed if you can buy it.",
+        ["75% Fire Resistance", "75% Cold Resistance", "75% Lightning Resistance", "30% increased Movement Speed"],
       ),
     ]),
     phase("endgame", "endgame", "Endgame", "Maps", 60, 100, [
@@ -506,7 +503,7 @@ export function storyPhases(spec: BuildSpec): GuidePhase[] {
         "No quest NPC.",
         "Map completion. No campaign stat.",
         `Run white maps until ${spec.skill} clears a pack without you stopping. Then raise the tier.`,
-        "75% fire, 75% cold, and 75% lightning. Chaos resistance 30–50%. Boots 30–35% increased Movement Speed.",
+        ["75% Fire Resistance", "75% Cold Resistance", "75% Lightning Resistance", "30% Chaos Resistance", "50% Chaos Resistance", "30% increased Movement Speed"],
       ),
       step(
         "What to upgrade",
@@ -516,7 +513,7 @@ export function storyPhases(spec: BuildSpec): GuidePhase[] {
         "Buy the rare, or craft with a Transmutation and an Augmentation while the base is still normal.",
         "The targets on the Gear tab.",
         `Weapon damage, then life, then the lowest resistance. The defence on the gear is ${spec.defence}.`,
-        "Body life +(120–214) if this build wears life. Energy shield builds shop flat energy shield +(61–96) instead. Do not chase 75% chaos.",
+        statsForLevel(spec, 78),
       ),
       step(
         "Uniques stay optional",

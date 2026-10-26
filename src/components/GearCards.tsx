@@ -1,5 +1,6 @@
 "use client";
 
+import { StatList } from "@/components/StatList";
 import type { GearCard, GearTotal } from "@/lib/types";
 import Image from "next/image";
 import { useState } from "react";
@@ -31,13 +32,9 @@ function dollSlots(cards: GearCard[]) {
 
 function Lines({ title, lines, active }: { title: string; lines: string[]; active: boolean }) {
   return (
-    <div className={active ? "border border-gold bg-panel p-3" : "border border-line p-3"}>
+    <div className={active ? "border border-gold bg-panel p-3" : "border border-line p-3"} data-gear-section={title}>
       <p className="text-xs tracking-[0.16em] text-gold uppercase">{active ? `${title} · now` : title}</p>
-      <ul className="mt-2 list-disc space-y-1 pl-4 text-sm text-parchment">
-        {lines.map((line) => (
-          <li key={line}>{line}</li>
-        ))}
-      </ul>
+      <StatList lines={lines} />
     </div>
   );
 }
@@ -55,27 +52,19 @@ function SlotButton({
 }) {
   const lines = level < 60 ? card.leveling : card.endgame;
   return (
-    <button
-      type="button"
-      onMouseEnter={() => onOpen(card.slot)}
-      onFocus={() => onOpen(card.slot)}
-      onClick={() => onOpen(card.slot)}
-      className={`group relative flex flex-col items-center gap-1 border bg-black p-1 ${selected ? "border-gold" : "border-line hover:border-gold"}`}
-    >
-      <span className="relative h-14 w-14 sm:h-16 sm:w-16">
-        <Image src={card.icon} alt="" fill className="object-contain" sizes="64px" />
-      </span>
-      <span className="w-full truncate text-center text-[10px] tracking-[0.12em] text-parchment uppercase">{card.slot}</span>
-      <span className="pointer-events-none absolute bottom-full left-1/2 z-30 mb-2 hidden w-56 -translate-x-1/2 border border-gold bg-ink p-2 text-left shadow-lg group-hover:block">
-        <span className="block text-[10px] tracking-[0.14em] text-gold uppercase">{level < 60 ? "Leveling" : "Endgame"}</span>
-        <ul className="mt-1 list-disc space-y-0.5 pl-4 text-xs text-parchment">
-          {lines.map((line) => (
-            <li key={line}>{line}</li>
-          ))}
-        </ul>
-        <span className="mt-1 block text-xs text-muted">{card.skip}</span>
-      </span>
-    </button>
+    <div data-gear-section={card.slot} className="min-w-0">
+      <button
+        type="button"
+        onClick={() => onOpen(card.slot)}
+        className={`flex w-full flex-col items-center gap-1 border bg-black p-1 ${selected ? "border-gold" : "border-line hover:border-gold"}`}
+      >
+        <span className="relative h-14 w-14 sm:h-16 sm:w-16">
+          <Image src={card.icon} alt="" fill className="object-contain" sizes="64px" />
+        </span>
+        <span className="w-full truncate text-center text-[10px] tracking-[0.12em] text-parchment uppercase">{card.slot}</span>
+      </button>
+      <StatList lines={lines} />
+    </div>
   );
 }
 
@@ -88,27 +77,13 @@ export function GearCards({ cards, totals, level }: { cards: GearCard[]; totals:
   return (
     <div>
       <div className="grid gap-3 sm:grid-cols-2">
-        <div className={levelingNow ? "border border-gold bg-panel p-3" : "border border-line p-3"}>
+        <div className={levelingNow ? "border border-gold bg-panel p-3" : "border border-line p-3"} data-gear-section="totals-leveling">
           <p className="text-xs tracking-[0.16em] text-gold uppercase">{levelingNow ? "Leveling · now" : "Leveling"}</p>
-          <ul className="mt-2 list-disc space-y-1 pl-4 text-sm">
-            {totals.map((row) => (
-              <li key={row.label}>
-                <span className="text-parchment">{row.label}. </span>
-                <span className="text-muted">{row.leveling}</span>
-              </li>
-            ))}
-          </ul>
+          <StatList lines={totals.map((row) => row.leveling).filter(Boolean)} />
         </div>
-        <div className={levelingNow ? "border border-line p-3" : "border border-gold bg-panel p-3"}>
+        <div className={levelingNow ? "border border-line p-3" : "border border-gold bg-panel p-3"} data-gear-section="totals-endgame">
           <p className="text-xs tracking-[0.16em] text-gold uppercase">{levelingNow ? "Endgame" : "Endgame · now"}</p>
-          <ul className="mt-2 list-disc space-y-1 pl-4 text-sm">
-            {totals.map((row) => (
-              <li key={row.label}>
-                <span className="text-parchment">{row.label}. </span>
-                <span className="text-muted">{row.endgame}</span>
-              </li>
-            ))}
-          </ul>
+          <StatList lines={totals.map((row) => row.endgame).filter(Boolean)} />
         </div>
       </div>
 
@@ -141,7 +116,6 @@ export function GearCards({ cards, totals, level }: { cards: GearCard[]; totals:
               <div>
                 <h3 className="font-display text-2xl text-parchment">{selected.slot}</h3>
                 <p className="text-parchment">{selected.base}</p>
-                <p className="mt-1 text-sm text-muted">{selected.why}</p>
               </div>
             </div>
             <div className="mt-3 grid gap-2 sm:grid-cols-2">
@@ -155,10 +129,6 @@ export function GearCards({ cards, totals, level }: { cards: GearCard[]; totals:
             <p className="mt-2 text-sm text-parchment">
               <span className="text-gold">How to get it. </span>
               {selected.how}
-            </p>
-            <p className="mt-1 text-sm text-muted">
-              <span className="text-parchment">While leveling. </span>
-              {selected.note}
             </p>
           </article>
         ) : null}
