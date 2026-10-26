@@ -2,6 +2,7 @@ import { armorForBand } from "@/content/armorPlan";
 import type { BuildSpec } from "@/content/buildSpecs";
 import { storyPhases } from "@/content/campaign";
 import { gearCardsFor, gearTotalsFor } from "@/content/gearCards";
+import { iconFor } from "@/lib/items";
 import { mainSkillReadyAt } from "@/content/gemFacts";
 import { loadoutFor } from "@/content/loadouts";
 import { pointsForBand, routeKeyFor } from "@/content/passivePlan";
@@ -112,7 +113,7 @@ export function composeGuide(spec: BuildSpec): Guide {
     treeKey: routeKeyFor(spec),
     weaponNoun: spec.weaponNoun,
     defence: spec.defence,
-    uniques: spec.uniques,
+    uniques: spec.uniques.map((piece) => ({ ...piece, icon: iconFor(piece.name) })),
     levelBands: buildBands(spec, loadout),
     phases: storyPhases(spec),
     loadout,

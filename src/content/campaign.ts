@@ -1,4 +1,5 @@
 import type { BuildSpec } from "@/content/buildSpecs";
+import { stepImage } from "@/content/zoneArt";
 import type { GuidePhase, GuideStep } from "@/lib/types";
 
 // Campaign route for patch 0.5, checked against:
@@ -41,7 +42,7 @@ function step(
   detail: string,
   gear?: string,
 ): GuideStep {
-  return { title, act, zone, quest, npc, reward, detail, gear };
+  return { title, act, zone, quest, npc, reward, detail, gear, image: stepImage(zone, quest) };
 }
 
 export function storyPhases(spec: BuildSpec): GuidePhase[] {
