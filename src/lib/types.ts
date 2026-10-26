@@ -41,6 +41,8 @@ export type GuideStep = {
   /** Concrete stat targets when this step tells you to change gear. */
   gear?: string;
   items?: ItemRef[];
+  /** Zone rune, or a map marker when the zone has no rune. */
+  image?: string;
 };
 
 export type GuideChapter = "acts" | "interludes" | "endgame";
@@ -90,6 +92,8 @@ export type StepCheck = {
   quest: string;
   /** True when this line is a gear target. The text must contain a number. */
   gear?: boolean;
+  /** Zone rune, or a map marker when the zone has no rune. */
+  image?: string;
 };
 
 export type TimelineStep = {
@@ -98,21 +102,17 @@ export type TimelineStep = {
   checks: StepCheck[];
 };
 
-export type GearAffix = {
-  name: string;
-  kind: "Prefix" | "Suffix";
-  rank: "Must" | "Nice" | "Ignore";
-  leveling: string;
-  earlyMaps: string;
-  endgame: string;
-};
-
 export type GearCard = {
   slot: string;
   base: string;
   why: string;
   note: string;
-  affixes: GearAffix[];
+  icon: string;
+  /** Highest priority first. Each line is one roll, with a number. */
+  leveling: string[];
+  /** Highest priority first. Each line is one roll, with a number. */
+  endgame: string[];
+  skip: string;
   how: string;
 };
 
