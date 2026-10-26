@@ -1,5 +1,5 @@
 import type { BuildSpec } from "@/content/buildSpecs";
-import { gearLineForLevel } from "@/content/gearCards";
+import { statsForLevel } from "@/content/statLines";
 import { stepImage } from "@/content/zoneArt";
 import { mainSkillReadyAt, requiredLevel } from "@/content/gemFacts";
 import { pointsForBand } from "@/content/passivePlan";
@@ -26,8 +26,8 @@ function titleFor(level: number) {
   return `Level ${level} · ${actFor(level)}`;
 }
 
-function check(text: string, act: string, zone: string, quest: string, gear = false): StepCheck {
-  return { text, act, zone, quest, gear, image: stepImage(zone, quest) };
+function check(text: string, act: string, zone: string, quest: string, gear = false, stats?: string[]): StepCheck {
+  return { text, act, zone, quest, gear, stats, image: stepImage(zone, quest) };
 }
 
 function mainSupports(spec: BuildSpec, loadout: Loadout) {
@@ -36,7 +36,7 @@ function mainSupports(spec: BuildSpec, loadout: Loadout) {
 }
 
 function gearCheck(spec: BuildSpec, level: number) {
-  return check(gearLineForLevel(spec, level), actFor(level), "Town vendor or the trade site", "Gear check", true);
+  return check("Shop these rolls.", actFor(level), "Town vendor or the trade site", "Gear check", true, statsForLevel(spec, level));
 }
 
 function passiveLine(spec: BuildSpec, level: number) {
@@ -66,7 +66,6 @@ function checksFor(level: number, spec: BuildSpec, loadout: Loadout, readyAt: nu
         "Act 1",
         "Clearfell Encampment",
         "Buy a weapon",
-        true,
       ),
     );
     if (readyAt <= 1) {
@@ -230,23 +229,15 @@ function checksFor(level: number, spec: BuildSpec, loadout: Loadout, readyAt: nu
       ),
     );
     checks.push(gearCheck(spec, level));
-    checks.push(
-      check(
-        "Boots stay at 20–25% increased Movement Speed. Do not trade the speed for a small life roll.",
-        "Act 4",
-        "Town vendor or the trade site",
-        "Gear check",
-        true,
-      ),
-    );
   } else if (level === 52) {
     checks.push(
       check(
-        "Do the Stolen Barya interlude first. Resistances drop when you enter. Recap fire, cold, and lightning toward 75% before you zone in.",
+        "Do the Stolen Barya interlude first. Recap these before you zone in.",
         "Interlude: The Stolen Barya",
         "The Khari Crossing",
         "Clearing the Way",
         true,
+        ["75% Fire Resistance", "75% Cold Resistance", "75% Lightning Resistance"],
       ),
     );
     checks.push(
@@ -279,31 +270,34 @@ function checksFor(level: number, spec: BuildSpec, loadout: Loadout, readyAt: nu
   } else if (level === 66) {
     checks.push(
       check(
-        "White maps. Fire, cold, and lightning resistance should each read 75% before you push tier.",
+        "Cap each element before you raise the map tier.",
         "Maps",
         "Your map device",
         "Gear check",
         true,
+        ["75% Fire Resistance", "75% Cold Resistance", "75% Lightning Resistance"],
       ),
     );
     checks.push(
       check(
-        "Chaos resistance of 30–50% is enough. Do not chase 75% chaos.",
+        "Chaos resistance stays in this band.",
         "Maps",
         "Town or the trade site",
         "Gear check",
         true,
+        ["30% Chaos Resistance", "50% Chaos Resistance", "+20-23% Chaos Resistance"],
       ),
     );
     checks.push(passiveLine(spec, level));
   } else if (level === 78) {
     checks.push(
       check(
-        "A rare with +(120–214) life and the right defence still beats a unique that has neither.",
+        "A rare with these rolls still beats a unique that has neither.",
         "Maps",
         "Town or the trade site",
         "Gear check",
         true,
+        statsForLevel(spec, level),
       ),
     );
     checks.push(gearCheck(spec, level));
@@ -333,23 +327,26 @@ function levelFromRow(row: Loadout["leveling"][number]) {
   return null;
 }
 
-function withNumbers(text: string, level: number) {
-  if (/\d/.test(text)) return text;
-  if (!/boot|resist|life|energy shield|movement|weapon|armour|armor|spirit/i.test(text)) return text;
-  return `${text} Gear target at this level: ${gearLineForLevel({ defence: "" }, level)}`;
-}
-
-function extras(loadout: Loadout): TimelineStep[] {
+function extras(spec: BuildSpec, loadout: Loadout): TimelineStep[] {
   const steps: TimelineStep[] = [];
   for (const row of loadout.leveling) {
     const level = levelFromRow(row);
     if (level === null || level < 2 || level > 95 || STOPS.includes(level)) continue;
-    const text = withNumbers(sentence(row.text), level);
+    const text = sentence(row.text);
     const gear = /boot|resist|life|movement|weapon|spirit|energy shield/i.test(text);
     steps.push({
       level,
       title: titleFor(level),
-      checks: [check(text, actFor(level), "This build's route", "Build route", gear)],
+      checks: [
+        check(
+          text,
+          actFor(level),
+          "This build's route",
+          "Build route",
+          gear,
+          gear ? statsForLevel(spec, level) : undefined,
+        ),
+      ],
     });
   }
   return steps;
@@ -364,7 +361,7 @@ export function timelineFor(spec: BuildSpec, loadout: Loadout): TimelineStep[] {
     checks: checksFor(level, spec, loadout, readyAt),
   }));
   const merged = new Map<number, TimelineStep>();
-  for (const step of [...base, ...extras(loadout)]) {
+  for (const step of [...base, ...extras(spec, loadout)]) {
     const existing = merged.get(step.level);
     if (!existing) {
       merged.set(step.level, step);

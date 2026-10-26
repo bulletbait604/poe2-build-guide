@@ -47,8 +47,12 @@ for (const spec of specs) {
       if (!step.act.trim() || !step.zone.trim() || !step.quest.trim()) {
         failures.push(`${spec.id} ${phase.id} step "${step.title}" is missing act, zone, or quest`);
       }
-      if (step.gear && !/\d/.test(step.gear)) {
-        failures.push(`${spec.id} ${phase.id} gear step "${step.title}" has no stat number`);
+      if (step.gear) {
+        const lines = Array.isArray(step.gear) ? step.gear : [step.gear];
+        const numeric = lines.filter((line) => /^(?:\+)?(?:\()?\d/.test(line));
+        if (numeric.length < 3) {
+          failures.push(`${spec.id} ${phase.id} gear step "${step.title}" has fewer than 3 stat lines`);
+        }
       }
     }
   }
@@ -57,8 +61,14 @@ for (const spec of specs) {
       if (!row.act.trim() || !row.zone.trim() || !row.quest.trim()) {
         failures.push(`${spec.id} level ${step.level} check is missing act, zone, or quest`);
       }
-      if (row.gear && !/\d/.test(row.text)) {
-        failures.push(`${spec.id} level ${step.level} gear check has no stat number`);
+      if (row.gear) {
+        const lines = row.stats ?? [];
+        if (lines.length < 3) failures.push(`${spec.id} level ${step.level} gear check has no stat list`);
+        for (const line of lines) {
+          if (!/^(?:\+)?(?:\()?\d/.test(line)) {
+            failures.push(`${spec.id} level ${step.level} stat is not value-first: ${line}`);
+          }
+        }
       }
     }
   }
@@ -72,8 +82,11 @@ for (const spec of specs) {
       ["leveling", card.leveling],
       ["endgame", card.endgame],
     ] as const) {
-      const numeric = lines.filter((line) => /\d/.test(line));
-      if (numeric.length < 3) failures.push(`${spec.id} ${card.slot} ${name} has fewer than 3 numeric stat lines`);
+      const numeric = lines.filter((line) => /^(?:\+)?(?:\()?\d/.test(line));
+      if (numeric.length < 3) failures.push(`${spec.id} ${card.slot} ${name} has fewer than 3 value-first stat lines`);
+      if (/quiver/i.test(card.slot) && lines.some((line) => /\+[2-9] to Level of all Projectile/.test(line))) {
+        failures.push(`${spec.id} quiver lists a projectile gem level above +1`);
+      }
     }
   }
   for (const piece of guide.uniques) {
@@ -115,6 +128,12 @@ for (const spec of specs) {
       }
     }
   }
+}
+
+const banned = /10-15% increased Movement Speed|11-20% Fire|36-45%|\+30-42 Spirit|Archon of the Storm|Invigorating Archon|Siphon Elements|Infuse Weapon|Giant's Blood|200% more damage|extra-projectile/;
+for (const spec of specs) {
+  const guide = composeGuide(spec);
+  if (banned.test(JSON.stringify(guide))) failures.push(`${spec.id} still contains a mashed tier or a removed node name`);
 }
 
 const ice = composeGuide(specs.find((spec) => spec.id === "deadeye-ice-shot")!);

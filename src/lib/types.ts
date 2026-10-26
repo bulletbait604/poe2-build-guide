@@ -38,8 +38,8 @@ export type GuideStep = {
   quest: string;
   npc: string;
   reward: string;
-  /** Concrete stat targets when this step tells you to change gear. */
-  gear?: string;
+  /** Concrete stat targets, one roll per line, value first. */
+  gear?: string | string[];
   items?: ItemRef[];
   /** Zone rune, or a map marker when the zone has no rune. */
   image?: string;
@@ -90,8 +90,10 @@ export type StepCheck = {
   act: string;
   zone: string;
   quest: string;
-  /** True when this line is a gear target. The text must contain a number. */
+  /** True when this line is a gear target. The stats list holds the numbers. */
   gear?: boolean;
+  /** One roll per line, value first. Required when gear is set. */
+  stats?: string[];
   /** Zone rune, or a map marker when the zone has no rune. */
   image?: string;
 };

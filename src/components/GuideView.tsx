@@ -3,9 +3,11 @@
 import { GearCards } from "@/components/GearCards";
 import { GemLinks } from "@/components/GemLinks";
 import { ItemChip } from "@/components/ItemChip";
+import { StatList } from "@/components/StatList";
 import { TreeMap } from "@/components/TreeMap";
 import { ascendancyIcon, classIcon } from "@/content/ascendancyArt";
 import type { GameClass } from "@/content/classes";
+import { proseToStats } from "@/content/statLines";
 import type { Guide, GuideChapter, TimelineStep } from "@/lib/types";
 import Image from "next/image";
 import Link from "next/link";
@@ -77,6 +79,11 @@ function StepCard({
                   </span>
                 </span>
               </label>
+              {check.stats?.length ? (
+                <div data-gear-section="check" className="pl-7">
+                  <StatList lines={check.stats} />
+                </div>
+              ) : null}
             </li>
           );
         })}
@@ -89,13 +96,15 @@ export function GuideView({
   guide,
   gameClass,
   initialLevel,
+  initialTab = "Now",
 }: {
   guide: Guide;
   gameClass: GameClass;
   initialLevel: number;
+  initialTab?: Tab;
 }) {
   const [level, setLevel] = useState(initialLevel);
-  const [tab, setTab] = useState<Tab>("Now");
+  const [tab, setTab] = useState<Tab>(initialTab);
   const [prices, setPrices] = useState<Record<string, string>>({});
   const [done, setDone] = useState<Record<string, boolean>>({});
 
@@ -313,10 +322,10 @@ export function GuideView({
                         {step.reward}
                       </p>
                       {step.gear ? (
-                        <p className="text-sm">
+                        <div className="text-sm" data-gear-section="campaign">
                           <span className="text-gold">Gear. </span>
-                          {step.gear}
-                        </p>
+                          <StatList lines={Array.isArray(step.gear) ? step.gear : proseToStats(step.gear)} />
+                        </div>
                       ) : null}
                     </li>
                   ))}
@@ -339,7 +348,7 @@ export function GuideView({
       {tab === "Gear" ? (
         <section id="gear" className="mt-2">
           <p className="max-w-3xl text-muted">
-            Hover or click a slot. The list is the stats to shop for, highest first. The gold list matches level {level}. {activeBand.gem}
+            Each slot lists its rolls under the icon. The gold list matches level {level}. {activeBand.gem}
           </p>
           <div className="mt-4">
             <GearCards cards={guide.gearCards} totals={guide.gearTotals} level={level} />

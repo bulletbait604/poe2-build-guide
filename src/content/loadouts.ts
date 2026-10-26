@@ -177,14 +177,11 @@ function iceShot(spec: BuildSpec): Loadout {
       cap,
       chaos,
       "Amulet: +levels to projectile skills, and at least 30 spirit.",
-      "20% quality on Ice Shot. That quality is 20% more damage on this gem.",
-      "Item rarity at least 100% once you are mapping.",
-      "One sapphire jewel with mana on kill.",
       "Movement speed on boots from Act 1.",
     ],
     ascendancy: deadeye
       ? ["Point Blank", "Endless Munitions", "Gathering Winds", "Mirage Deadeye"]
-      : [spec.ascendancyPick, "Then the extra-projectile or frenzy node the Amazon trial offers. Use the first node for a whole zone before the second."],
+      : [spec.ascendancyPick, "Then Penetrate or Elemental Surge. Use the first node for a whole zone before the second."],
     groups: [
       group("Clear", "Ice Shot is the main arrow from level 31. The Ice Shot page does not print a full support row under it, so this row stays the skill plus the cold-attack supports other cold pages do name: Ice Bite and Elemental Armament.", [
         gem("Ice Shot", ["Ice Bite I", "Elemental Armament I", "Rapid Attacks II"]),
@@ -481,7 +478,7 @@ function supportingFire(): Loadout {
       "Respec at level 36 costs about 21,700 gold.",
       "A level 16 Varnished Crossbow while you are still on bolts.",
       "One of each minion, unless a note below says otherwise.",
-      "Uul-Netol's Embrace, if you ever buy it, is 40% of damage as extra chaos.",
+      "Uul-Netol's Embrace is a support gem, if you use it.",
     ],
     ascendancy: ["Take the Tactician node that buffs the attack you are using. After the swap, that attack is Supporting Fire."],
     groups: [
@@ -511,7 +508,7 @@ function supportingFire(): Loadout {
       "Before 36: Permafrost Bolts, Fragmentation Rounds on frozen rares, Frost Bomb, Freezing Mark on bosses.",
       "After 36: Supporting Fire every time it comes off cooldown. It clears packs by itself.",
       "Skeletal Sniper command on a tanky rare. The gas cloud ignites because of Fire Attunement.",
-      "Boss: Elemental Weakness and Frost Bomb, Supporting Fire up, sniper command, Arsonist command when you want Archon of Undeath.",
+      "Boss: Elemental Weakness and Frost Bomb, Supporting Fire up, then the sniper command.",
     ],
     leveling: [
       { levels: "1–15", text: "Permafrost Bolts and a level 16 Varnished Crossbow. Movement-speed boots. Life and resistances." },
@@ -677,13 +674,13 @@ function coc(spec: BuildSpec, page: GuideLink): Loadout {
 function arc(): Loadout {
   return loadout({
     overview:
-      "Get a cold infusion, cast Flame Wall, cast Orb of Storms twice, then Arc. If Arc consumes a Lightning Infusion it deals 200% more damage, chains 6 extra times, and shocks. Frost Bomb wants Long Fuse and Prolonged Duration.",
+      "Get a cold infusion, cast Flame Wall, cast Orb of Storms twice, then Arc. Arc can consume a Lightning Infusion to deal more damage and chain further. Frost Bomb wants Long Fuse and Prolonged Duration.",
     numbers: [
       cap,
       chaos,
-      "Arc with a Lightning Infusion: 200% more damage, 6 extra chains, and shock.",
+      "Arc can consume a Lightning Infusion to deal more damage and chain further.",
     ],
-    ascendancy: ["Archon of the Storm", "Invigorating Archon", "Siphon Elements"],
+    ascendancy: ["Shaper of Storms", "Constant Gale", "Strike Twice"],
     groups: [
       group("Spells", "Arc is the clear. Orb of Storms is the orb you cast twice. Flame Wall is the infusion setup.", [
         gem("Arc", ["Rapid Casting I"]),
@@ -704,7 +701,7 @@ function arc(): Loadout {
     leveling: [
       { levels: "1–14", text: "Arc or Spark, plus Frost Bomb. Movement-speed boots. One resistance on each ring toward 20%." },
       { levels: "15+", text: "The four-step order above. Long Fuse and Prolonged Duration on Frost Bomb." },
-      { levels: "Maps", text: "Archon of the Storm first if you do not already have it. Archmage last." },
+      { levels: "Maps", text: "Shaper of Storms first if you do not already have it. Archmage last." },
     ],
     gear: esGear("wand", "Lightning damage, cast speed, and +levels to lightning spells."),
     sources: [guide("arc-stormweaver-build-guide", "Maxroll Arc Stormweaver"), ...commonSources],
@@ -886,7 +883,7 @@ function spiralVolley(spec: BuildSpec): Loadout {
     ],
     ascendancy:
       spec.ascendancyId === "deadeye"
-        ? ["Gathering Winds", "Point Blank", "Endless Munitions", "The frenzy or extra-projectile node you still need for Spiral Volley"]
+        ? ["Gathering Winds", "Point Blank", "Endless Munitions"]
         : [spec.ascendancyPick, "Pathfinder poison cap is the reason to play the poison version. The charge rules below are from the Deadeye Spiral Volley page."],
     groups: [
       group("Until 54", "Lightning Arrow and Lightning Rod, the same idea as the lightning bow: rods, then the arrow.", [
@@ -1026,7 +1023,7 @@ function walkingCalamity(): Loadout {
     overview:
       "Walking Calamity builds glory from rage, at maximum rage, and drops meteors while you walk. Herald of Ice, Volcano, Shockwave Totem, Entangle, and Frost Bomb are the other buttons on that page. It is the balanced Shaman: tank, clear, and single target, not a one-button mapper.",
     numbers: [cap, chaos, "Rage on the tree or the weapon so you actually sit at maximum rage.", "Life and armour. You walk through the meteors."],
-    ascendancy: ["A rage or armour node. Giant's Blood if you are using a two-hander that asks for it."],
+    ascendancy: ["Take Maximum Rage. It is on the Shaman panel."],
     groups: [
       group("Calamity", "The skills the Walking Calamity page names.", [
         gem("Walking Calamity"),
