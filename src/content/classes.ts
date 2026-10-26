@@ -28,7 +28,7 @@ export const classes: GameClass[] = [
       {
         id: "titan",
         name: "Titan",
-        blurb: "Rolling Slam, Earthquake, Shield Wall, or Supercharged Slam. Armour and a rare mace.",
+        blurb: "Rolling Slam, Earthquake, Shield Wall, or Supercharged Slam. Buy a Wooden Club from Renly in Clearfell Encampment.",
         guideId: "titan-slams",
         primary: true,
       },
@@ -73,7 +73,7 @@ export const classes: GameClass[] = [
       {
         id: "gemling-legionnaire",
         name: "Gemling Legionnaire",
-        blurb: "Twister, oil grenades, Perfect Strike, or Earthshatter. Gem quality is the upgrade.",
+        blurb: "Twister, oil grenades, Perfect Strike, or Earthshatter. Gem quality comes from this ascendancy.",
         guideId: "gemling-twister",
         primary: false,
       },
@@ -114,7 +114,7 @@ export const classes: GameClass[] = [
       {
         id: "amazon",
         name: "Amazon",
-        blurb: "Lightning Spear, Twister, Rake, or Glacial Lance. Damage on a rare spear.",
+        blurb: "Lightning Spear, Twister, Rake, or Glacial Lance. Buy a Hardwood Spear from Renly in Clearfell Encampment.",
         guideId: "amazon-lightning-spear",
         primary: true,
       },
@@ -207,7 +207,7 @@ export const classes: GameClass[] = [
       {
         id: "stormweaver",
         name: "Stormweaver",
-        blurb: "Spark, Arc, Fireball, or Ball Lightning. Cast speed on a rare wand.",
+        blurb: "Spark, Arc, Fireball, or Ball Lightning. Buy a Withered Wand from Una in Clearfell Encampment.",
         guideId: "stormweaver-spark",
         primary: true,
       },

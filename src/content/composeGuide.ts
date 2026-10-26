@@ -78,12 +78,12 @@ function gemLine(spec: BuildSpec, to: number, loadout: Loadout) {
 }
 
 function ignoreLine(spec: BuildSpec, to: number) {
-  if (to <= 9) return "Do not buy a unique to fill a slot. A dropped rare with life is the upgrade.";
+  if (to <= 9) return "Do not buy a unique to fill a slot. Buy the named base on the gear card, or use an Orb of Transmutation and then an Orb of Augmentation on a normal base.";
   if (to <= 19) return "Do not refund a point you just placed. The list above is the order.";
   if (to <= 29) return "Do not take a second ascendancy node until the first one has been in use for a whole zone.";
   if (to <= 44) return "Do not path across the tree for one notable, and do not start a second build in the other weapon set.";
   if (to <= 59) return "Do not skip an interlude reward. The points and the spirit are permanent.";
-  return `Do not buy a unique that costs more than the rare you already have. ${spec.focus}`;
+  return "Search the trade site for the base named on the gear card. Do not buy a unique that costs more than the rare you already have.";
 }
 
 export function composeGuide(spec: BuildSpec): Guide {

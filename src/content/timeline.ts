@@ -1,4 +1,5 @@
 import type { BuildSpec } from "@/content/buildSpecs";
+import { armourText, isCaster, shops, weaponStats, weaponText } from "@/content/shopping";
 import { statsForLevel } from "@/content/statLines";
 import { stepImage } from "@/content/zoneArt";
 import { mainSkillReadyAt, requiredLevel } from "@/content/gemFacts";
@@ -36,7 +37,10 @@ function mainSupports(spec: BuildSpec, loadout: Loadout) {
 }
 
 function gearCheck(spec: BuildSpec, level: number) {
-  return check("Shop these rolls.", actFor(level), "Town vendor or the trade site", "Gear check", true, statsForLevel(spec, level));
+  const shop = shops(level).armour;
+  const armour = armourText(spec.defence, level, isCaster(spec));
+  const text = level === 1 ? armour : `${weaponText(spec.weaponNoun, level)}\n${armour}`;
+  return check(text, actFor(level), shop.where, `Buy from ${shop.who}`, true, statsForLevel(spec, level));
 }
 
 function passiveLine(spec: BuildSpec, level: number) {
@@ -62,16 +66,18 @@ function checksFor(level: number, spec: BuildSpec, loadout: Loadout, readyAt: nu
   if (level === 1) {
     checks.push(
       check(
-        `Buy the ${spec.weaponNoun} with the highest damage number from the first vendor in Clearfell Encampment. Item level 1 is fine.`,
+        weaponText(spec.weaponNoun, 1),
         "Act 1",
-        "Clearfell Encampment",
-        "Buy a weapon",
+        shops(1)[spec.weaponNoun === "wand" || spec.weaponNoun === "staff" || spec.weaponNoun === "sceptre" ? "caster" : "armour"].where,
+        `Buy a ${spec.weaponNoun}`,
+        true,
+        weaponStats(spec.weaponNoun, 1),
       ),
     );
     if (readyAt <= 1) {
       checks.push(check(`Socket ${spec.skill}. That is the main button.`, "Act 1", "Your skill panel", "Socket the main skill"));
     } else {
-      const early = sentence(loadout.leveling[0]?.text ?? "Use the weapon's basic attack and any gem the vendor offers at level 1.");
+      const early = sentence(loadout.leveling[0]?.text ?? "Use the weapon's basic attack until the main gem is in the bar.");
       const requiredNote = skillLevel === readyAt ? "" : ` The gem's required level is ${skillLevel}.`;
       checks.push(
         check(

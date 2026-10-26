@@ -126,7 +126,7 @@ export function GearCards({ cards, totals, level }: { cards: GearCard[]; totals:
               <span className="text-gold">Skip. </span>
               {selected.skip}
             </p>
-            <p className="mt-2 text-sm text-parchment">
+            <p className="mt-2 whitespace-pre-line text-sm text-parchment">
               <span className="text-gold">How to get it. </span>
               {selected.how}
             </p>

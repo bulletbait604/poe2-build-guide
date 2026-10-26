@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "node scripts/check-guide.mjs && node --import tsx scripts/check-composed.ts && node --import tsx scripts/check-verified.ts && NODE_ENV=test TSX_TSCONFIG_PATH=scripts/tsconfig.render.json node --import tsx scripts/check-render.ts"
+    "test": "node scripts/check-guide.mjs && node --import tsx scripts/check-composed.ts && node --import tsx scripts/check-verified.ts && node --import tsx scripts/check-specific.ts && NODE_ENV=test TSX_TSCONFIG_PATH=scripts/tsconfig.render.json node --import tsx scripts/check-render.ts"
   },
   "dependencies": {
     "next": "15.5.28",

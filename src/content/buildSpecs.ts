@@ -29,7 +29,7 @@ export type BuildSpec = {
 
 const u = (name: string, slot: string, level: number, note: string): UniqueDraft => ({ name, slot, level, note });
 
-const optional = "Optional. A rare with the stats in the upgrade cards replaces it. Do not buy this to start.";
+const optional = "Optional. A rare with the stats on the gear card replaces it. Do not buy this to start.";
 
 export const buildSpecs: BuildSpec[] = [
   {
@@ -74,7 +74,7 @@ export const buildSpecs: BuildSpec[] = [
     pack: "Drop Lightning Rod in the pack, then shoot the rod. If the rod is not down, you are doing extra work.",
     boss: "Keep the rod under the boss and shoot it. Move when the boss swings.",
     ascendancyPick: "Take Endless Munitions first.",
-    focus: "Highest attack damage on a rare bow. Life and evasion. Do not wait on a unique quiver.",
+    focus: "On the trade site, a Heavy Bow or a Warmonger Bow with (26-39) to (44-66) added Physical Damage and +4 to Level of all Projectile Skills. Life and evasion on the body.",
     uniques: [
       u("Quill Rain", "Bow", 5, optional),
       u("Drillneck", "Quiver", 55, "A maps quiver if it drops. It pierces and has attack speed. It does not add physical damage."),
@@ -119,7 +119,7 @@ export const buildSpecs: BuildSpec[] = [
     pack: "Throw into the pack. Gas Arrow if they are still standing. Refill the mana flask before it is empty.",
     boss: "Throw, step, throw. If the flask has no charges, use Gas Arrow until it does.",
     ascendancyPick: "Take the flask node first so the concoction has charges.",
-    focus: "Mana flask charges, life, and evasion. The bow can stay a plain rare.",
+    focus: "Mana flask charges, life, and evasion. A Crude Bow from Renly in Clearfell Encampment is enough while the flask does the throw.",
     uniques: [u("Goldrim", "Helmet", 10, optional), u("Wanderlust", "Boots", 11, optional)],
   },
   {
@@ -135,13 +135,13 @@ export const buildSpecs: BuildSpec[] = [
     defence: "evasion",
     speed: "attack speed",
     damage: "lightning damage",
-    summary: "The Huntress league-start spear. Lightning Spear clears. Storm Lance is the boss plant. Replace the spear whenever a new base has more damage.",
+    summary: "The Huntress league-start spear. Lightning Spear clears. Storm Lance is the boss plant. Renly in Clearfell Encampment sells a Hardwood Spear at level 1, then an Ironhead Spear at level 5.",
     fantasy: "A huntress who throws one spear and is already moving.",
     pack: "Throw Lightning Spear into the pack and sidestep. Storm Lance only when a rare is still standing.",
     boss: "Plant Storm Lance at the feet, throw Lightning Spear, step off the slam.",
     ascendancyPick: "Take Penetrate or Elemental Surge and keep throwing the same spear.",
-    focus: "A spear with physical damage and attack speed. Around level 5, 16, 26, and 33, check the vendor for the next spear base. Life and evasion on the body. Movement speed on the boots.",
-    uniques: [u("Splinter of Lorrata", "Spear", 1, optional), u("Skysliver", "Spear", 16, "Compare it at level 16. Keep the spear with more damage, rare or unique.")],
+    focus: "Hardwood Spear from Renly in Clearfell Encampment, then Ironhead Spear at level 5, Winged Spear at level 16, Forked Spear at level 26, and Barbed Spear at level 33 from the weapon shop of that act. Life and evasion on the body. 10% increased Movement Speed on Rawhide Boots.",
+    uniques: [u("Splinter of Lorrata", "Spear", 1, optional), u("Skysliver", "Spear", 16, "At level 16, wear it when its physical damage is above the Winged Spear from the weapon shop.")],
   },
   {
     id: "amazon-twister",
@@ -496,7 +496,7 @@ export const buildSpecs: BuildSpec[] = [
     fantasy: "A mercenary who oils a pack and lets gem quality do the rest.",
     pack: "Oil, explode, leave. Do not add a third grenade until these two already clear.",
     boss: "Same pair from range. Reload off to the side.",
-    ascendancyPick: "Take quality first. A higher-quality grenade is the upgrade, not a new skill.",
+    ascendancyPick: "Take quality first. Raise the grenade you already socketed before you add another skill.",
     focus: "Fire resistance, life, reload speed, and the attributes the gems ask for.",
     uniques: [u("Rampart Raptor", "Crossbow", 4, optional), u("Wanderlust", "Boots", 11, optional)],
   },
@@ -551,7 +551,7 @@ export const buildSpecs: BuildSpec[] = [
     helper: "Falling Thunder",
     support: "Rapid Attacks II",
     weaponNoun: "quarterstaff",
-    weaponStat: "Attack speed and attack damage. You can fight bare-handed early. A staff is for when a rare one is clearly stronger.",
+    weaponStat: "Attack speed and attack damage. Bare hands are fine under Hollow Form. Otherwise buy a Wrapped Quarterstaff from Renly in Clearfell Encampment.",
     defence: "evasion and energy shield",
     speed: "attack speed",
     damage: "physical or lightning damage",
@@ -560,7 +560,7 @@ export const buildSpecs: BuildSpec[] = [
     pack: "Whirling Assault through the pack and leave before the skill ends if they are still hitting you.",
     boss: "Build up, Falling Thunder, step out. Short whirls only. Do not spin through a slam.",
     ascendancyPick: "Take Hollow Form or the bell node and socket Whirling Assault or Falling Thunder. Do not socket a channelled skill.",
-    focus: "Life on the body, evasion and energy shield, attack speed. A quarterstaff only when it hits harder than your fists.",
+    focus: "Life on the body, evasion and energy shield, attack speed. Buy a Wrapped Quarterstaff from Renly in Clearfell Encampment when you leave Hollow Form.",
     uniques: [u("Ghostmarch", "Boots", 16, optional), u("The Blood Thorn", "Quarterstaff", 38, optional)],
   },
   {
@@ -761,7 +761,7 @@ export const buildSpecs: BuildSpec[] = [
     helper: "Orb of Storms",
     support: "Rapid Casting I",
     weaponNoun: "wand",
-    weaponStat: "Cast speed and a plus to spell skills. A plain rare wand with those numbers wins.",
+    weaponStat: "Cast speed and +1 to Level of all Spell Skills on a Withered Wand from Una in Clearfell Encampment.",
     defence: "energy shield",
     speed: "cast speed",
     damage: "lightning damage",
@@ -908,7 +908,7 @@ export const buildSpecs: BuildSpec[] = [
     helper: "Entangle",
     support: "a support that says it supports spells",
     weaponNoun: "staff",
-    weaponStat: "Fire or spell damage. A vendor staff is correct if the numbers are higher.",
+    weaponStat: "Fire or spell damage on an Ashen Staff from Una in Clearfell Encampment, then a Pyrophyte Staff at level 16.",
     defence: "armour",
     speed: "cast speed",
     damage: "fire damage",
@@ -1013,7 +1013,7 @@ export const buildSpecs: BuildSpec[] = [
     helper: "Gas Arrow",
     support: "Rapid Attacks II",
     weaponNoun: "bow",
-    weaponStat: "You throw from flask charges. A weapon is optional until a rare bow is clearly stronger.",
+    weaponStat: "You throw from flask charges. A Crude Bow from Renly in Clearfell Encampment is enough until a Shortbow at level 5.",
     defence: "evasion",
     speed: "attack speed",
     damage: "fire damage",
@@ -1080,7 +1080,7 @@ export const buildSpecs: BuildSpec[] = [
     defence: "evasion",
     speed: "attack speed",
     damage: "cold damage",
-    summary: "A freezing spear. Glacial Lance is the shot. Storm Lance holds a pack in place while you throw the next one. Check the vendor for a stronger spear as you level.",
+    summary: "A freezing spear. Glacial Lance is the shot. Storm Lance holds a pack in place while you throw the next one. Buy a Hardwood Spear from Renly in Clearfell Encampment, then an Ironhead Spear at level 5.",
     fantasy: "A huntress who pins a pack in ice and throws the next lance from outside it.",
     pack: "Storm Lance into the pack, Glacial Lance through the same spot, then move.",
     boss: "Lance, step, lance. Storm Lance when the boss stops. Do not channel in a slam.",
@@ -1106,7 +1106,7 @@ export const buildSpecs: BuildSpec[] = [
     pack: "Storm Lance in the pack, Lightning Spear through it. Spend Primal Bounty on the same spot.",
     boss: "Keep the lance under the boss and throw. Move when it swings.",
     ascendancyPick: "Take the primal node that makes one throw bigger, and use that throw every zone.",
-    focus: "A stronger rare spear every few levels. Life, evasion, movement speed.",
+    focus: "Hardwood Spear at level 1, Ironhead Spear at level 5, Winged Spear at level 16. Life, evasion, and 10% increased Movement Speed on Rawhide Boots.",
     uniques: [u("Chainsting", "Spear", 16, optional), u("Surefooted Sigil", "Amulet", 20, optional)],
   },
   {
@@ -1164,7 +1164,7 @@ export const buildSpecs: BuildSpec[] = [
     defence: "evasion",
     speed: "attack speed",
     damage: "lightning damage",
-    summary: "Spearfield holds the ground. Lightning Spear shoots through it. The ritual charm is whatever dropped. A rare spear is the upgrade.",
+    summary: "Spearfield holds the ground. Lightning Spear shoots through it. The ritual charm is the one that dropped. Buy a Hardwood Spear from Renly in Clearfell Encampment.",
     fantasy: "A huntress who fences a pack in spears and throws lightning through the fence.",
     pack: "Spearfield across the road, Lightning Spear through the same line, then walk on.",
     boss: "Field at the boss, spear through the field, move. Recast the field when it falls.",
@@ -1475,7 +1475,7 @@ export const buildSpecs: BuildSpec[] = [
     helper: "Falling Thunder",
     support: "Rapid Attacks II",
     weaponNoun: "quarterstaff",
-    weaponStat: "Cold or physical damage. Bare hands are fine until a staff is clearly stronger.",
+    weaponStat: "Cold or physical damage. Bare hands are fine under Hollow Form. Otherwise buy a Wrapped Quarterstaff from Renly in Clearfell Encampment.",
     defence: "evasion",
     speed: "attack speed",
     damage: "cold damage",
@@ -1484,7 +1484,7 @@ export const buildSpecs: BuildSpec[] = [
     pack: "Palm through the pack. Thunder only on the rare. Keep moving.",
     boss: "Palm until it is frozen or staggered, thunder, step out. Do not spend thunder on an empty combo.",
     ascendancyPick: "Take Hollow Form or the bell node and use the palm for a whole zone before a second node.",
-    focus: "Evasion, life, and cold resistance. A staff only when it hits harder than your hands.",
+    focus: "Evasion, life, and cold resistance. Buy a Wrapped Quarterstaff from Renly in Clearfell Encampment when you leave empty hands.",
     uniques: [u("Dream Fragments", "Ring", 12, optional), u("Foxshade", "Body", 28, optional)],
   },
   {
@@ -1504,8 +1504,8 @@ export const buildSpecs: BuildSpec[] = [
     fantasy: "A monk who spins through a pack and leaves a crack of fire on the path.",
     pack: "Whirl through, fissure back along the same line, leave the fire.",
     boss: "Fissure under it, whirl across a slam, fissure again from the side.",
-    ascendancyPick: "Take Hollow Form first if you do not have a staff that hits harder than your hands.",
-    focus: "Fire resistance, evasion, and life. Weapon damage only when the staff is an upgrade.",
+    ascendancyPick: "Take Hollow Form first while your hands are empty. Buy a Wrapped Quarterstaff from Renly in Clearfell Encampment when you want the weapon.",
+    focus: "Fire resistance, evasion, and life. Weapon damage starts when you buy a Wrapped Quarterstaff from Renly in Clearfell Encampment.",
     uniques: [u("Pillar of the Caged God", "Quarterstaff", 4, optional), u("Goldrim", "Helmet", 10, optional)],
   },
   {
@@ -1710,7 +1710,7 @@ export const buildSpecs: BuildSpec[] = [
     defence: "energy shield",
     speed: "cast speed",
     damage: "lightning damage",
-    summary: "Orb of Storms in the pack, Ball Lightning through the orb. The orb is the clear. A rare wand with cast speed is the upgrade.",
+    summary: "Orb of Storms in the pack, Ball Lightning through the orb. The orb is the clear. Buy a Withered Wand from Una in Clearfell Encampment, with (9-12)% increased Cast Speed.",
     fantasy: "A sorceress who leaves a storm on the ground and rolls lightning through it.",
     pack: "Orb in the pack, ball through the orb, walk. Recast the orb when you change rooms.",
     boss: "Orb under the boss, ball, move. Do not stand in the orb.",

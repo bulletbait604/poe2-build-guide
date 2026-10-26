@@ -36,7 +36,8 @@ function requireLists(html: string, label: string) {
 }
 
 const now = render(createElement(GuideView, { guide, gameClass, initialLevel: 12 }));
-if (!now.includes("Shop these rolls.")) failures.push("Now tab did not render the gear check");
+if (!now.includes("Renly in Clearfell Encampment")) failures.push("Now tab did not name Renly in Clearfell Encampment");
+if (!now.includes("Laced Boots")) failures.push("Now tab did not name the level 12 boots");
 requireLists(now, "Now");
 
 const leveling = render(createElement(GuideView, { guide, gameClass, initialLevel: 12, initialTab: "Leveling" }));

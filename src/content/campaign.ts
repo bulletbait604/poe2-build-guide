@@ -506,13 +506,13 @@ export function storyPhases(spec: BuildSpec): GuidePhase[] {
         ["75% Fire Resistance", "75% Cold Resistance", "75% Lightning Resistance", "30% Chaos Resistance", "50% Chaos Resistance", "30% increased Movement Speed"],
       ),
       step(
-        "What to upgrade",
+        "Map gear",
         "Maps",
-        "Town or the trade site",
+        "your hideout",
         "Gear check",
-        "Buy the rare, or craft with a Transmutation and an Augmentation while the base is still normal.",
+        "Search the trade site for the base named on the Gear tab.",
         "The targets on the Gear tab.",
-        `Weapon damage, then life, then the lowest resistance. The defence on the gear is ${spec.defence}.`,
+        `Search the trade site. The defence on the gear is ${spec.defence}. Buy the base named on the Gear tab, with the rolls in the list under this step. If that rare is missing, buy a normal base and use an Orb of Transmutation, then an Orb of Augmentation.`,
         statsForLevel(spec, 78),
       ),
       step(

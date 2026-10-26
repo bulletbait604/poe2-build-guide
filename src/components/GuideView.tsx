@@ -75,7 +75,7 @@ function StepCard({
                     <span className="block text-xs tracking-[0.12em] text-gold uppercase">
                       {check.act} · {check.zone} · {check.quest}
                     </span>
-                    {check.text}
+                    <span className="block whitespace-pre-line">{check.text}</span>
                   </span>
                 </span>
               </label>

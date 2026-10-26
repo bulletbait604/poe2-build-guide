@@ -1,4 +1,5 @@
 import type { BuildSpec } from "@/content/buildSpecs";
+import { slotStage, type ShopSpec } from "@/content/shopping";
 import type { GearStage, GemGroup, GuideLink, LinkedGem, Loadout } from "@/lib/types";
 
 const TIER = "https://maxroll.gg/poe2/tierlists/league-starter-build-tier-list";
@@ -29,80 +30,92 @@ function group(label: string, detail: string, skills: LinkedGem[]): GemGroup {
 
 const cap = "75% fire, 75% cold, and 75% lightning.";
 const chaos = "Chaos resistance 30–50% in maps. 75% chaos is not the target.";
-const bootsEarly =
-  "Movement speed first. Buy it from the Act 1 vendor if none drops. Then life, then one resistance. Boots with 0% movement speed do not count.";
-const bootsLate = "Keep movement speed. Add life and whichever resistance is lowest.";
-const bootsMaps = "Highest movement speed on the pair, then life, then a resistance you still need for the 75% cap.";
 
 function slots(rows: Array<[string, string, string, string]>): GearStage[] {
   return rows.map(([slot, early, late, maps]) => ({ slot, early, late, maps }));
 }
 
-function bowGear(weaponEarly: string, weaponMaps: string, extra: Array<[string, string, string, string]> = []): GearStage[] {
+function row(slot: string, spec: ShopSpec, extra = ""): [string, string, string, string] {
+  const [early, late, maps] = slotStage(slot, spec);
+  return [slot, early, late, extra ? `${maps}\n${extra}` : maps];
+}
+
+const bowSpec: ShopSpec = { weaponNoun: "bow", defence: "evasion", speed: "attack speed" };
+const spearSpec: ShopSpec = { weaponNoun: "spear", defence: "evasion", speed: "attack speed" };
+const crossbowSpec: ShopSpec = { weaponNoun: "crossbow", defence: "armour and evasion", speed: "attack speed" };
+
+function bowGear(extra: string, mapsExtra: string, more: Array<[string, string, string, string]> = []): GearStage[] {
   return slots([
-    ["Bow", weaponEarly, "Replace any bow that is about five levels old. The tooltip damage number is the check, not the item name.", weaponMaps],
-    ["Quiver", "Life and added damage.", "Added damage, life, and one resistance.", "Added damage, attack speed, and +1 to Level of all Projectile Skills."],
-    ["Body", "Life, then evasion. An empty chest is the first fix.", "Highest life, then evasion.", "Highest evasion chest you can wear, with life. A Greater Iron Rune in the socket if the chest has one."],
-    ["Helmet", "Life, or +16-20% to one resistance.", "Life, evasion, and one resistance.", "Life, evasion, and whichever element is under 75%."],
-    ["Gloves", "Life. Added damage to attacks only on a pair that already has life.", "Life and attack speed.", "Life, attack speed, then added damage to attacks."],
-    ["Boots", bootsEarly, bootsLate, bootsMaps],
-    ["Amulet", "One resistance, or spirit if a spirit gem on the skill tab is still grey.", "Spirit and one resistance. +1 to projectile skills if it appears.", "+1 to Level of all Projectile Skills, then spirit, then life."],
-    ["Rings", "+16-20% to one resistance on each ring, on different elements. Iron Rings are the Act 1 damage rings until a rare beats the damage.", "+26-30% to one resistance on each ring, on different elements.", `${cap} Attributes so gems are not red. ${chaos}`],
-    ["Belt", "Life. Strength if a gem is red.", "Life and one resistance.", "Life, strength, and a resistance."],
-    ...extra,
+    row("Bow", bowSpec, mapsExtra ? `${extra} ${mapsExtra}` : extra),
+    row("Quiver", bowSpec),
+    row("Body", bowSpec),
+    row("Helmet", bowSpec),
+    row("Gloves", bowSpec),
+    row("Boots", bowSpec),
+    row("Amulet", bowSpec, "Spirit on the amulet is +(30-33) while leveling and +(47-50) in maps. Quivers stay at +1 to Level of all Projectile Skills."),
+    row("Rings", bowSpec, `${cap} ${chaos}`),
+    row("Belt", bowSpec),
+    ...more,
   ]);
 }
 
 function spearGear(): GearStage[] {
   return slots([
-    ["Spear", "Highest physical or lightning damage spear from the vendor. Iron Rings in Act 1 until a rare ring beats them.", "A spear about the level of the zone.", "Flat damage and attack speed. +1 to Level of all Projectile Skills beats a small damage roll."],
-    ["Body", "Life, then evasion.", "Life and evasion.", "Life and evasion."],
-    ["Helmet", "Life or one resistance.", "Life and a resistance.", "Life, evasion, and a missing resistance."],
-    ["Gloves", "Added damage to attacks, then life.", "Life and attack speed.", "Life, attack speed, added damage."],
-    ["Boots", bootsEarly, bootsLate, bootsMaps],
-    ["Amulet", "One resistance.", "Spirit if a spirit gem is still grey.", "Spirit and attributes. Mirage Archer reserves 60 spirit."],
-    ["Rings", "Iron Rings in Act 1. Then +16-20% to one resistance on each ring.", "+26-30% to one resistance on each ring.", `${cap} ${chaos}`],
-    ["Belt", "Life.", "Life and a resistance.", "Life, strength, and a resistance."],
+    row("Spear", spearSpec, "Mirage Archer reserves 60 spirit when that gem is on the bar."),
+    row("Body", spearSpec),
+    row("Helmet", spearSpec),
+    row("Gloves", spearSpec),
+    row("Boots", spearSpec),
+    row("Amulet", spearSpec),
+    row("Rings", spearSpec, `${cap} ${chaos}`),
+    row("Belt", spearSpec),
   ]);
 }
 
 function crossbowGear(note: string): GearStage[] {
   return slots([
-    ["Crossbow", "Highest damage crossbow. A level 16 Varnished Crossbow is the usual Act 1–2 step.", "Added damage, then reload. Replace it when packs slow down.", note],
-    ["Body", "Life, then armour and evasion.", "Life and armour.", "Life, armour, and evasion."],
-    ["Helmet", "Life or one resistance.", "Life and a resistance.", "Life and a resistance under 75%."],
-    ["Gloves", "Life.", "Life and attack speed.", "Life and attack speed."],
-    ["Boots", bootsEarly, bootsLate, bootsMaps],
-    ["Amulet", "One resistance.", "Life and a resistance.", "Attributes and a resistance."],
-    ["Rings", "+16-20% to one resistance on each ring.", "+26-30% to one resistance on each ring.", `${cap} ${chaos}`],
-    ["Belt", "Life.", "Life and a resistance.", "Life and a resistance."],
+    row("Crossbow", crossbowSpec, note),
+    row("Body", crossbowSpec),
+    row("Helmet", crossbowSpec),
+    row("Gloves", crossbowSpec),
+    row("Boots", crossbowSpec),
+    row("Amulet", crossbowSpec),
+    row("Rings", crossbowSpec, `${cap} ${chaos}`),
+    row("Belt", crossbowSpec),
   ]);
 }
 
 function armourGear(weapon: string, weaponMaps: string): GearStage[] {
+  const spec: ShopSpec = { weaponNoun: weapon, defence: "armour", speed: "attack speed" };
   return slots([
-    ["Weapon", `Highest ${weapon} damage from the vendor. A white weapon that hits harder beats a unique you are waiting on.`, "Replace a weapon that is about five levels old.", weaponMaps],
-    ["Shield", "Life and armour, if the build holds one. Block is a bonus.", "More life and armour.", "Life and armour. The shield is a life piece."],
-    ["Body", "Life, then armour.", "Highest life, then armour.", "Highest life and armour. A unique body is optional."],
-    ["Helmet", "Life or one resistance.", "Life and a resistance.", "Life, armour, and a missing resistance."],
-    ["Gloves", "Life.", "Life and attack speed.", "Life, attack speed, then added damage."],
-    ["Boots", bootsEarly, bootsLate, bootsMaps],
-    ["Amulet", "One resistance or strength.", "Life and strength.", "Life, strength, and a resistance."],
-    ["Rings", "+16-20% to one resistance on each ring.", "+26-30% to one resistance on each ring.", `${cap} ${chaos}`],
-    ["Belt", "Life and strength.", "Life and strength.", "Life, strength, and a resistance."],
+    row("Weapon", spec, weaponMaps),
+    row("Shield", spec),
+    row("Body", spec),
+    row("Helmet", spec),
+    row("Gloves", spec),
+    row("Boots", spec),
+    row("Amulet", spec),
+    row("Rings", spec, `${cap} ${chaos}`),
+    row("Belt", spec),
   ]);
 }
 
 function esGear(weapon: string, weaponMaps: string): GearStage[] {
+  const noun = weapon.includes("sceptre") ? "sceptre" : weapon.includes("wand") ? "wand" : weapon;
+  const spec: ShopSpec = {
+    weaponNoun: noun,
+    defence: "energy shield",
+    speed: noun === "quarterstaff" ? "attack speed" : "cast speed",
+  };
   return slots([
-    ["Weapon", `A ${weapon} with spell damage or the matching element. +1 to spell skills is the roll to keep.`, "Higher spell damage or +gem levels.", weaponMaps],
-    ["Body", "Energy shield and some life.", "Highest energy shield, then life.", "Highest energy shield. Chaos Inoculation only after the build's own note says the shield is high enough."],
-    ["Helmet", "Energy shield or one resistance.", "Energy shield and a resistance.", "Energy shield and a resistance under 75%."],
-    ["Gloves", "Any life or energy shield.", "Cast speed, if the pair already has a defence.", "Cast speed and a resistance."],
-    ["Boots", bootsEarly, bootsLate, bootsMaps],
-    ["Amulet", "One resistance, or +1 to spell skills.", "+1 to spell or minion skills, then spirit.", "+1 to Level of all Spell Skills, then spirit, then a resistance."],
-    ["Rings", "+16-20% to one resistance on each ring.", "+26-30% to one resistance on each ring.", `${cap} ${chaos}`],
-    ["Belt", "Life or energy shield.", "Life and a resistance.", "Life and a resistance."],
+    row("Weapon", spec, weaponMaps),
+    row("Body", spec, "Chaos Inoculation waits until this build's own note says the energy shield can take a hit."),
+    row("Helmet", spec),
+    row("Gloves", spec),
+    row("Boots", spec),
+    row("Amulet", spec),
+    row("Rings", spec, `${cap} ${chaos}`),
+    row("Belt", spec),
   ]);
 }
 
@@ -122,7 +135,7 @@ function lightningArrow(): Loadout {
       chaos,
       "Herald of Thunder and Wind Dancer each reserve 30 spirit. Turn them on only when that spirit is free.",
       "Skip Chaos Inoculation until the energy shield is high.",
-      "Movement speed on boots from Act 1.",
+      "10% increased Movement Speed on the level 1 boots from Renly in Clearfell Encampment.",
     ],
     ascendancy: ["Gathering Winds", "Point Blank", "Endless Munitions", "Mirage Deadeye"],
     groups: [
@@ -154,14 +167,14 @@ function lightningArrow(): Loadout {
       "Lightning Arrow into the rods.",
     ],
     leveling: [
-      { levels: "1–14", text: "Lightning Arrow as soon as it drops. Freezing Salvo covers bosses until the rod is in the bar. Buy movement-speed boots in Act 1." },
+      { levels: "1–14", text: "Lightning Arrow as soon as it drops. Freezing Salvo covers bosses until the rod is in the bar. Buy Rawhide Boots from Renly in Clearfell Encampment with 10% increased Movement Speed." },
       { levels: "15–30", text: "Lightning Rod in the pack, then Lightning Arrow. Take Gathering Winds at the first trial and use it for a whole zone." },
       { levels: "31–50", text: "Add Tornado Shot and Barrage. Socket Rapid Attacks II first, then one more support from the row at a time." },
       { levels: "Maps", text: "The full panel above. Chaos Inoculation only after the energy shield is high and the resistances are already at 75%." },
     ],
     gear: bowGear(
-      "Highest damage bow on the vendor. Added lightning is a bonus, not the requirement.",
-      "Highest elemental or physical DPS bow. A Greater Iron Rune in the bow if it has a socket.",
+      "Added lightning is a bonus. Keep the physical damage rolls.",
+      "A Greater Iron Rune in a weapon socket adds 18% increased Physical Damage.",
     ),
     sources: [guide("lightning-arrow-deadeye", "Maxroll Lightning Arrow Deadeye"), ...commonSources],
   });
@@ -177,7 +190,7 @@ function iceShot(spec: BuildSpec): Loadout {
       cap,
       chaos,
       "Amulet: +levels to projectile skills, and at least 30 spirit.",
-      "Movement speed on boots from Act 1.",
+      "10% increased Movement Speed on the level 1 boots from Renly in Clearfell Encampment.",
     ],
     ascendancy: deadeye
       ? ["Point Blank", "Endless Munitions", "Gathering Winds", "Mirage Deadeye"]
@@ -220,8 +233,8 @@ function iceShot(spec: BuildSpec): Loadout {
       { levels: "Maps", text: "Two bows and two quivers. Clear set: extra arrows and a Cadiro's Gambit, only after the bow already kills the pack. Boss set: flat damage, critical chance, gem levels. Attack speed and extra arrows do nothing on that second set." },
     ],
     gear: bowGear(
-      "Highest damage bow. Cold on the bow is a bonus.",
-      "Highest DPS elemental or physical bow, with a Greater Iron Rune. Clear bow wants extra arrows. Boss bow wants flat damage, critical chance, and gem levels.",
+      "Cold damage on the bow is a bonus. Keep the physical damage rolls.",
+      "A Greater Iron Rune in a weapon socket adds 18% increased Physical Damage. Clear bow: extra arrows after the physical rolls. Boss bow: flat damage, critical chance, and +4 to Level of all Projectile Skills.",
       [["Jewel", "Skip jewels until maps.", "Life or a resistance if one drops.", "One sapphire jewel with mana on kill. Rarity on gear to at least 100%."]],
     ),
     sources: [
@@ -243,7 +256,7 @@ function lightningSpear(): Loadout {
       "Campaign spirit is 100. Mirage Archer reserves 60 spirit.",
       "Seaglass Spear requires level 51.",
       "Iron Rings in Act 1.",
-      "Movement speed on boots from Act 1.",
+      "10% increased Movement Speed on the level 1 boots from Renly in Clearfell Encampment.",
     ],
     ascendancy: [
       "Take the first Amazon node that adds a projectile or a frenzy tool, and use Lightning Spear for a whole zone before the next node.",
@@ -307,7 +320,7 @@ function twister(spec: BuildSpec): Loadout {
       cap,
       chaos,
       "Attributes enough to socket the gems. Put the rest into strength for life.",
-      "Movement speed on boots from Act 1.",
+      "10% increased Movement Speed on the level 1 boots from Renly in Clearfell Encampment.",
     ],
     ascendancy:
       spec.ascendancyId === "gemling-legionnaire"
@@ -361,7 +374,7 @@ function shieldWall(): Loadout {
   return loadout({
     overview:
       "Shield Wall is the clear and the cover. Shockwave Totem slams beside you. Herald of Ash picks up overkill. Lineage gems Ahn's Citadel and Kaom's Madness turn the walls into branching fissures later. They are not required to start.",
-    numbers: [cap, chaos, "Life and armour on the shield and the chest. The mace is physical damage.", "Movement speed on boots from Act 1."],
+    numbers: [cap, chaos, "Life and armour on the shield and the chest. The mace is physical damage.", "10% increased Movement Speed on the level 1 boots from Renly in Clearfell Encampment."],
     ascendancy: [
       "Take the armour-break or block node after Shield Wall is already the button you press.",
       "Warbringer only: Warcaller's Bellow is an ascendancy notable, not a gem. It makes warcries explode corpses.",
@@ -387,11 +400,11 @@ function shieldWall(): Loadout {
       "Step back. Replace the totem when it dies. Do not hold the wall in a slam.",
     ],
     leveling: [
-      { levels: "1–14", text: "A slam or the wall, whichever gem you have. Armour and life. Movement-speed boots." },
+      { levels: "1–14", text: "Socket the slam or Shield Wall, the gem you were given. Buy Rough Greaves from Renly in Clearfell Encampment with 10% increased Movement Speed." },
       { levels: "15+", text: "Shield Wall plus the totem. Add the supports in the order listed." },
       { levels: "Maps", text: "Ahn's Citadel and Kaom's Madness if you own them. A rare mace still beats a unique that hits for less." },
     ],
-    gear: armourGear("mace", "Highest physical damage mace. Life and armour on the shield."),
+    gear: armourGear("mace", "Life and armour on the Splintered Tower Shield, then on the body."),
     sources: [guide("shield-wall-warbringer-build-guide", "Maxroll Shield Wall Warbringer"), ...commonSources],
   });
 }
@@ -402,7 +415,7 @@ function grenades(): Loadout {
   return loadout({
     overview:
       "Throw a grenade and leave. Oil Grenade, Explosive Grenade, Cluster, Gas, and Flash are all on the bar. If Explosive Grenade is on cooldown, throw a different grenade. Grenades work from level 1.",
-    numbers: [cap, chaos, "Fire resistance on the jewellery, because you are standing near the blast.", "Movement speed on boots from Act 1. You reload while you walk."],
+    numbers: [cap, chaos, "Fire resistance on the jewellery, because you are standing near the blast.", "10% increased Movement Speed on the level 1 boots from Renly in Clearfell Encampment. You reload while you walk."],
     ascendancy: ["Sorcery Ward first, so a bad grenade does not end the zone."],
     groups: [
       group(
@@ -624,7 +637,7 @@ function minions(spec: BuildSpec, page: GuideLink): Loadout {
       "Refresh a dead minion before you start a new pack.",
     ],
     leveling: [
-      { levels: "1–14", text: "Volcano and the first minion you are offered. +minion levels if a vendor piece has it." },
+      { levels: "1–14", text: "Volcano and the first minion you are offered. Buy a Rattling Sceptre from Una in Clearfell Encampment and keep +1 to Level of all Minion Skills." },
       { levels: "15+", text: "Skeletal Sniper and the command. One support at a time, Meat Shield first." },
       { levels: "Maps", text: "The full rows. A higher minion level beats a new unique." },
     ],
@@ -916,8 +929,8 @@ function spiralVolley(spec: BuildSpec): Loadout {
       { levels: "Maps", text: "Tame Beast with Haste. Ghost Dance after the energy-shield gear exists." },
     ],
     gear: bowGear(
-      "Highest damage bow. Keep a physical damage roll on it for the later armour break.",
-      "Physical damage plus elemental damage. Extra arrows help the Lightning Arrow leveling, then the volley.",
+      "Keep a physical damage roll for armour break.",
+      "Physical damage plus one elemental damage roll. Extra arrows help Lightning Arrow, then the volley.",
     ),
     sources: [
       guide("spiral-volley-deadeye-build-guide", "Maxroll Spiral Volley Deadeye"),
@@ -966,7 +979,10 @@ function poisonburst(): Loadout {
       { levels: "15+", text: "Poisonburst, Gas Arrow, Herald of Plague. Movement-speed boots." },
       { levels: "Maps", text: "Vine Arrow and Bursting Plague. The tree wants attack damage, poison duration, and bow attack speed." },
     ],
-    gear: bowGear("A bow with physical or chaos damage and attack speed.", "Highest DPS bow. Poison duration and attack speed beat a unique with neither."),
+    gear: bowGear(
+      "Physical or chaos damage, then attack speed. Poison duration is a bonus suffix.",
+      "Poison duration and attack speed. A unique with neither of those rolls stays in the stash.",
+    ),
     sources: [guide("poisonburst-arrow-pathfinder", "Maxroll Poisonburst Pathfinder"), ...commonSources],
   });
 }
@@ -1054,7 +1070,7 @@ function glacialLance(): Loadout {
   return loadout({
     overview:
       "Glacial Lance is the cold spear or bow clear on the Deadeye and Amazon pages. Freeze the pack, then the lance. Snipe or a second throw on a frozen boss. Cold-attack supports here are Ice Bite and Elemental Armament, which the Permafrost and Hollow Form pages name on cold hits. The Glacial Lance page is the route.",
-    numbers: [cap, chaos, "Movement speed on boots from Act 1.", "Cold or physical damage on the weapon."],
+    numbers: [cap, chaos, "10% increased Movement Speed on the level 1 boots from Renly in Clearfell Encampment.", "Cold or physical damage on the weapon."],
     ascendancy:
       ["Point Blank or the extra projectile, then Gathering Winds. One node for a zone before the next."],
     groups: [
@@ -1090,7 +1106,7 @@ function generic(spec: BuildSpec): Loadout {
           : armourGear(spec.weaponNoun, spec.weaponStat);
   return loadout({
     overview: `${spec.summary} The October 5, 2026 league-starter list does not print a separate support row for this exact pairing, so the skill tab shows the gems this route actually names and nothing invented beside them.`,
-    numbers: [cap, chaos, "Movement speed on boots from Act 1.", "Life on the body before a damage unique."],
+    numbers: [cap, chaos, "10% increased Movement Speed on the level 1 boots from Renly in Clearfell Encampment.", "Life on the body before a damage unique."],
     ascendancy: [spec.ascendancyPick],
     groups: [
       group("Main", `${spec.skill} is the button. ${spec.helper} is the second button.`, [
@@ -1100,7 +1116,7 @@ function generic(spec: BuildSpec): Loadout {
     ],
     rotation: [spec.pack, spec.boss],
     leveling: [
-      { levels: "1–14", text: `Put ${spec.skill} on the bar as soon as it drops. ${spec.helper} waits for a second skill gem. Buy movement-speed boots.` },
+      { levels: "1–14", text: `Put ${spec.skill} on the bar as soon as it drops. ${spec.helper} waits for a second skill gem. Buy boots from Renly in Clearfell Encampment with 10% increased Movement Speed. The level 1 base is Rawhide Boots, Rough Greaves, or Straw Sandals, matching the defence on the gear card.` },
       { levels: "15–40", text: spec.ascendancyPick },
       { levels: "41+", text: spec.focus },
     ],
