@@ -1,4 +1,6 @@
 import type { BuildSpec } from "@/content/buildSpecs";
+import { starterFor } from "@/content/earlySkill";
+import { requiredLevel } from "@/content/gemFacts";
 import { slotStage, type ShopSpec } from "@/content/shopping";
 import type { GearStage, GemGroup, GuideLink, LinkedGem, Loadout } from "@/lib/types";
 
@@ -85,8 +87,8 @@ function crossbowGear(note: string): GearStage[] {
   ]);
 }
 
-function armourGear(weapon: string, weaponMaps: string): GearStage[] {
-  const spec: ShopSpec = { weaponNoun: weapon, defence: "armour", speed: "attack speed" };
+function armourGear(weapon: string, weaponMaps: string, defence = "armour"): GearStage[] {
+  const spec: ShopSpec = { weaponNoun: weapon, defence, speed: "attack speed" };
   return slots([
     row("Weapon", spec, weaponMaps),
     row("Shield", spec),
@@ -167,14 +169,14 @@ function lightningArrow(): Loadout {
       "Lightning Arrow into the rods.",
     ],
     leveling: [
-      { levels: "1–14", text: "Lightning Arrow as soon as it drops. Freezing Salvo covers bosses until the rod is in the bar. Buy Rawhide Boots from Renly in Clearfell Encampment with 10% increased Movement Speed." },
+      { levels: "1–14", text: "Bow Shot on the left mouse button until you cut Lightning Arrow. Lightning Arrow is a Tier 1 gem: usable from level 1. Freezing Salvo is a Tier 3 gem. It covers bosses once you can cut it. Buy Rawhide Boots from Renly in Clearfell Encampment with 10% increased Movement Speed." },
       { levels: "15–30", text: "Lightning Rod in the pack, then Lightning Arrow. Take Gathering Winds at the first trial and use it for a whole zone." },
       { levels: "31–50", text: "Add Tornado Shot and Barrage. Socket Rapid Attacks II first, then one more support from the row at a time." },
       { levels: "Maps", text: "The full panel above. Chaos Inoculation only after the energy shield is high and the resistances are already at 75%." },
     ],
     gear: bowGear(
       "Added lightning is a bonus. Keep the physical damage rolls.",
-      "A Greater Iron Rune in a weapon socket adds 18% increased Physical Damage.",
+      "From level 30 the body can take a Greater Iron Rune. It requires level 30 and adds 18% increased Armour, Evasion and Energy Shield. It is not a level 1 socket.",
     ),
     sources: [guide("lightning-arrow-deadeye", "Maxroll Lightning Arrow Deadeye"), ...commonSources],
   });
@@ -229,12 +231,12 @@ function iceShot(spec: BuildSpec): Loadout {
     leveling: [
       { levels: "1–13", text: "Bow Shot costs no mana and is the early clear. Frost Bomb for exposure. Escape Shot to freeze and make distance. Lightning Arrow finishes a pack. Stormcaller Arrow is the single-target shot until Snipe." },
       { levels: "14–30", text: "Add Freezing Salvo. Escape Shot plus Freezing Salvo on bosses. When the boss freezes, Snipe. Ice-Tipped Arrows on cooldown." },
-      { levels: "31+", text: "Ice Shot joins the bar and takes the clear. Keep Snipe for frozen bosses. Quality on Ice Shot as soon as you can cut it." },
+      { levels: "31+", text: "At level 31, Ice Shot joins the bar and takes the clear. Bow Shot, Escape Shot, and Freezing Salvo are the buttons before that. Keep Snipe for frozen bosses." },
       { levels: "Maps", text: "Two bows and two quivers. Clear set: extra arrows and a Cadiro's Gambit, only after the bow already kills the pack. Boss set: flat damage, critical chance, gem levels. Attack speed and extra arrows do nothing on that second set." },
     ],
     gear: bowGear(
       "Cold damage on the bow is a bonus. Keep the physical damage rolls.",
-      "A Greater Iron Rune in a weapon socket adds 18% increased Physical Damage. Clear bow: extra arrows after the physical rolls. Boss bow: flat damage, critical chance, and +4 to Level of all Projectile Skills.",
+      "From level 30 the body can take a Greater Iron Rune. It requires level 30 and adds 18% increased Armour, Evasion and Energy Shield. Clear bow: extra arrows after the physical rolls. Boss bow: flat damage, critical chance, and +4 to Level of all Projectile Skills.",
       [["Jewel", "Skip jewels until maps.", "Life or a resistance if one drops.", "One sapphire jewel with mana on kill. Rarity on gear to at least 100%."]],
     ),
     sources: [
@@ -246,7 +248,7 @@ function iceShot(spec: BuildSpec): Loadout {
   });
 }
 
-function lightningSpear(): Loadout {
+function lightningSpear(spec: BuildSpec): Loadout {
   return loadout({
     overview:
       "Lightning Spear clears. Storm Lance is the stake you throw or shoot into. Explosive Spear is the Act 1 button. Sniper's Mark goes on the rare. Mirage Archer reserves 60 spirit.",
@@ -258,10 +260,13 @@ function lightningSpear(): Loadout {
       "Iron Rings in Act 1.",
       "10% increased Movement Speed on the level 1 boots from Renly in Clearfell Encampment.",
     ],
-    ascendancy: [
-      "Take the first Amazon node that adds a projectile or a frenzy tool, and use Lightning Spear for a whole zone before the next node.",
-      "Lineage supports on the spear, when you own them: Garukhan's Resolve, Rakiata's Flow, Rigwald's Ferocity.",
-    ],
+    ascendancy:
+      spec.ascendancyId === "amazon"
+        ? [
+            "Take the first Amazon node that adds a projectile or a frenzy tool, and use Lightning Spear for a whole zone before the next node.",
+            "Lineage supports on the spear, when you own them: Garukhan's Resolve, Rakiata's Flow, Rigwald's Ferocity.",
+          ]
+        : [spec.ascendancyPick],
     groups: [
       group(
         "Spear",
@@ -290,7 +295,7 @@ function lightningSpear(): Loadout {
     ],
     leveling: [
       { levels: "1–4", text: "Explosive Spear into the pack. Contagion if it spreads. Frost Bomb on the boss." },
-      { levels: "5–14", text: "Lightning Spear becomes the clear. Parry or Disengage for frenzy. Iron Rings. Movement-speed boots." },
+      { levels: "5–14", text: "At level 5, Lightning Spear takes the clear. It is a Tier 3 gem, usable from level 3, and this route waits for the level 5 Ironhead Spear. Parry or Disengage feed frenzy. Iron Rings. Movement-speed boots." },
       { levels: "15–50", text: "Sniper's Mark and Storm Lance. Seaglass Spear requires level 51." },
       { levels: "Maps", text: "Add the support row one gem at a time. Mirage Archer reserves 60 spirit." },
     ],
@@ -356,8 +361,8 @@ function twister(spec: BuildSpec): Loadout {
       "Sniper's Mark on the rare, then the same two buttons.",
     ],
     leveling: [
-      { levels: "1–14", text: "Whirling Slash and the first spear throw. Movement-speed boots." },
-      { levels: "15–40", text: "Twister as soon as it drops. Barrage when you have the spirit or the socket." },
+      { levels: "1–14", text: "Twister is a Tier 1 gem: usable from level 1. Whirling Slash moves you. Spear Stab is the single-target poke until Twister is cut. This is a spear, not a bow. Movement-speed boots." },
+      { levels: "15–40", text: "Barrage is a Tier 5 gem. Add it when you have the spirit or the socket. Twister stays the clear." },
       { levels: "Maps", text: "Black Insignia if it is cheap. Hyrri's Ire only when a rare body has less evasion and life." },
     ],
     gear: spearGear(),
@@ -370,15 +375,18 @@ function twister(spec: BuildSpec): Loadout {
   });
 }
 
-function shieldWall(): Loadout {
+function shieldWall(spec: BuildSpec): Loadout {
   return loadout({
     overview:
       "Shield Wall is the clear and the cover. Shockwave Totem slams beside you. Herald of Ash picks up overkill. Lineage gems Ahn's Citadel and Kaom's Madness turn the walls into branching fissures later. They are not required to start.",
     numbers: [cap, chaos, "Life and armour on the shield and the chest. The mace is physical damage.", "10% increased Movement Speed on the level 1 boots from Renly in Clearfell Encampment."],
-    ascendancy: [
-      "Take the armour-break or block node after Shield Wall is already the button you press.",
-      "Warbringer only: Warcaller's Bellow is an ascendancy notable, not a gem. It makes warcries explode corpses.",
-    ],
+    ascendancy:
+      spec.ascendancyId === "warbringer"
+        ? [
+            "Take the armour-break or block node after Shield Wall is already the button you press.",
+            "Warbringer only: Warcaller's Bellow is an ascendancy notable, not a gem. It makes warcries explode corpses.",
+          ]
+        : [spec.ascendancyPick],
     groups: [
       group("Wall", "The Shield Wall page links these supports to Shield Wall.", [
         gem("Shield Wall", ["Rapid Attacks II", "Fire Attunement", "Brutality II"]),
@@ -400,7 +408,7 @@ function shieldWall(): Loadout {
       "Step back. Replace the totem when it dies. Do not hold the wall in a slam.",
     ],
     leveling: [
-      { levels: "1–14", text: "Socket the slam or Shield Wall, the gem you were given. Buy Rough Greaves from Renly in Clearfell Encampment with 10% increased Movement Speed." },
+      { levels: "1–14", text: "Rolling Slam until level 7. Shield Wall is a Tier 7 gem. Use a one-hand mace plus a shield. Buy Rough Greaves from Renly in Clearfell Encampment with 10% increased Movement Speed." },
       { levels: "15+", text: "Shield Wall plus the totem. Add the supports in the order listed." },
       { levels: "Maps", text: "Ahn's Citadel and Kaom's Madness if you own them. A rare mace still beats a unique that hits for less." },
     ],
@@ -411,12 +419,15 @@ function shieldWall(): Loadout {
 
 const grenadeSupports = ["Multishot I", "Elemental Armament I", "Magnified Area I", "Rapid Attacks I", "Fire Attunement", "Deliberation", "Short Fuse II"];
 
-function grenades(): Loadout {
+function grenades(spec: BuildSpec): Loadout {
   return loadout({
     overview:
       "Throw a grenade and leave. Oil Grenade, Explosive Grenade, Cluster, Gas, and Flash are all on the bar. If Explosive Grenade is on cooldown, throw a different grenade. Grenades work from level 1.",
     numbers: [cap, chaos, "Fire resistance on the jewellery, because you are standing near the blast.", "10% increased Movement Speed on the level 1 boots from Renly in Clearfell Encampment. You reload while you walk."],
-    ascendancy: ["Sorcery Ward first, so a bad grenade does not end the zone."],
+    ascendancy:
+      spec.ascendancyId === "witchhunter"
+        ? ["Sorcery Ward first, so a bad grenade does not end the zone."]
+        : [spec.ascendancyPick],
     groups: [
       group(
         "Grenades",
@@ -524,9 +535,9 @@ function supportingFire(): Loadout {
       "Boss: Elemental Weakness and Frost Bomb, Supporting Fire up, then the sniper command.",
     ],
     leveling: [
-      { levels: "1–15", text: "Permafrost Bolts and a level 16 Varnished Crossbow. Movement-speed boots. Life and resistances." },
-      { levels: "16–35", text: "Supporting Fire can be used as a bonus in Act 2, while you are still on the crossbow. Keep saving gold." },
-      { levels: "36", text: "Respec into Supporting Fire. About 21,700 gold. One of each minion." },
+      { levels: "1–15", text: "Permafrost Bolts on a Makeshift Crossbow. At level 4 the crossbow base is a Tense Crossbow. Movement-speed boots. Life and resistances. A Varnished Crossbow requires level 16, so it is not the level 1 weapon." },
+      { levels: "16–35", text: "Stay on Permafrost Bolts and Fragmentation Rounds. At level 16, buy a Varnished Crossbow. Supporting Fire is a Tier 1 gem, and this route still waits for the level 36 respec. Keep saving gold." },
+      { levels: "36", text: "Respec into Supporting Fire at level 36. About 21,700 gold. One of each minion." },
       { levels: "Maps", text: "Skeletal Arsonist stays low level, from a level 5 or level 7 uncut, once Brutus' Brain is in. Her Declaration lets you swap the Brute for a Reaver." },
     ],
     gear: crossbowGear("After level 36 the crossbow matters less than the minion levels and your resistances. Before that, added damage and reload."),
@@ -562,7 +573,7 @@ function entangle(): Loadout {
       "Refresh Entangle when the root ends. Do not stand in the pack to cast it.",
     ],
     leveling: [
-      { levels: "1–20", text: "Entangle as soon as it exists, plus whatever cold or chaos spell you already have. Life and armour." },
+      { levels: "1–20", text: "Entangle is a Tier 1 gem: usable from level 1. Spark covers the pack until Entangle is cut. Life and armour." },
       { levels: "21+", text: "Add the support row from the top: Accelerated Growth, then Branching Fissures, then the rest." },
       { levels: "Maps", text: "Archmage when your mana pool can pay for it. Lineage gems when you own them." },
     ],
@@ -600,7 +611,7 @@ function grimPillars(): Loadout {
     ],
     leveling: [
       { levels: "1–14", text: "Volcano, Frost Bomb, Contagion, and Essence Drain. Do not link Spell Cascade to Volcano." },
-      { levels: "15–30", text: "Entangle, then Spell Totem and Grim Pillars as soon as both gems exist." },
+      { levels: "15–30", text: "Entangle stays on the bar. Add Spell Totem and Grim Pillars when both gems can be cut." },
       { levels: "Maps", text: "The support row, one gem at a time, in the order listed." },
     ],
     gear: esGear("staff", "+levels to spells, then spell damage. The totem uses your gem, so gem level is the weapon stat."),
@@ -637,11 +648,24 @@ function minions(spec: BuildSpec, page: GuideLink): Loadout {
       "Refresh a dead minion before you start a new pack.",
     ],
     leveling: [
-      { levels: "1–14", text: "Volcano and the first minion you are offered. Buy a Rattling Sceptre from Una in Clearfell Encampment and keep +1 to Level of all Minion Skills." },
-      { levels: "15+", text: "Skeletal Sniper and the command. One support at a time, Meat Shield first." },
+      {
+        levels: "1–14",
+        text:
+          spec.id === "disciple-minions"
+            ? "Volcano is the Tier 1 spell on the Disciple page. Skeletal Warrior is the Tier 1 minion gem. Wait on Skeletal Sniper. It is a persistent minion, and poe2db does not list an Uncut Skill Gem Tier for it. Socket it when the character sheet spirit can pay the reservation printed on the gem. +1 to Level of all Minion Skills needs item level 2."
+            : spec.id === "spirit-walker-minions"
+              ? "Spear Stab is the level 1 spear attack. Skeletal Warrior is the Tier 1 minion gem. The companion is an ascendancy node, not this minion. Wait on Skeletal Sniper until the character sheet spirit can pay the reservation printed on the gem. poe2db does not list an Uncut Skill Gem Tier for it."
+              : spec.id === "acolyte-minions"
+                ? "Skeletal Warrior is the Tier 1 minion gem on the sceptre. Unearth is the Tier 1 corpse spell. Wait on Skeletal Sniper until the character sheet spirit can pay the reservation printed on the gem. poe2db does not list an Uncut Skill Gem Tier for it."
+                : "Unearth is the Tier 1 spell. Skeletal Warrior is the Tier 1 minion gem. Wait on Skeletal Sniper until the character sheet spirit can pay the reservation printed on the gem. poe2db does not list an Uncut Skill Gem Tier for it. Do not buy a Rattling Sceptre and expect +1 minion skills at item level 1. That roll needs item level 2.",
+      },
+      { levels: "30+", text: "At level 30, Skeletal Sniper takes the command if the character sheet spirit can pay the reservation printed on the gem. One support at a time, Meat Shield first. Level 30 is not a gem tier." },
       { levels: "Maps", text: "The full rows. A higher minion level beats a new unique." },
     ],
-    gear: esGear("wand or sceptre", "+levels to minion skills. Spell damage is second."),
+    gear:
+      spec.weaponNoun === "spear"
+        ? spearGear()
+        : esGear(spec.weaponNoun, "+levels to minion skills. Spell damage is second."),
     sources: [guide("disciple-of-varashta-minion-build-guide", "Maxroll Disciple of Varashta minions"), page, ...commonSources],
   });
 }
@@ -744,7 +768,7 @@ function essenceDrain(spec: BuildSpec): Loadout {
       "On a boss, Temporal Chains, then keep the drain on the boss.",
     ],
     leveling: [
-      { levels: "1–12", text: "Contagion and Essence Drain from the first town. Energy shield on the chest." },
+      { levels: "1–12", text: "Contagion until level 3. Essence Drain is a Tier 3 gem and takes the clear at level 3. Energy shield on the chest." },
       { levels: "13+", text: "Chain I on Essence Drain first, then Zenith II, then Execute III." },
       { levels: "Maps", text: "Temporal Chains and the sniper. Do not add a third damage spell." },
     ],
@@ -786,8 +810,9 @@ function whirling(): Loadout {
       "Herald of Ash stays on.",
     ],
     leveling: [
-      { levels: "1–20", text: "Hollow Palm, then Whirling Assault. Life on the chest." },
-      { levels: "21+", text: "Herald of Ash, the bell, Storm Wave. Swap the palm for a staff when the staff's damage is higher." },
+      { levels: "1–10", text: "Quarterstaff Strike. Both hand slots stay empty for Hollow Palm Technique. Do not equip a quarterstaff. Whirling Assault is a Tier 11 gem." },
+      { levels: "11–20", text: "At level 11, Whirling Assault takes the clear. Hands stay empty until level 21." },
+      { levels: "21+", text: "Herald of Ash, the bell, Storm Wave. At level 21 a quarterstaff can replace empty hands when its damage is higher. Hollow Palm Technique turns off if either hand is filled." },
       { levels: "Maps", text: "The lineage gems. Ghost Dance if you have the spirit." },
     ],
     gear: armourGear("quarterstaff", "Attack speed and physical or elemental damage. Hollow Palm only while it still kills faster than a staff."),
@@ -874,7 +899,7 @@ function oilBarrage(): Loadout {
     leveling: [
       { levels: "1–9", text: "Glacial Cascade and Frozen Locus. Amor Mandragora. The large spike has to be what hits the locus." },
       { levels: "10–30", text: "Herald of Ice. Freezing Mark on bosses." },
-      { levels: "31+", text: "Oil Barrage, Hollow Focus, Devour. Cooldown recovery on the focus." },
+      { levels: "31+", text: "At level 31, Oil Barrage takes the clear. It is a Tier 9 gem. Hollow Focus and Devour. Cooldown recovery on the focus." },
       { levels: "Maps", text: "Optional Blasphemy setup. It costs a gem socket and wants +(47-50) to Spirit on the body. Repulsion is not a legal support on Blasphemy." },
     ],
     gear: armourGear("quarterstaff", "Critical chance or power charge on hit once Oil Barrage is the skill. Cooldown recovery on a suffix."),
@@ -885,7 +910,7 @@ function oilBarrage(): Loadout {
 function spiralVolley(spec: BuildSpec): Loadout {
   return loadout({
     overview:
-      "Level with Lightning Arrow and Lightning Rod. At level 54, with Resonance allocated, swap the clear to Spiral Volley. The page says the build does not work without Resonance and without the supports in Spiral Volley. Snipe linked to Perfected Endurance is the button when you have no frenzy charges. The bow needs physical damage, because only physical damage breaks armour.",
+      "Level with Bow Shot, then Lightning Arrow and Lightning Rod. At level 54, after Resonance is allocated, swap the clear to Spiral Volley. Spiral Volley spends a frenzy charge. Without Resonance the charge is not refunded, so the clear is worse. The skill still fires. Snipe linked to Perfected Endurance is the button when you have no frenzy charges. The bow needs physical damage, because only physical damage breaks armour.",
     numbers: [
       cap,
       chaos,
@@ -924,8 +949,8 @@ function spiralVolley(spec: BuildSpec): Loadout {
       "Once the bow is strong, Spiral Volley itself stuns white monsters and you need Snipe less.",
     ],
     leveling: [
-      { levels: "1–53", text: "Play Lightning Arrow. Do not force Spiral Volley early." },
-      { levels: "54", text: "Allocate Resonance. Socket the supports. Swap the clear to Spiral Volley." },
+      { levels: "1–53", text: "Bow Shot, then Lightning Arrow and Lightning Rod. Do not force Spiral Volley early. Spiral Volley is a Tier 13 gem." },
+      { levels: "54", text: "At level 54, allocate Resonance, socket the supports, and swap the clear to Spiral Volley. The skill still fires without Resonance. The frenzy charge is not refunded, so the clear is worse." },
       { levels: "Maps", text: "Tame Beast with Haste. Ghost Dance after the energy-shield gear exists." },
     ],
     gear: bowGear(
@@ -975,8 +1000,8 @@ function poisonburst(): Loadout {
       "Temporal Chains on a boss, then the same two arrows. Vine Arrow if the boss walks out.",
     ],
     leveling: [
-      { levels: "1–14", text: "Lightning Arrow and Lightning Rod until Poisonburst is the stronger clear." },
-      { levels: "15+", text: "Poisonburst, Gas Arrow, Herald of Plague. Movement-speed boots." },
+      { levels: "1–14", text: "Lightning Arrow and Lightning Rod. Poisonburst Arrow is a Tier 1 gem, and this page still levels with the lightning bow first." },
+      { levels: "15+", text: "At level 15, Poisonburst Arrow takes the clear. Gas Arrow is a Tier 7 gem. Herald of Plague. Movement-speed boots." },
       { levels: "Maps", text: "Vine Arrow and Bursting Plague. The tree wants attack damage, poison duration, and bow attack speed." },
     ],
     gear: bowGear(
@@ -989,7 +1014,7 @@ function poisonburst(): Loadout {
 
 function boneshatter(): Loadout {
   return loadout({
-    overview: "Leap Slam primes a stun. Boneshatter spends it. The hammer follow-up is the third hit. The Boneshatter page describes that order and does not print a support row, so the supports stay empty rather than guessed.",
+    overview: "Boneshatter is a Tier 1 gem: usable from level 1. Leap Slam primes a stun. Boneshatter spends it. The hammer follow-up is the third hit. Use a one-hand mace plus a shield, or a two-hand mace with the shield slot empty. Do not equip both. The Boneshatter page describes that order and does not print a support row, so the supports stay empty rather than guessed.",
     numbers: [cap, chaos, "Armour and life. Stun is the defence and the damage setup.", "Movement speed on boots so Leap Slam is not your only movement."],
     ascendancy: ["A Titan stun or armour node after Boneshatter is already stunning a rare."],
     groups: [
@@ -1001,8 +1026,8 @@ function boneshatter(): Loadout {
     ],
     rotation: ["Leap Slam onto the pack.", "Boneshatter the stunned enemy.", "The hammer follow-up.", "Step out. Do not Boneshatter a target that is not stunned."],
     leveling: [
-      { levels: "1–14", text: "Rolling Slam or Leap Slam. Armour on the chest." },
-      { levels: "15+", text: "Boneshatter on stunned rares. Rapid Attacks II in it when the gem says it supports the attack." },
+      { levels: "1–14", text: "Boneshatter is a Tier 1 gem: usable from level 1. Rolling Slam or Leap Slam primes the stun, then Boneshatter spends it. One-hand Wooden Club plus a shield, or a two-hand Felled Greatclub with the shield slot empty. Leave the unused hand empty. Armour on the chest." },
+      { levels: "15+", text: "Add Rapid Attacks II in Boneshatter when the gem says it supports the attack." },
       { levels: "Maps", text: "A higher physical mace. Life on every armour piece." },
     ],
     gear: armourGear("mace", "Physical damage and stun. Attack speed second."),
@@ -1010,11 +1035,14 @@ function boneshatter(): Loadout {
   });
 }
 
-function rake(): Loadout {
+function rake(spec: BuildSpec): Loadout {
   return loadout({
-    overview: "Rake from Act 1. Dash in, apply the bleed, dash out. Herald of Blood explodes the kill. Blood Hunt is the follow-up on an enemy that is already bleeding. The bleed page does not print a full support row.",
+    overview: "Rake is a Tier 3 gem: usable from level 3. poe2db tags it Attack, AoE, Melee, Strike, Physical, and it requires a spear. Spear Stab is the button before that. Dash in, apply the bleed, dash out. Herald of Blood explodes the kill. Blood Hunt is the follow-up on an enemy that is already bleeding. From item level 18 the weapon roll is +1 to Level of all Melee Skills. The bleed page does not print a full support row.",
     numbers: [cap, chaos, "Physical damage on the spear. Bleed needs a hit that is physical.", "Movement speed on boots. The build is the dash."],
-    ascendancy: ["An Amazon node that helps the spear or the bleed, after Rake is already the clear."],
+    ascendancy:
+      spec.ascendancyId === "amazon"
+        ? ["An Amazon node that helps the spear or the bleed, after Rake is already the clear."]
+        : [spec.ascendancyPick],
     groups: [
       group("Bleed", "Rake, then Blood Hunt, with Herald of Blood.", [
         gem("Rake", ["Rapid Attacks II"]),
@@ -1024,7 +1052,8 @@ function rake(): Loadout {
     ],
     rotation: ["Dash in with Rake.", "Blood Hunt on the bleeding rare.", "Dash out. Herald of Blood does the explosion.", "Do not stand in the pack after the bleed is on."],
     leveling: [
-      { levels: "1–14", text: "Rake as soon as it drops. A spear with physical damage." },
+      { levels: "1–2", text: "Spear Stab on the left mouse button. Rake is a Tier 3 gem." },
+      { levels: "3–14", text: "At level 3, Rake takes the clear. It is an Attack, AoE, Melee, Strike skill and needs a spear. Keep physical damage. From item level 18, keep +1 to Level of all Melee Skills." },
       { levels: "15+", text: "Herald of Blood and Blood Hunt." },
       { levels: "Maps", text: "A faster spear if the dash feels slow. Life and evasion on the chest." },
     ],
@@ -1066,13 +1095,15 @@ function walkingCalamity(): Loadout {
   });
 }
 
-function glacialLance(): Loadout {
+function glacialLance(spec: BuildSpec): Loadout {
   return loadout({
     overview:
       "Glacial Lance is the cold spear or bow clear on the Deadeye and Amazon pages. Freeze the pack, then the lance. Snipe or a second throw on a frozen boss. Cold-attack supports here are Ice Bite and Elemental Armament, which the Permafrost and Hollow Form pages name on cold hits. The Glacial Lance page is the route.",
     numbers: [cap, chaos, "10% increased Movement Speed on the level 1 boots from Renly in Clearfell Encampment.", "Cold or physical damage on the weapon."],
     ascendancy:
-      ["Point Blank or the extra projectile, then Gathering Winds. One node for a zone before the next."],
+      spec.ascendancyId === "deadeye"
+        ? ["Point Blank or the extra projectile, then Gathering Winds. One node for a zone before the next."]
+        : [spec.ascendancyPick],
     groups: [
       group("Lance", "Glacial Lance with the cold-attack supports those other cold pages print.", [
         gem("Glacial Lance", ["Ice Bite I", "Elemental Armament I", "Rapid Attacks II"]),
@@ -1084,12 +1115,55 @@ function glacialLance(): Loadout {
     ],
     rotation: ["Glacial Lance through the pack.", "Freezing Mark on a boss.", "Snipe or a second lance once it is frozen.", "Escape Shot if the boss closes."],
     leveling: [
-      { levels: "1–14", text: "The first cold projectile you have, plus Escape Shot. Movement-speed boots." },
-      { levels: "15+", text: "Glacial Lance. Herald of Ice. Ice Bite in the lance." },
+      { levels: "1–14", text: "Escape Shot until level 7. Glacial Lance is a Tier 7 gem. Movement-speed boots." },
+      { levels: "15+", text: "At level 15, Glacial Lance takes the clear. Herald of Ice. Ice Bite in the lance." },
       { levels: "Maps", text: "The same 75% resistance rule as the other cold bows." },
     ],
-    gear: spearGear(),
+    gear: spec.weaponNoun === "bow" ? bowGear("Cold or physical damage on the bow.", "Cold damage, then attack speed.") : spearGear(),
     sources: [guide("glacial-lance-deadeye", "Maxroll Glacial Lance Deadeye"), ...commonSources],
+  });
+}
+
+function flicker(): Loadout {
+  return loadout({
+    overview:
+      "Flicker Strike is a Tier 13 gem. Levels 1–12 use Falling Thunder. Into the Breach is the Acolyte ascendancy skill that opens a breach. It is not a door in the zone.",
+    numbers: [cap, chaos, "Life on the body before you flicker.", "10% increased Movement Speed on the level 1 boots from Renly in Clearfell Encampment."],
+    ascendancy: ["Take Into the Breach on the Acolyte panel. Skip a darkness node if you cannot see the slam."],
+    groups: [
+      group("Early", "Falling Thunder is the Tier 1 hit.", [gem("Falling Thunder", ["Rapid Attacks II"])]),
+      group("Later", "Flicker Strike from a Tier 13 uncut. Into the Breach opens the breach.", [gem("Flicker Strike"), gem("Into the Breach")]),
+    ],
+    rotation: [
+      "Levels 1–12: Falling Thunder.",
+      "Into the Breach opens a breach. It is an ascendancy skill, not a zone door.",
+      "Flicker Strike only after the Tier 13 gem is cut.",
+    ],
+    leveling: [
+      { levels: "1–12", text: "Falling Thunder on the left mouse button until level 13. Flicker Strike is a Tier 13 gem. Into the Breach opens a breach. It is not a door in the zone." },
+      { levels: "13+", text: "At level 13, Flicker Strike takes the clear. Into the Breach stays the breach skill." },
+    ],
+    gear: armourGear("quarterstaff", "Attack damage. Life on the armour matters more than the weapon early.", "evasion"),
+    sources: commonSources,
+  });
+}
+
+function comet(spec: BuildSpec): Loadout {
+  return loadout({
+    overview:
+      "Spark for levels 1–4. Frostbolt is a Tier 5 gem and is the clear from level 5. Comet is a Tier 11 gem and is the boss button once that uncut can be cut. Time Freeze is for a boss wind-up.",
+    numbers: [cap, chaos, "Energy shield on the body.", "Cold or cast speed on the wand."],
+    ascendancy: [spec.ascendancyPick],
+    groups: [
+      group("Cold", "Frostbolt clears. Comet is the boss hit.", [gem("Frostbolt", ["Rapid Casting I"]), gem("Comet"), gem("Spark"), gem("Frost Bomb")]),
+    ],
+    rotation: [spec.pack, spec.boss],
+    leveling: [
+      { levels: "1–4", text: "Spark on the left mouse button. Frostbolt is a Tier 5 gem." },
+      { levels: "5+", text: "At level 5, Frostbolt takes the clear. Comet is a Tier 11 gem. Put Comet on the boss button when a Tier 11 uncut can be cut." },
+    ],
+    gear: esGear("wand", "Cold damage and cast speed."),
+    sources: commonSources,
   });
 }
 
@@ -1097,13 +1171,13 @@ function generic(spec: BuildSpec): Loadout {
   const support = spec.support.startsWith("a support") || spec.support.startsWith("one ") ? [] : [spec.support];
   const defence = spec.defence.includes("energy")
     ? esGear(spec.weaponNoun, spec.weaponStat)
-    : spec.weaponNoun.includes("bow")
-      ? bowGear(spec.weaponStat, spec.weaponStat)
-      : spec.weaponNoun.includes("crossbow")
-        ? crossbowGear(spec.weaponStat)
+    : spec.weaponNoun.includes("crossbow")
+      ? crossbowGear(spec.weaponStat)
+      : spec.weaponNoun.includes("bow")
+        ? bowGear(spec.weaponStat, spec.weaponStat)
         : spec.weaponNoun.includes("spear")
           ? spearGear()
-          : armourGear(spec.weaponNoun, spec.weaponStat);
+          : armourGear(spec.weaponNoun, spec.weaponStat, spec.defence.toLowerCase().includes("evasion") ? "evasion" : spec.defence);
   return loadout({
     overview: `${spec.summary} The October 5, 2026 league-starter list does not print a separate support row for this exact pairing, so the skill tab shows the gems this route actually names and nothing invented beside them.`,
     numbers: [cap, chaos, "10% increased Movement Speed on the level 1 boots from Renly in Clearfell Encampment.", "Life on the body before a damage unique."],
@@ -1116,7 +1190,7 @@ function generic(spec: BuildSpec): Loadout {
     ],
     rotation: [spec.pack, spec.boss],
     leveling: [
-      { levels: "1–14", text: `Put ${spec.skill} on the bar as soon as it drops. ${spec.helper} waits for a second skill gem. Buy boots from Renly in Clearfell Encampment with 10% increased Movement Speed. The level 1 base is Rawhide Boots, Rough Greaves, or Straw Sandals, matching the defence on the gear card.` },
+      { levels: "1–14", text: `Use ${starterFor(spec.weaponNoun)} on the left mouse button until level ${Math.max(requiredLevel(spec.skill), 1)}. ${spec.skill} is not the Riverbank button unless that level is 1. ${spec.helper} waits for a second skill gem. Buy boots from Renly in Clearfell Encampment with 10% increased Movement Speed. The level 1 base is Rawhide Boots, Rough Greaves, or Straw Sandals, matching the defence on the gear card.` },
       { levels: "15–40", text: spec.ascendancyPick },
       { levels: "41+", text: spec.focus },
     ],
@@ -1158,6 +1232,8 @@ const byId: Record<string, (spec: BuildSpec) => Loadout> = {
   "pathfinder-poisonburst": poisonburst,
   "acolyte-poisonburst": poisonburst,
   "titan-boneshatter": boneshatter,
+  "acolyte-flicker": flicker,
+  "chronomancer-comet": comet,
   "amazon-rake": rake,
   "ritualist-rake": rake,
   "ritualist-blood-hunt": rake,
@@ -1213,9 +1289,9 @@ const byId: Record<string, (spec: BuildSpec) => Loadout> = {
       ],
     };
   },
-  "warbringer-shockwave": () =>
+  "warbringer-shockwave": (spec) =>
     loadout({
-      ...shieldWall(),
+      ...shieldWall(spec),
       overview:
         "Shockwave Totem is the slam, with Urgent Totems and Rapid Attacks, which is the totem row on the Shield Wall page. Shield Wall is the cover. This is the totem-first Warbringer, using that printed link.",
       ascendancy: ["Ancestral or armour-break node, after the totem is already down in every pack."],
@@ -1229,11 +1305,18 @@ const byId: Record<string, (spec: BuildSpec) => Loadout> = {
       sources: commonSources,
       ascendancy: [spec.ascendancyPick],
     }),
-  "invoker-tempest-bell": () =>
+  "invoker-tempest-bell": (spec) =>
     loadout({
       ...hollowForm(),
       overview:
-        "The October 5, 2026 list's Invoker starter is Ice Strike, which is already a route on this ascendancy. This fifth route is the bell: drop Tempest Bell, Ice Strike the bell, the wave covers the pack. The support names are the cold-attack supports the Hollow Form page prints on Ice Strike.",
+        "Drop Tempest Bell, then Ice Strike the bell. The wave covers the pack. This is an Invoker route. Take the first node on the Invoker panel after both skills are on the bar.",
+      ascendancy: [spec.ascendancyPick],
+      leveling: [
+        { levels: "1–20", text: "Ice Strike on the left mouse button and Tempest Bell. Life and a resistance on every piece. Buy a Wrapped Quarterstaff from Renly in Clearfell Encampment." },
+        { levels: "21+", text: "Keep Ice Strike on the bell. Cooldown recovery comes from gear." },
+        { levels: "Maps", text: "Resistances at 75%. A rare quarterstaff with cold damage." },
+      ],
+      gear: armourGear("quarterstaff", "Cold damage and attack speed.", "evasion"),
       groups: [
         group("Bell", "Ice Strike uses Ice Bite and Elemental Armament.", [
           gem("Tempest Bell"),
@@ -1270,8 +1353,9 @@ const byId: Record<string, (spec: BuildSpec) => Loadout> = {
       ],
       rotation: [spec.pack, "Time Freeze on a boss wind-up, then Comet.", "Temporal Rift if you already took the hit."],
       leveling: [
-        { levels: "1–20", text: "Frostbolt and Frost Bomb. Movement-speed boots." },
-        { levels: "21+", text: "Comet on bosses. Arctic Armour. Time Freeze only on the wind-up." },
+        { levels: "1–4", text: "Spark on the left mouse button. Frostbolt is a Tier 5 gem." },
+        { levels: "5–20", text: "At level 5, Frostbolt takes the clear. Frost Bomb for exposure. Comet is a Tier 11 gem and is not this clear." },
+        { levels: "21+", text: "Comet on bosses once a Tier 11 uncut can be cut. Arctic Armour. Time Freeze only on the wind-up." },
         { levels: "Maps", text: "The 75% caps. Do not comet every doorway." },
       ],
       gear: esGear("wand", "Cold damage and cast speed."),

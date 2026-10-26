@@ -4,6 +4,8 @@
 // https://poe2db.tw/us/Bows and the matching pages for each weapon and armour class.
 // Rare-mod numbers are the single tiers already checked in statLines.ts.
 
+import { energyAt, lifeAt, type AffixSlot } from "@/content/statLines";
+
 type Base = { name: string; level: number; detail: string };
 
 const BOW: Base[] = [
@@ -424,10 +426,17 @@ export function shops(level: number): { armour: Shop; caster: Shop; next: string
 
 export function defenceKey(defence: string): "str" | "dex" | "int" {
   const text = defence.toLowerCase();
+  if (text.includes("intelligence")) return "int";
   if (text.includes("energy") && !text.includes("armour") && !text.includes("evasion")) return "int";
   if (text.includes("evasion") && text.includes("energy")) return "int";
   if (text.includes("evasion")) return "dex";
   return "str";
+}
+
+function wantsEnergyShield(defence: string) {
+  const text = defence.toLowerCase();
+  if (text.includes("life")) return false;
+  return text.includes("energy") || defenceKey(defence) === "int";
 }
 
 export function casterWeapon(noun: string) {
@@ -500,111 +509,182 @@ function fallback(shop: Shop, base: string, level: number) {
   return `If ${shop.who} has no ${base} with one of those rolls, buy a normal ${base} and use an Orb of Transmutation, then an Orb of Augmentation. ${row.next}`;
 }
 
-function weaponRolls(noun: string, level: number): { accept: string[]; ideal: string[] } {
-  const key = weaponKind(noun);
-  const early = level < 66;
-  if (key === "bow" || key === "spear") {
-    const speed = key === "spear" ? "(26-28)% increased Attack Speed" : "(17-19)% increased Attack Speed";
-    const low = ["(4-6) to (7-11) added Physical Damage", "(5-7)% increased Attack Speed", "+1 to Level of all Projectile Skills"];
-    const high = ["(26-39) to (44-66) added Physical Damage", "(155-169)% increased Physical Damage", speed, "+4 to Level of all Projectile Skills"];
-    return early ? { accept: low, ideal: ["(40-49)% increased Physical Damage", ...high] } : { accept: high, ideal: high };
-  }
-  if (key === "crossbow") {
-    const high = ["(37-55) to (63-94) added Physical Damage", "(17-19)% increased Attack Speed", "+5 to Level of all Projectile Skills"];
-    return early
-      ? { accept: ["(5-8) to (10-15) added Physical Damage", "(5-7)% increased Attack Speed", "+2 to Level of all Projectile Skills"], ideal: high }
-      : { accept: high, ideal: high };
-  }
-  if (key === "quarterstaff") {
-    const high = ["(37-55) to (63-94) added Physical Damage", "(26-28)% increased Attack Speed", "+5 to Level of all Melee Skills"];
-    return early
-      ? { accept: ["(5-8) to (10-15) added Physical Damage", "(5-7)% increased Attack Speed", "+2 to Level of all Melee Skills"], ideal: high }
-      : { accept: high, ideal: high };
-  }
-  if (key === "wand") {
-    return early
-      ? {
-          accept: ["+1 to Level of all Spell Skills", "(9-12)% increased Cast Speed", "+5-8 Intelligence"],
-          ideal: ["+4 to Level of all Spell Skills", "(33-35)% increased Cast Speed", "+28-30 Intelligence"],
-        }
-      : {
-          accept: ["+4 to Level of all Spell Skills", "(33-35)% increased Cast Speed", "+28-30 Intelligence"],
-          ideal: ["+4 to Level of all Spell Skills", "(33-35)% increased Cast Speed", "+28-30 Intelligence"],
-        };
-  }
-  if (key === "staff") {
-    return early
-      ? {
-          accept: ["+2 to Level of all Spell Skills", "(14-19)% increased Cast Speed", "+5-8 Intelligence"],
-          ideal: ["(5-6) to Level of all Spell Skills", "(50-52)% increased Cast Speed", "+28-30 Intelligence"],
-        }
-      : {
-          accept: ["(5-6) to Level of all Spell Skills", "(50-52)% increased Cast Speed", "+28-30 Intelligence"],
-          ideal: ["(5-6) to Level of all Spell Skills", "(50-52)% increased Cast Speed", "+28-30 Intelligence"],
-        };
-  }
-  if (key === "sceptre") {
-    return early
-      ? {
-          accept: ["+1 to Level of all Minion Skills", "(5-7)% increased Attack Speed for allies in your Presence", "+5-8 Intelligence"],
-          ideal: ["+4 to Level of all Minion Skills", "(14-16)% increased Attack Speed for allies in your Presence", "+28-30 Intelligence"],
-        }
-      : {
-          accept: ["+4 to Level of all Minion Skills", "(14-16)% increased Attack Speed for allies in your Presence", "+28-30 Intelligence"],
-          ideal: ["+4 to Level of all Minion Skills", "(14-16)% increased Attack Speed for allies in your Presence", "+28-30 Intelligence"],
-        };
-  }
-  return early
-    ? {
-        accept: ["(4-6) to (7-11) added Physical Damage", "(40-49)% increased Physical Damage", "+5-8 Strength"],
-        ideal: ["(26-39) to (44-66) added Physical Damage", "(155-169)% increased Physical Damage", "+28-30 Strength"],
-      }
-    : {
-        accept: ["(26-39) to (44-66) added Physical Damage", "(155-169)% increased Physical Damage", "+28-30 Strength"],
-        ideal: ["(26-39) to (44-66) added Physical Damage", "(155-169)% increased Physical Damage", "+28-30 Strength"],
-      };
+const PLURAL_BASE = /(?:Boots|Sandals|Greaves|Bracers|Gloves|Gauntlets|Mitts)$/;
+
+export function withArticle(name: string) {
+  if (PLURAL_BASE.test(name)) return name;
+  return /^[aeiou]/i.test(name) ? `an ${name}` : `a ${name}`;
 }
 
-function bullets(lines: string[]) {
-  return lines.map((line) => `• ${line}`).join("\n");
+const SKIP_ROLLS =
+  "Skip these rolls: increased Rarity of Items found, Critical Hit Chance. Don't spend currency on a unique; wear one only if it drops and beats your current item.";
+
+const RESIST_FIRST =
+  "Resistances first: until Fire, Cold, and Lightning are each 75% (the cap, shown on the character sheet), pick resistance over extra Life.";
+
+type TaggedRoll = { ilvl: number; text: string };
+
+function best(rows: TaggedRoll[], level: number) {
+  let chosen: TaggedRoll | undefined;
+  for (const row of rows) {
+    if (row.ilvl <= level) chosen = row;
+  }
+  return chosen;
+}
+
+function nextRoll(rows: TaggedRoll[], level: number) {
+  return rows.find((row) => row.ilvl > level);
+}
+
+const PHYS_PERCENT: TaggedRoll[] = [
+  { ilvl: 1, text: "(40-49)% increased Physical Damage" },
+  { ilvl: 8, text: "(50-64)% increased Physical Damage" },
+  { ilvl: 16, text: "(65-84)% increased Physical Damage" },
+  { ilvl: 33, text: "(85-109)% increased Physical Damage" },
+  { ilvl: 46, text: "(110-134)% increased Physical Damage" },
+  { ilvl: 60, text: "(135-154)% increased Physical Damage" },
+  { ilvl: 75, text: "(155-169)% increased Physical Damage" },
+  { ilvl: 82, text: "(170-179)% increased Physical Damage" },
+];
+
+const FLAT_ONE_HAND: TaggedRoll[] = [
+  { ilvl: 1, text: "Adds (1-2) to (4-5) Physical Damage" },
+  { ilvl: 8, text: "Adds (4-6) to (7-11) Physical Damage" },
+  { ilvl: 16, text: "Adds (6-9) to (11-16) Physical Damage" },
+];
+
+const FLAT_TWO_HAND: TaggedRoll[] = [
+  { ilvl: 1, text: "Adds (2-3) to (5-7) Physical Damage" },
+  { ilvl: 8, text: "Adds (5-8) to (10-15) Physical Damage" },
+  { ilvl: 16, text: "Adds (8-12) to (15-22) Physical Damage" },
+];
+
+const ATTACK_SPEED: TaggedRoll[] = [
+  { ilvl: 1, text: "(5-7)% increased Attack Speed" },
+  { ilvl: 11, text: "(8-10)% increased Attack Speed" },
+  { ilvl: 22, text: "(11-13)% increased Attack Speed" },
+  { ilvl: 30, text: "(14-16)% increased Attack Speed" },
+];
+
+const PHYS_IDEAL = [
+  "Ideal at item level 75: (155-169)% increased Physical Damage.",
+  "Ideal at item level 82: (170-179)% increased Physical Damage.",
+];
+
+function fromLine(row: TaggedRoll | undefined) {
+  return row ? `From item level ${row.ilvl}: ${row.text}.` : "";
+}
+
+export function weaponRollPlan(noun: string, level: number): { now: string[]; later: string[]; ideal: string[] } {
+  const key = weaponKind(noun);
+  const martial = key === "bow" || key === "spear" || key === "crossbow" || key === "quarterstaff" || key === "mace";
+  if (martial) {
+    const flat = key === "crossbow" || key === "quarterstaff" ? FLAT_TWO_HAND : FLAT_ONE_HAND;
+    const gem: TaggedRoll[] =
+      key === "crossbow"
+        ? [{ ilvl: 18, text: "+2 to Level of all Projectile Skills" }]
+        : key === "quarterstaff"
+          ? [{ ilvl: 18, text: "+2 to Level of all Melee Skills" }]
+          : key === "mace"
+            ? [{ ilvl: 18, text: "+1 to Level of all Melee Skills" }]
+            : [{ ilvl: 18, text: "+1 to Level of all Projectile Skills" }];
+    const now = [best(PHYS_PERCENT, level), best(flat, level), best(ATTACK_SPEED, level)].flatMap((row) => (row ? [row.text] : []));
+    const later = [nextRoll(PHYS_PERCENT, level), nextRoll(flat, level), nextRoll(gem, level)].map(fromLine).filter(Boolean);
+    return { now, later, ideal: PHYS_IDEAL };
+  }
+  if (key === "wand") {
+    const spell: TaggedRoll[] = [
+      { ilvl: 1, text: "(25-34)% increased Spell Damage" },
+      { ilvl: 8, text: "(35-44)% increased Spell Damage" },
+    ];
+    const cast: TaggedRoll[] = [
+      { ilvl: 1, text: "(9-12)% increased Cast Speed" },
+      { ilvl: 15, text: "(13-16)% increased Cast Speed" },
+    ];
+    const gem: TaggedRoll[] = [{ ilvl: 5, text: "+1 to Level of all Spell Skills" }];
+    const now = [best(spell, level), best(cast, level), { ilvl: 1, text: "+5-8 Intelligence" }].flatMap((row) => (row ? [row.text] : []));
+    return {
+      now,
+      later: [nextRoll(spell, level), nextRoll(cast, level), nextRoll(gem, level)].map(fromLine).filter(Boolean),
+      ideal: ["Ideal at item level 78: +4 to Level of all Spell Skills.", "Ideal at item level 80: (33-35)% increased Cast Speed."],
+    };
+  }
+  if (key === "staff") {
+    const spell: TaggedRoll[] = [
+      { ilvl: 1, text: "(50-68)% increased Spell Damage" },
+      { ilvl: 8, text: "(69-88)% increased Spell Damage" },
+    ];
+    const cast: TaggedRoll[] = [
+      { ilvl: 1, text: "(14-19)% increased Cast Speed" },
+      { ilvl: 15, text: "(20-25)% increased Cast Speed" },
+    ];
+    const gem: TaggedRoll[] = [{ ilvl: 5, text: "+2 to Level of all Spell Skills" }];
+    const now = [best(spell, level), best(cast, level), { ilvl: 1, text: "+5-8 Intelligence" }].flatMap((row) => (row ? [row.text] : []));
+    return {
+      now,
+      later: [nextRoll(spell, level), nextRoll(cast, level), nextRoll(gem, level)].map(fromLine).filter(Boolean),
+      ideal: ["Ideal at item level 78: +(5-6) to Level of all Spell Skills.", "Ideal at item level 80: (50-52)% increased Cast Speed."],
+    };
+  }
+  if (key === "sceptre") {
+    const damage: TaggedRoll[] = [{ ilvl: 1, text: "Allies in your Presence deal (25-34)% increased Damage" }];
+    const gem: TaggedRoll[] = [{ ilvl: 2, text: "+1 to Level of all Minion Skills" }];
+    const speed: TaggedRoll[] = [{ ilvl: 5, text: "Allies in your Presence have (5-7)% increased Attack Speed" }];
+    const ally = "Allies in your Presence deal (1-2) to (3-4) added Attack Physical Damage";
+    const now = [best(damage, level)?.text, "+5-8 Intelligence", level >= 2 ? "+1 to Level of all Minion Skills" : ally].filter((row): row is string => Boolean(row));
+    return {
+      now: now.slice(0, 3),
+      later: [nextRoll(gem, level), nextRoll(speed, level)].map(fromLine).filter(Boolean),
+      ideal: [
+        "Ideal at item level 55: Allies in your Presence have (14-16)% increased Attack Speed.",
+        "Ideal at item level 78: +4 to Level of all Minion Skills.",
+      ],
+    };
+  }
+  const now = [best(PHYS_PERCENT, level), best(FLAT_ONE_HAND, level), { text: "+5-8 Strength", ilvl: 1 }]
+    .flatMap((row) => (row ? [row.text] : []));
+  return { now, later: [fromLine(nextRoll(PHYS_PERCENT, level))].filter(Boolean), ideal: PHYS_IDEAL };
 }
 
 function ignoreWeapon(noun: string) {
   if (noun === "bow") {
-    return "Ignore item rarity, critical hit chance, and any unique. Ignore an Artillery Bow. That base has 50% reduced Projectile Range.";
+    return `${SKIP_ROLLS} Also skip an Artillery Bow. That base has 50% reduced Projectile Range.`;
   }
   if (noun === "quiver") {
-    return "Ignore item rarity. A quiver rolls +1 to Level of all Projectile Skills. It does not roll +2 or +3.";
+    return `${SKIP_ROLLS} A quiver rolls +1 to Level of all Projectile Skills. It does not roll +2 or +3.`;
   }
-  return "Ignore item rarity, stun threshold, and any unique you would have to buy.";
+  return SKIP_ROLLS;
 }
 
 export function weaponStats(noun: string, level: number) {
-  return weaponRolls(noun, level).accept.slice(0, 3);
+  return weaponRollPlan(noun, level).now.slice(0, 3);
 }
 
-export function weaponText(noun: string, level: number) {
-  const key = weaponKind(noun);
-  const shop = shopFor(key, level);
-  const base = baseAt(key, level);
-  const rolls = weaponRolls(key, level);
+export function weaponText(noun: string, level: number, attack = false) {
+  const key = attack && weaponKind(noun) === "staff" ? "quarterstaff" : weaponKind(noun);
+  const shop = shopFor(weaponKind(noun), level);
+  const base = attack && weaponKind(noun) === "staff" ? baseAt("staff", level) : baseAt(key, level);
+  const rolls = weaponRollPlan(key, level);
   const great = key === "mace" ? pick(GREAT, level) : null;
   const shield = noun.toLowerCase().includes("shield") ? baseAt("shield", level) : null;
   const hand = great
-    ? `With a shield equipped, buy the one-hand mace. The two-hand mace at this level is a ${great.name} (${great.detail}), and it fills both hands.`
+    ? `Use either setup. One-hand mace plus shield: ${withArticle(base.name)} (${base.detail}). Two-hand mace, shield slot empty: ${withArticle(great.name)} (${great.detail}). Do not equip both.`
     : "";
-  const off = shield ? `The shield at this level is a ${shield.name} (${shield.detail}).` : "";
+  const off = shield ? `The shield at this level is ${withArticle(shield.name)} (${shield.detail}).` : "";
   const bowNext = key === "bow" ? "A Shortbow needs level 5 and 12 Dexterity. A Recurve Bow needs level 16 and 31 Dexterity." : "";
+  const bear = attack
+    ? "Maul is a Bear-form melee Strike (poe2db: Attack, Shapeshift, Bear, AoE, Melee, Strike, Requires Talismans). Shop attack and melee rolls. Skip spell damage and +to spell skills. The numbers are the quarterstaff attack ladder, used when this weapon rolls them. A separate talisman modifier table is not copied here."
+    : "";
   return [
-    `Buy a ${noun} from ${place(shop)}.`,
-    `The base at level ${level} is a ${base.name} (${base.detail}).`,
+    `Buy ${withArticle(noun)} from ${place(shop)}.`,
+    `The base at level ${level} is ${withArticle(base.name)} (${base.detail}).`,
+    bear,
     bowNext,
     hand,
     off,
-    "Acceptable on that base:",
-    bullets(rolls.accept),
-    "Ideal once the item level can roll it:",
-    bullets(rolls.ideal),
+    "Acceptable rolls are the list under this line. A roll is legal only when the item's item level, shown by holding Alt and hovering the item, is at least the level named below.",
+    ...(level > 1 ? rolls.later : []),
+    ...(level >= 60 ? rolls.ideal : []),
     ignoreWeapon(key),
     fallback(shop, base.name, level),
   ]
@@ -615,35 +695,28 @@ export function weaponText(noun: string, level: number) {
 export function quiverText(level: number) {
   const shop = shops(level).armour;
   const base = baseAt("quiver", level);
-  const rolls = level < 66
-    ? ["+1 to Level of all Projectile Skills", "(5-7)% increased Attack Speed", "(8-10)% increased Attack Speed"]
-    : ["+1 to Level of all Projectile Skills", "(14-16)% increased Attack Speed", "(11-13)% increased Attack Speed"];
   return [
     `Buy a quiver from ${place(shop)}.`,
-    `The base at level ${level} is a ${base.name}. ${base.detail}. At level 1 the Broadhead Quiver adds 1 to 3 Physical Damage to Attacks. Keep that one unless this build's damage is fire, in which case a level 8 Fire Quiver adds 3 to 5 Fire damage to Attacks.`,
-    "Acceptable:",
-    bullets(rolls),
-    "Ideal stays +1 to Level of all Projectile Skills, with (14-16)% increased Attack Speed.",
+    `The base at level ${level} is ${withArticle(base.name)} (${base.detail}). At level 1 the Broadhead Quiver adds 1 to 3 Physical Damage to Attacks. Keep that one unless this build's damage is fire, in which case a level 8 Fire Quiver adds 3 to 5 Fire damage to Attacks.`,
+    "Acceptable rolls are the list under this line.",
+    level < 5
+      ? "At this level the attack-speed roll is (5-7)%. +1 to Level of all Projectile Skills needs item level 5. A quiver does not roll +2 or +3."
+      : "Keep +1 to Level of all Projectile Skills. (14-16)% increased Attack Speed needs item level 60. A quiver does not roll +2 or +3.",
     ignoreWeapon("quiver"),
     fallback(shop, base.name, level),
   ].join("\n");
 }
 
-function lifeLine(defence: string, level: number) {
-  const energy = defenceKey(defence) === "int";
-  if (level < 16) return energy ? "+10-17 maximum Energy Shield" : "+10-19 maximum Life";
-  if (level < 33) return energy ? "+25-30 maximum Energy Shield" : "+30-39 maximum Life";
-  if (level < 52) return energy ? "+36-41 maximum Energy Shield" : "+60-69 maximum Life";
-  if (level < 66) return energy ? "+61-73 maximum Energy Shield" : "+100-119 maximum Life";
-  return energy ? "+91-96 maximum Energy Shield" : "+200-214 maximum Life";
+function poolLine(defence: string, level: number, slot: AffixSlot) {
+  // Belts, rings, and strength shields roll IncreasedLife. They do not roll the body energy-shield ladder.
+  if (slot === "belt" || slot === "ring" || slot === "shield" || slot === "amulet") return lifeAt(level, slot);
+  return wantsEnergyShield(defence) ? energyAt(level, slot) : lifeAt(level, slot);
 }
 
 function resistLine(level: number) {
-  if (level < 16) return "+6-10% Fire Resistance, +6-10% Cold Resistance, and +6-10% Lightning Resistance";
-  if (level < 33) return "+11-15% Fire Resistance, +11-15% Cold Resistance, and +11-15% Lightning Resistance";
-  if (level < 52) return "+16-20% Fire Resistance, +16-20% Cold Resistance, and +16-20% Lightning Resistance";
-  if (level < 66) return "+26-30% Fire Resistance, +26-30% Cold Resistance, and +26-30% Lightning Resistance";
-  return "+36-40% Fire Resistance, +36-40% Cold Resistance, and +36-40% Lightning Resistance";
+  const tier =
+    level < 12 ? "6-10" : level < 24 ? "11-15" : level < 36 ? "16-20" : level < 48 ? "21-25" : level < 60 ? "26-30" : level < 71 ? "31-35" : level < 82 ? "36-40" : "41-45";
+  return `+${tier}% Fire Resistance, +${tier}% Cold Resistance, and +${tier}% Lightning Resistance`;
 }
 
 function moveLine(level: number) {
@@ -663,11 +736,15 @@ export function armourText(defence: string, level: number, caster: boolean) {
   const gloves = armourAt("gloves", defence, level);
   const boots = armourAt("boots", defence, level);
   const belt = armourAt("belt", defence, level);
-  const life = lifeLine(defence, level);
   const resist = resistLine(level);
+  const bootsLife = poolLine(defence, level, "boots");
+  const bodyLife = poolLine(defence, level, "body");
+  const helmLife = poolLine(defence, level, "helmet");
+  const gloveLife = poolLine(defence, level, "gloves");
+  const beltLife = poolLine(defence, level, "belt");
   const ring = caster
-    ? "Buy a Lazuli Ring from the jewellery shop. The base is +(20-30) to maximum Mana. At level 8 a Ruby Ring is +(20-30)% to Fire Resistance, at level 12 a Sapphire Ring is +(20-30)% to Cold Resistance, and at level 16 a Topaz Ring is +(20-30)% to Lightning Resistance."
-    : "Buy an Iron Ring from the jewellery shop. The base Adds 1 to 4 Physical Damage to Attacks. At level 8 a Ruby Ring is +(20-30)% to Fire Resistance, at level 12 a Sapphire Ring is +(20-30)% to Cold Resistance, and at level 16 a Topaz Ring is +(20-30)% to Lightning Resistance.";
+    ? `Buy a Lazuli Ring from ${jewels.who}. The base is +(20-30) to maximum Mana. At level 8 a Ruby Ring is +(20-30)% to Fire Resistance, at level 12 a Sapphire Ring is +(20-30)% to Cold Resistance, and at level 16 a Topaz Ring is +(20-30)% to Lightning Resistance.`
+    : `Buy an Iron Ring from ${jewels.who}. The base Adds 1 to 4 Physical Damage to Attacks. At level 8 a Ruby Ring is +(20-30)% to Fire Resistance, at level 12 a Sapphire Ring is +(20-30)% to Cold Resistance, and at level 16 a Topaz Ring is +(20-30)% to Lightning Resistance.`;
   const key = defenceKey(defence);
   const amulet = key === "int"
     ? "At level 1 buy an Azure Amulet, (20-30)% increased Mana Regeneration Rate. At level 8 buy a Lapis Amulet. The base itself is +(10-15) to Intelligence."
@@ -676,15 +753,15 @@ export function armourText(defence: string, level: number, caster: boolean) {
       : "At level 1 buy a Crimson Amulet, (2-4) Life Regeneration per second. At level 8 buy an Amber Amulet. The base itself is +(10-15) to Strength.";
   return [
     `Buy the armour from ${place(armour)}.`,
-    `Boots: a ${boots.name}. ${boots.detail}. ${moveLine(level)} Also take ${life} and one of ${resist}.`,
-    `Body: a ${body.name}. ${body.detail}. Acceptable: ${life}. Ideal on a body in maps is ${defenceKey(defence) === "int" ? "+91-96 maximum Energy Shield and (101-110)% increased Energy Shield" : "+200-214 maximum Life"}. A Greater Iron Rune in the body socket adds 18% increased Armour, Evasion and Energy Shield.`,
-    `Helmet: a ${helm.name}. ${helm.detail}. Acceptable: ${life}.`,
-    `Gloves: a ${gloves.name}. ${gloves.detail}. Acceptable: ${life}.`,
-    `Belt: a ${belt.name} from ${place(armour)}. ${belt.detail}. Acceptable: ${life}.`,
-    `Rings and amulets are ${place(jewels)}, in the same town.`,
+    `Boots: ${withArticle(boots.name)} (${boots.detail}). ${moveLine(level)} Also take ${bootsLife} and one of ${resist}.`,
+    `Body: ${withArticle(body.name)} (${body.detail}). Acceptable: ${bodyLife}.${level >= 65 ? ` Maps are waystone areas after the campaign. ${wantsEnergyShield(defence) ? "The top energy shield roll on a body is +(91-96) to maximum Energy Shield, and it needs item level 79. Boots and gloves stop at +(48-60), item level 54. Helmets stop at +(61-73), item level 60." : "The top life roll on a body is +(200-214) to maximum Life, and it needs item level 80. Boots and gloves stop at +(120-149), item level 60. Helmets and belts stop at +(150-174), item level 65. Rings stop at +(100-119), item level 54. Shields stop at +(175-189), item level 70."}` : ""}${level >= 30 ? " From level 30, a Greater Iron Rune in the body socket adds 18% increased Armour, Evasion and Energy Shield. It requires level 30." : ""}`,
+    `Helmet: ${withArticle(helm.name)} (${helm.detail}). Acceptable: ${helmLife}.`,
+    `Gloves: ${withArticle(gloves.name)} (${gloves.detail}). Acceptable: ${gloveLife}.`,
+    `Belt: ${withArticle(belt.name)} from ${place(armour)} (${belt.detail}). Acceptable: ${beltLife}.`,
+    `Rings and amulets are sold by ${jewels.who} in ${jewels.where}.`,
     ring,
     amulet,
-    "Ignore boots with 0% increased Movement Speed. Ignore stun threshold and life regeneration on the armour. Ignore a second life roll while one of fire, cold, or lightning is still under 75%.",
+    `Ignore boots with 0% increased Movement Speed. ${RESIST_FIRST} ${SKIP_ROLLS}`,
     fallback(armour, boots.name, level),
   ].join("\n");
 }
@@ -696,39 +773,48 @@ function pieceText(slot: string, spec: ShopSpec, level: number) {
   if (/shield/i.test(slot)) {
     const shop = shops(level).armour;
     const base = baseAt("shield", level);
-    const life = lifeLine(spec.defence, level);
+    const life = poolLine(spec.defence, level, "shield");
     return [
       `Buy a shield from ${place(shop)}.`,
-      `The base at level ${level} is a ${base.name}. ${base.detail}.`,
+      `The base at level ${level} is ${withArticle(base.name)} (${base.detail}).`,
       `Acceptable: ${life}, and ${resistLine(level)}.`,
-      "Ignore block chance and item rarity.",
+      SKIP_ROLLS,
       fallback(shop, base.name, level),
     ].join("\n");
   }
-  if (/bow|spear|crossbow|quarterstaff|mace|wand|staff|sceptre|weapon/i.test(slot)) return weaponText(spec.weaponNoun, level);
+  if (/bow|spear|crossbow|quarterstaff|mace|wand|staff|sceptre|weapon/i.test(slot)) {
+    return weaponText(nounFromSlot(slot, spec.weaponNoun), level);
+  }
   const row = shops(level);
   const caster = isCaster(spec);
-  const life = lifeLine(spec.defence, level);
   if (/boot/i.test(slot)) {
     const base = armourAt("boots", spec.defence, level);
     return [
       `Buy boots from ${place(row.armour)}.`,
-      `The base at level ${level} is ${base.name}. ${base.detail}.`,
+      `The base at level ${level} is ${withArticle(base.name)} (${base.detail}).`,
       moveLine(level),
-      `Also take ${life} and one of ${resistLine(level)}.`,
-      "Ignore a pair with 0% increased Movement Speed, stun threshold, and life regeneration.",
+      `Also take ${poolLine(spec.defence, level, "boots")} and one of ${resistLine(level)}.`,
+      `Ignore a pair with 0% increased Movement Speed. ${RESIST_FIRST}`,
       fallback(row.armour, base.name, level),
     ].join("\n");
   }
   if (/body|helm|glove|belt/i.test(slot)) {
-    const key: ArmourSlot = /body/i.test(slot) ? "body" : /helm/i.test(slot) ? "helmet" : /glove/i.test(slot) ? "gloves" : "belt";
+    const slotKey: AffixSlot = /body/i.test(slot) ? "body" : /helm/i.test(slot) ? "helmet" : /glove/i.test(slot) ? "gloves" : "belt";
+    const key: ArmourSlot = slotKey === "helmet" ? "helmet" : slotKey === "gloves" ? "gloves" : slotKey === "belt" ? "belt" : "body";
     const base = armourAt(key, spec.defence, level);
-    const rune = /body/i.test(slot) ? " A Greater Iron Rune in the body socket adds 18% increased Armour, Evasion and Energy Shield." : "";
+    const life = poolLine(spec.defence, level, slotKey);
+    const rune = slotKey === "body" && level >= 30 ? " From level 30, a Greater Iron Rune in the body socket adds 18% increased Armour, Evasion and Energy Shield. It requires level 30." : "";
+    const maps =
+      slotKey === "body" && level >= 65
+        ? wantsEnergyShield(spec.defence)
+          ? " Maps are waystone areas after the campaign. +(91-96) to maximum Energy Shield on a body needs item level 79."
+          : " Maps are waystone areas after the campaign. +(200-214) to maximum Life on a body needs item level 80. That roll is not on boots, gloves, helmets, belts, or rings."
+        : "";
     return [
       `Buy this from ${place(row.armour)}.`,
-      `The base at level ${level} is ${base.name}. ${base.detail}.`,
-      `Acceptable: ${life}, and one of ${resistLine(level)}.${rune}`,
-      "Ignore stun threshold, life regeneration, and item rarity.",
+      `The base at level ${level} is ${withArticle(base.name)} (${base.detail}).`,
+      `Acceptable: ${life}, and one of ${resistLine(level)}.${rune}${maps}`,
+      `${RESIST_FIRST} ${SKIP_ROLLS}`,
       fallback(row.armour, base.name, level),
     ].join("\n");
   }
@@ -743,8 +829,8 @@ function pieceText(slot: string, spec: ShopSpec, level: number) {
       `Buy this from ${place(row.caster)}.`,
       `Take ${named}.`,
       "At level 8 a Ruby Ring is +(20-30)% to Fire Resistance. At level 12 a Sapphire Ring is +(20-30)% to Cold Resistance. At level 16 a Topaz Ring is +(20-30)% to Lightning Resistance.",
-      `Acceptable rare rolls: ${life}, and ${resistLine(level)}.`,
-      "Ignore a second life roll while fire, cold, or lightning is still under 75%.",
+      `Acceptable rare rolls: ${poolLine(spec.defence, level, /amulet/i.test(slot) ? "amulet" : "ring")}, and ${resistLine(level)}.`,
+      RESIST_FIRST,
       fallback(row.caster, /amulet/i.test(slot) ? "amulet" : "ring", level),
     ].join("\n");
   }
@@ -753,6 +839,18 @@ function pieceText(slot: string, spec: ShopSpec, level: number) {
 
 export function slotStage(slot: string, spec: ShopSpec): [string, string, string] {
   return [pieceText(slot, spec, 1), pieceText(slot, spec, 28), pieceText(slot, spec, 66)];
+}
+
+function nounFromSlot(slot: string, fallback: string) {
+  if (/crossbow/i.test(slot)) return "crossbow";
+  if (/quarterstaff/i.test(slot)) return "quarterstaff";
+  if (/^bow$/i.test(slot)) return "bow";
+  if (/spear/i.test(slot)) return "spear";
+  if (/sceptre/i.test(slot)) return "sceptre";
+  if (/wand/i.test(slot)) return "wand";
+  if (/^staff$/i.test(slot)) return "staff";
+  if (/mace/i.test(slot)) return "mace";
+  return fallback;
 }
 
 export function baseLabel(slot: string, spec: ShopSpec) {
@@ -766,10 +864,11 @@ export function baseLabel(slot: string, spec: ShopSpec) {
     return `${base.name}. ${base.detail}.`;
   }
   if (/bow|spear|crossbow|weapon|staff|wand|mace|sceptre|quarterstaff/i.test(slot)) {
-    const now = baseAt(spec.weaponNoun, 1);
-    const mid = baseAt(spec.weaponNoun, 16);
-    const maps = baseAt(spec.weaponNoun, 65);
-    if (weaponKind(spec.weaponNoun) === "bow") {
+    const noun = nounFromSlot(slot, spec.weaponNoun);
+    const now = baseAt(noun, 1);
+    const mid = baseAt(noun, 16);
+    const maps = baseAt(noun, 65);
+    if (weaponKind(noun) === "bow") {
       return "Crude Bow at level 1. Shortbow at level 5. Recurve Bow at level 16. Heavy Bow at level 65.";
     }
     return `${now.name} at level 1. ${mid.name} at level ${mid.level}. ${maps.name} at level ${maps.level}.`;

@@ -42,17 +42,14 @@ function Lines({ title, lines, active }: { title: string; lines: string[]; activ
 function SlotButton({
   card,
   selected,
-  level,
   onOpen,
 }: {
   card: GearCard;
   selected: boolean;
-  level: number;
   onOpen: (slot: string) => void;
 }) {
-  const lines = level < 60 ? card.leveling : card.endgame;
   return (
-    <div data-gear-section={card.slot} className="min-w-0">
+    <div className="min-w-0">
       <button
         type="button"
         onClick={() => onOpen(card.slot)}
@@ -63,7 +60,6 @@ function SlotButton({
         </span>
         <span className="w-full truncate text-center text-[10px] tracking-[0.12em] text-parchment uppercase">{card.slot}</span>
       </button>
-      <StatList lines={lines} />
     </div>
   );
 }
@@ -92,7 +88,7 @@ export function GearCards({ cards, totals, level }: { cards: GearCard[]; totals:
           <div className="grid grid-cols-3 gap-2">
             {grid.map((card, index) =>
               card ? (
-                <SlotButton key={card.slot} card={card} selected={selected?.slot === card.slot} level={level} onOpen={setOpen} />
+                <SlotButton key={card.slot} card={card} selected={selected?.slot === card.slot} onOpen={setOpen} />
               ) : (
                 <span key={`empty-${index}`} className="min-h-[76px] border border-dashed border-line/60 bg-black/30" />
               ),
@@ -101,7 +97,7 @@ export function GearCards({ cards, totals, level }: { cards: GearCard[]; totals:
           {extra.length ? (
             <div className="mt-2 grid grid-cols-3 gap-2">
               {extra.map((card) => (
-                <SlotButton key={card.slot} card={card} selected={selected?.slot === card.slot} level={level} onOpen={setOpen} />
+                <SlotButton key={card.slot} card={card} selected={selected?.slot === card.slot} onOpen={setOpen} />
               ))}
             </div>
           ) : null}

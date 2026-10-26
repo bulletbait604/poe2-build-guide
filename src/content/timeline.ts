@@ -1,7 +1,8 @@
 import type { BuildSpec } from "@/content/buildSpecs";
-import { armourText, isCaster, shops, weaponStats, weaponText } from "@/content/shopping";
+import { armourAt, armourText, baseAt, isCaster, shops, weaponStats, weaponText } from "@/content/shopping";
 import { statsForLevel } from "@/content/statLines";
 import { stepImage } from "@/content/zoneArt";
+import { pressLine } from "@/content/earlySkill";
 import { mainSkillReadyAt, requiredLevel } from "@/content/gemFacts";
 import { pointsForBand } from "@/content/passivePlan";
 import type { Loadout, StepCheck, TimelineStep } from "@/lib/types";
@@ -38,9 +39,26 @@ function mainSupports(spec: BuildSpec, loadout: Loadout) {
 
 function gearCheck(spec: BuildSpec, level: number) {
   const shop = shops(level).armour;
+  const attack = spec.skill === "Maul";
+  if (level === 4) {
+    const bodyNow = armourAt("body", spec.defence, 4);
+    const bodyWas = armourAt("body", spec.defence, 1);
+    const bootsNow = armourAt("boots", spec.defence, 4);
+    const bootsWas = armourAt("boots", spec.defence, 1);
+    const weaponNow = baseAt(spec.weaponNoun, 4);
+    const weaponWas = baseAt(spec.weaponNoun, 1);
+    const fresh = weaponStats(spec.weaponNoun, 4).filter((line) => !weaponStats(spec.weaponNoun, 1).includes(line));
+    const changes = [
+      weaponNow.name === weaponWas.name ? `Weapon base is still ${weaponWas.name}. No new weapon base at level 4.` : `New weapon base: ${weaponNow.name} (${weaponNow.detail}).`,
+      bodyNow.name === bodyWas.name ? `Body is still ${bodyWas.name}.` : `New body: ${bodyNow.name} (${bodyNow.detail}).`,
+      bootsNow.name === bootsWas.name ? `Boots are still ${bootsWas.name}.` : `New boots: ${bootsNow.name} (${bootsNow.detail}).`,
+      fresh.length ? "New rolls since level 1 are the list under this line." : "No new roll since level 1. Keep the level 1 list.",
+    ];
+    return check(changes.join(" "), actFor(level), shop.where, `Buy from ${shop.who}`, fresh.length > 0, fresh.length ? fresh : undefined);
+  }
   const armour = armourText(spec.defence, level, isCaster(spec));
-  const text = level === 1 ? armour : `${weaponText(spec.weaponNoun, level)}\n${armour}`;
-  return check(text, actFor(level), shop.where, `Buy from ${shop.who}`, true, statsForLevel(spec, level));
+  const text = level === 1 ? armour : `${weaponText(spec.weaponNoun, level, attack)}\n${armour}`;
+  return check(text, actFor(level), shop.where, `Buy from ${shop.who}`, true, level === 1 ? statsForLevel(spec, level) : weaponStats(spec.weaponNoun, level));
 }
 
 function passiveLine(spec: BuildSpec, level: number) {
@@ -60,13 +78,12 @@ function checksFor(level: number, spec: BuildSpec, loadout: Loadout, readyAt: nu
   const node = loadout.ascendancy[0] ?? spec.ascendancyPick;
   const second = loadout.ascendancy[1];
   const checks: StepCheck[] = [];
-  const skillLevel = requiredLevel(spec.skill);
   const helperLevel = requiredLevel(spec.helper);
 
   if (level === 1) {
     checks.push(
       check(
-        weaponText(spec.weaponNoun, 1),
+        weaponText(spec.weaponNoun, 1, spec.skill === "Maul"),
         "Act 1",
         shops(1)[spec.weaponNoun === "wand" || spec.weaponNoun === "staff" || spec.weaponNoun === "sceptre" ? "caster" : "armour"].where,
         `Buy a ${spec.weaponNoun}`,
@@ -74,14 +91,23 @@ function checksFor(level: number, spec: BuildSpec, loadout: Loadout, readyAt: nu
         weaponStats(spec.weaponNoun, 1),
       ),
     );
-    if (readyAt <= 1) {
-      checks.push(check(`Socket ${spec.skill}. That is the main button.`, "Act 1", "Your skill panel", "Socket the main skill"));
+    const hollow = /Hollow Palm/i.test(`${loadout.overview} ${loadout.leveling.map((row) => row.text).join(" ")}`);
+    if (hollow) {
+      checks[0] = check(
+        `Hollow Palm Technique needs both hand slots empty. poe2db: you can attack as though using a quarterstaff only while both hands are empty. Do not equip a quarterstaff until level 21. ${checks[0].text}`,
+        "Act 1",
+        checks[0].zone,
+        checks[0].quest,
+        true,
+        checks[0].stats,
+      );
+    }
+    if (readyAt <= 1 && spec.skill !== "Skeletal Sniper") {
+      checks.push(check(`Socket ${spec.skill}. That is the left mouse button. ${pressLine(spec, loadout, 1)}`, "Act 1", "Your skill panel", "Socket the main skill"));
     } else {
-      const early = sentence(loadout.leveling[0]?.text ?? "Use the weapon's basic attack until the main gem is in the bar.");
-      const requiredNote = skillLevel === readyAt ? "" : ` The gem's required level is ${skillLevel}.`;
       checks.push(
         check(
-          `Do not socket ${spec.skill} yet. It joins this route at level ${readyAt}.${requiredNote} Until then: ${early}`,
+          `Wait on ${spec.skill}. ${pressLine(spec, loadout, 1)}`,
           "Act 1",
           "Your skill panel",
           "Wait on the main skill",
@@ -93,7 +119,7 @@ function checksFor(level: number, spec: BuildSpec, loadout: Loadout, readyAt: nu
     if (helperLevel <= 4) {
       checks.push(
         check(
-          `Add ${spec.helper} when you get a second skill gem. It is the second button, not a replacement.`,
+          `Add ${spec.helper} when you get a second skill gem. It is the right mouse button, not a replacement.`,
           "Act 1",
           "Your skill panel",
           "Socket the second skill",
@@ -102,7 +128,7 @@ function checksFor(level: number, spec: BuildSpec, loadout: Loadout, readyAt: nu
     } else {
       checks.push(
         check(
-          `Wait on ${spec.helper}. Its required level is ${helperLevel}.`,
+          `Wait on ${spec.helper}. Tier ${helperLevel} gem: usable from level ${helperLevel}.`,
           "Act 1",
           "Your skill panel",
           "Wait on the second skill",
@@ -122,7 +148,7 @@ function checksFor(level: number, spec: BuildSpec, loadout: Loadout, readyAt: nu
     );
     checks.push(
       check(
-        "Freythorn is the side zone. Quest log: Ominous Altars. Finish the rituals and kill the King in the Mists. The reward is +30 spirit. Spirit pays for auras and minions. It is not mana. Finn's turn-in is an Uncut Support Gem, not the spirit.",
+        "Freythorn is the side zone. Quest log: Ominous Altars. Finish the rituals and kill the King in the Mists. Maxroll's permanent stats page: +30 spirit, and an Uncut Spirit Gem on the first kill. Spirit pays for auras and minions. It is not mana. poe2db lists the quest reward as a Ruby, Sapphire, and Topaz Charm. Finn's page does not list an Uncut Support Gem. An Uncut Support Gem is the optional Dyadic Ritual in the Hunting Grounds.",
         "Act 1",
         "Freythorn",
         "Ominous Altars",
@@ -298,7 +324,7 @@ function checksFor(level: number, spec: BuildSpec, loadout: Loadout, readyAt: nu
   } else if (level === 78) {
     checks.push(
       check(
-        "A rare with these rolls still beats a unique that has neither.",
+        "A rare with these rolls still beats a unique that has neither. +(200-214) maximum Life is body armour only, at item level 80. Boots and gloves stop at +(120-149). Helmets and belts stop at +(150-174). Rings stop at +(100-119). Shields stop at +(175-189). +(91-96) maximum Energy Shield is body armour only, at item level 79.",
         "Maps",
         "Town or the trade site",
         "Gear check",
@@ -381,7 +407,7 @@ export function timelineFor(spec: BuildSpec, loadout: Loadout): TimelineStep[] {
   }
   if (readyAt > 1) {
     const line = check(
-      `Socket ${spec.skill} now. It is the main button from here.`,
+      `Socket ${spec.skill} now. It is the left mouse button from here.`,
       actFor(readyAt),
       "Your skill panel",
       "Socket the main skill",
@@ -397,7 +423,7 @@ export function timelineFor(spec: BuildSpec, loadout: Loadout): TimelineStep[] {
     const level = supportReadyAt(index, support, readyAt);
     const step = merged.get(level);
     const line = check(
-      `Link ${support} into ${spec.skill}. This is support ${index + 1}. Its required level is ${requiredLevel(support)}.`,
+      `Link ${support} into ${spec.skill}. This is support ${index + 1}. Tier ${requiredLevel(support)} gem: usable from level ${requiredLevel(support)}.`,
       actFor(level),
       "Your skill panel",
       "Socket supports",

@@ -43,7 +43,7 @@ const tips: Record<string, string> = {
   "Killing Palm": "A dash to a low enemy. Use it to move, not to open a pack.",
   "Whirling Assault": "A spinning staff attack. Walk it through the pack.",
   "Flicker Strike": "A teleporting melee hit. You land on the enemy, so know where that is.",
-  "Into the Breach": "A breach step. Use it to move onto the pack, then the main skill.",
+  "Into the Breach": "The Acolyte skill that opens a breach. It is not a door in the zone. Falling Thunder is the level 1 hit. Flicker Strike is a Tier 13 gem.",
   Spark: "Sparks that fill the room. Cast and walk. You do not aim each one.",
   "Frost Bomb": "A bomb that chills and lowers resistance. Drop it on the boss.",
   "Orb of Storms": "A storm you leave on the ground. Cast the other skill into it.",
@@ -154,7 +154,7 @@ const tips: Record<string, string> = {
   "Hollow Form": "A short form. Tap it and the copies finish the assault.",
   "Grim Pillars": "Pillars from a spell totem. Drop the totem, then let the pillars work.",
   "Spell Totem": "A totem that casts the linked spell.",
-  "Spiral Volley": "A bow attack that spends frenzy charges. It needs Resonance or the charges do not come back.",
+  "Spiral Volley": "A bow attack that spends a frenzy charge. It still fires without Resonance. Without that keystone the charge is not refunded, so the clear is worse.",
   "Oil Barrage": "Spends power charges and fires a wave of oil projectiles.",
   "Shockwave Totem": "A totem that slams. Drop it and fight next to it.",
   "Arctic Armour": "A cold guard. Turn it on before a boss.",
@@ -163,7 +163,7 @@ const tips: Record<string, string> = {
 };
 
 function fallback(name: string, role: "skill" | "helper" | "support") {
-  if (role === "skill") return `Socket ${name} as soon as the gem is offered. It stays the main skill.`;
+  if (role === "skill") return `${name} is this route's main skill. The leveling notes say when it goes on the left mouse button.`;
   if (role === "helper") return `${name} is the second button. Add it when you have a second skill gem.`;
   if (name.startsWith("a support") || name.startsWith("one fire")) {
     return `Socket ${name}. Read the gem before you link it. If the text does not mention this skill, take it out.`;

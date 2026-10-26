@@ -21,7 +21,7 @@ export const extraSpecs: BuildSpec[] = [
     defence: "evasion",
     speed: "attack speed",
     damage: "lightning and physical damage",
-    summary: "Level with Lightning Arrow. At level 54, with Resonance, Spiral Volley takes the clear. It does not work without that keystone.",
+    summary: "Level with Bow Shot, then Lightning Arrow. At level 54, with Resonance, Spiral Volley takes the clear. The skill still fires without Resonance. The frenzy charge is not refunded, so the clear is worse.",
     fantasy: "A ranger who spends a frenzy charge and gets it back by breaking the pack.",
     pack: "Spiral Volley when several monsters are in the shot. Snipe if you have no frenzy charge.",
     boss: "Stack Lightning Rods while you are still on Lightning Arrow. After the swap, Snipe for the first charge, then Spiral Volley.",
@@ -69,7 +69,7 @@ export const extraSpecs: BuildSpec[] = [
     boss: "Frost Bomb, Orb of Storms, Spark.",
     ascendancyPick: "Take the Pathfinder flask or poison node and keep Spark as the only clear.",
     focus: "Cast speed, movement speed, and 75% resistances.",
-    uniques: [u("Lifesprig", "Wand", 78, "Maps only.")],
+    uniques: [u("Lifesprig", "Wand", 2, "Maps only.")],
   }),
   spec({
     id: "pathfinder-spiral-volley",
@@ -109,7 +109,7 @@ export const extraSpecs: BuildSpec[] = [
     fantasy: "A huntress who freezes a pack and snipes the one that is still standing.",
     pack: "Escape Shot and Freezing Salvo until level 31, then Ice Shot.",
     boss: "Freeze, then Snipe. Snipe only on a frozen enemy.",
-    ascendancyPick: "Take the Amazon projectile node and use Ice Shot for a zone before a second node.",
+    ascendancyPick: "Take the Amazon projectile node and use it for a whole zone before a second node. Ice Shot joins at level 31.",
     focus: "Movement speed, evasion, life, and a bow that already kills.",
     uniques: [u("Queen of the Forest", "Body", 51, optional)],
   }),
@@ -132,7 +132,7 @@ export const extraSpecs: BuildSpec[] = [
     boss: "Elemental Weakness, then the command. Keep the minion alive.",
     ascendancyPick: "The Spirit Walker minion node first. Use the command for a whole zone.",
     focus: "Spirit and +minion levels. Life and evasion on the body.",
-    uniques: [u("The Dark Defiler", "Sceptre", 52, "A maps swap if you put the minions on a sceptre.")],
+    uniques: [u("The Dark Defiler", "Sceptre", 1, "A maps swap if you put the minions on a sceptre.")],
   }),
   spec({
     id: "ritualist-blood-hunt",
@@ -279,7 +279,7 @@ export const extraSpecs: BuildSpec[] = [
     boss: "Frost Bomb, then Spark. Comet when it crits.",
     ascendancyPick: "A Gemling node that raises the spell you are casting. One node, then a zone.",
     focus: "Critical chance, energy shield, and 75% resistances.",
-    uniques: [u("Lifesprig", "Wand", 78, "Maps only.")],
+    uniques: [u("Lifesprig", "Wand", 2, "Maps only.")],
   }),
   spec({
     id: "invoker-tempest-bell",
@@ -405,7 +405,7 @@ export const extraSpecs: BuildSpec[] = [
     boss: "Elemental Weakness, then the command.",
     ascendancyPick: "The minion node. One of them, for a zone.",
     focus: "+minion levels and spirit.",
-    uniques: [u("The Dark Defiler", "Sceptre", 52, optional)],
+    uniques: [u("The Dark Defiler", "Sceptre", 1, optional)],
   }),
   spec({
     id: "infernalist-minions",
@@ -426,7 +426,7 @@ export const extraSpecs: BuildSpec[] = [
     boss: "Curse, then the sniper command. Replace a dead minion.",
     ascendancyPick: "The Infernalist minion or demon node after the sniper is already out.",
     focus: "+minion levels, spirit, and energy shield.",
-    uniques: [u("The Dark Defiler", "Sceptre", 52, optional)],
+    uniques: [u("The Dark Defiler", "Sceptre", 1, optional)],
   }),
   spec({
     id: "blood-mage-dark-effigy",
@@ -468,7 +468,7 @@ export const extraSpecs: BuildSpec[] = [
     boss: "Curse, command, replace what died.",
     ascendancyPick: "The energy shield node first, then a minion node.",
     focus: "+minion levels and energy shield.",
-    uniques: [u("The Dark Defiler", "Sceptre", 52, optional)],
+    uniques: [u("The Dark Defiler", "Sceptre", 1, optional)],
   }),
   spec({
     id: "stormweaver-frostbolt-coc",
@@ -489,7 +489,7 @@ export const extraSpecs: BuildSpec[] = [
     boss: "Frost Bomb, Elemental Weakness, Frostbolt. Detonate the ice.",
     ascendancyPick: "Take Shaper of Storms or Constant Gale on lightning gear. Take Heavy Snows if the staff is cold.",
     focus: "Critical chance and energy shield. CI only when the shield is high.",
-    uniques: [u("Lifesprig", "Wand", 78, "Maps only.")],
+    uniques: [u("Lifesprig", "Wand", 2, "Maps only.")],
   }),
   spec({
     id: "chronomancer-arctic-armour",
@@ -531,7 +531,7 @@ export const extraSpecs: BuildSpec[] = [
     boss: "Elemental Weakness, Freezing Mark, command.",
     ascendancyPick: "Bind one djinn or the minion node. Do not summon a second djinn the same hour.",
     focus: "+minion levels on the wand or amulet. Spirit for the auras you turned on.",
-    uniques: [u("The Dark Defiler", "Sceptre", 52, optional)],
+    uniques: [u("The Dark Defiler", "Sceptre", 1, optional)],
   }),
   spec({
     id: "disciple-frostbolt-coc",
@@ -552,7 +552,7 @@ export const extraSpecs: BuildSpec[] = [
     boss: "Frost Bomb, Elemental Weakness, Frostbolt, detonate.",
     ascendancyPick: "A cold or spell node after Frostbolt is already critting.",
     focus: "Critical chance and energy shield.",
-    uniques: [u("Lifesprig", "Wand", 78, "Maps only.")],
+    uniques: [u("Lifesprig", "Wand", 2, "Maps only.")],
   }),
   spec({
     id: "shaman-walking-calamity",

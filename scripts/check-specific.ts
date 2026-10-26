@@ -4,6 +4,9 @@ import { join } from "node:path";
 import { buildSpecs } from "../src/content/buildSpecs";
 import { extraSpecs } from "../src/content/extraSpecs";
 import { composeGuide } from "../src/content/composeGuide";
+import { instructsUse, pressLine } from "../src/content/earlySkill";
+import { mainSkillReadyAt } from "../src/content/gemFacts";
+import { loadoutFor } from "../src/content/loadouts";
 
 const banned: Array<[RegExp, string]> = [
   [/highest damage/i, "highest damage"],
@@ -47,6 +50,19 @@ const banned: Array<[RegExp, string]> = [
   [/pick up a better/i, "pick up a better"],
 ];
 
+function weaponFamily(noun: string) {
+  const text = noun.toLowerCase();
+  if (text.includes("crossbow")) return "crossbow";
+  if (text.includes("quarter")) return "quarterstaff";
+  if (text.includes("bow")) return "bow";
+  if (text.includes("spear")) return "spear";
+  if (text.includes("sceptre")) return "sceptre";
+  if (text.includes("wand")) return "wand";
+  if (text.includes("staff")) return "staff";
+  if (text.includes("mace")) return "mace";
+  return text;
+}
+
 const failures: string[] = [];
 const specs = [...buildSpecs, ...extraSpecs];
 
@@ -68,6 +84,77 @@ for (const spec of specs) {
   if (!/Acceptable/.test(opening.text)) failures.push(`${spec.id} level 1 does not list an acceptable roll`);
   if (!/Orb of Transmutation/.test(opening.text)) failures.push(`${spec.id} level 1 does not say what to do when the shop is empty`);
   if (!opening.stats || opening.stats.length < 3) failures.push(`${spec.id} level 1 weapon check has no stat list`);
+
+  const loadout = loadoutFor(spec);
+  const ready = mainSkillReadyAt(spec.skill, loadout.overview, loadout.leveling);
+  for (let level = 1; level < ready; level += 1) {
+    if (instructsUse(pressLine(spec, loadout, level), spec.skill)) {
+      failures.push(`${spec.id} level ${level} tells you to use ${spec.skill}, which joins at level ${ready}`);
+    }
+  }
+  for (const step of guide.timeline) {
+    if (step.level >= ready) continue;
+    for (const check of step.checks) {
+      if (instructsUse(check.text, spec.skill)) {
+        failures.push(`${spec.id} timeline ${step.level} uses ${spec.skill} before level ${ready}`);
+      }
+    }
+  }
+  for (const phase of guide.phases) {
+    if (phase.levelMax >= ready) continue;
+    for (const step of phase.steps) {
+      const text = `${step.detail} ${step.reward}`;
+      if (instructsUse(text, spec.skill)) failures.push(`${spec.id} ${phase.title} “${step.title}” uses ${spec.skill} before level ${ready}`);
+    }
+  }
+  if (spec.skill === "Skeletal Sniper" && instructsUse(pressLine(spec, loadout, 1), spec.skill)) {
+    failures.push(`${spec.id} Riverbank tells you to use Skeletal Sniper`);
+  }
+
+  const family = weaponFamily(spec.weaponNoun);
+  const weaponCard = guide.gearCards.find((card) => /^(?:bow|spear|crossbow|weapon|staff|wand|mace|sceptre|quarterstaff)$/i.test(card.slot));
+  if (family === "crossbow") {
+    if (guide.gearCards.some((card) => card.slot === "Quiver" || card.slot === "Bow")) {
+      failures.push(`${spec.id} is a crossbow guide with a bow or quiver card`);
+    }
+    if (!weaponCard || !/Crossbow/.test(weaponCard.base) || /Crude Bow|Heavy Bow|Shortbow/.test(weaponCard.base)) {
+      failures.push(`${spec.id} crossbow card does not list a crossbow base`);
+    }
+  }
+  if (family === "bow") {
+    if (!weaponCard || !/Bow/.test(weaponCard.base) || /Crossbow|Hardwood Spear|Sceptre/.test(weaponCard.base)) {
+      failures.push(`${spec.id} bow card does not list a bow base`);
+    }
+  }
+  if (family === "spear") {
+    if (!weaponCard || !/Spear/.test(weaponCard.base) || /Crude Bow|Heavy Bow|Sceptre|Crossbow/.test(weaponCard.base)) {
+      failures.push(`${spec.id} spear card does not list a spear base`);
+    }
+  }
+  if (family === "sceptre") {
+    if (!weaponCard || !/Sceptre/.test(weaponCard.base) || /Spear|Hardwood/.test(weaponCard.base)) {
+      failures.push(`${spec.id} sceptre card does not list a sceptre base`);
+    }
+  }
+  if (weaponCard && /From item level (?:8|18)|Ideal at item level (?:75|82)/.test(weaponCard.how)) {
+    failures.push(`${spec.id} level 1 weapon card lists a higher item-level roll`);
+  }
+  const route = [loadout.overview, ...loadout.ascendancy, ...loadout.leveling.map((row) => row.text)].join("\n");
+  if (spec.ascendancyId !== "witchhunter" && /Sorcery Ward/.test(route)) failures.push(`${spec.id} names Sorcery Ward`);
+  if (spec.ascendancyId !== "amazon" && /Amazon node|first Amazon/.test(route)) failures.push(`${spec.id} names an Amazon node`);
+  if (spec.ascendancyId !== "deadeye" && /Point Blank|Gathering Winds/.test(route)) failures.push(`${spec.id} names a Deadeye node`);
+  if (spec.id === "invoker-tempest-bell" && /Hollow Form/.test(route)) failures.push(`${spec.id} names Hollow Form`);
+  if (spec.ascendancyId !== "warbringer" && /Warbringer only/.test(route)) failures.push(`${spec.id} has a Warbringer-only note`);
+
+  const rendered = JSON.stringify(guide);
+  const vowel = rendered.match(/\ba [AaEeIiOoUu][A-Za-z]+/g) ?? [];
+  for (const hit of vowel) {
+    if (/^a (?:and|extra|area|early|endgame|act|attack|armour|evasion|energy|elemental|ice|oil|orb|open|optional|uncut|azure|amber|ashen|iron|explosive|essence|una)\b/i.test(hit)) {
+      failures.push(`${spec.id} uses “${hit}”`);
+    }
+  }
+  const plural = rendered.match(/\ba (?:[A-Za-z]+ )?(?:Boots|Sandals|Greaves|Bracers|Gloves|Gauntlets|Mitts)\b/g) ?? [];
+  for (const hit of plural) failures.push(`${spec.id} uses “${hit}”`);
 }
 
 function walk(dir: string) {
