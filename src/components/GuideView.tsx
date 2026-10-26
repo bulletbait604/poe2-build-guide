@@ -75,7 +75,7 @@ function StepCard({
                     <span className="block text-xs tracking-[0.12em] text-gold uppercase">
                       {check.act} · {check.zone} · {check.quest}
                     </span>
-                    {check.text}
+                    <span className="block whitespace-pre-line">{check.text}</span>
                   </span>
                 </span>
               </label>
@@ -259,6 +259,19 @@ export function GuideView({
             Do the list on the gold card. Check a line when it is done. The next card is what is coming, not what you do today.
             Weapon-set points apply only while that weapon set is active. Spirit pays for auras and minions. Ascendancy points are a separate panel from the passive tree.
           </p>
+          <details className="mt-3 border border-line bg-panel p-3 text-sm text-parchment">
+            <summary className="cursor-pointer text-gold">Words on this page</summary>
+            <ul className="mt-2 space-y-2">
+              <li><span className="text-gold">Gold card. </span>The checklist on this Now tab. Do those lines before the later cards.</li>
+              <li><span className="text-gold">Weapon set. </span>You have two weapon sets. A skill can be assigned to one of them. Weapon-set points are passive points that work only while that set is active. They are not the point you get for leveling up.</li>
+              <li><span className="text-gold">Item level. </span>Hold Alt and hover the item. Item level is not the level you need to equip the base. A roll can need a higher item level than that requirement.</li>
+              <li><span className="text-gold">Stun threshold. </span>How much stun a hit must build before you are stunned. A higher number means you are harder to stun. It is not life.</li>
+              <li><span className="text-gold">Presence. </span>The area around your character. “Allies in your Presence” affects allies standing in that area. It is not a skill you turn on.</li>
+              <li><span className="text-gold">Maps. </span>Waystone areas after the campaign. The campaign ends first. A roll such as +(200-214) to maximum Life needs item level 80, so it is a maps roll.</li>
+              <li><span className="text-gold">Rare monster. </span>A monster with a yellow name. Stronger than a normal monster. Weaker than a unique boss.</li>
+              <li><span className="text-gold">Pack. </span>A group of monsters standing together. The clear skill is for the pack. The boss skill is for the rare or the unique.</li>
+            </ul>
+          </details>
           <StepCard step={current} active done={done} onToggle={toggle} guideId={guide.id} />
           {upcoming ? (
             <div>
@@ -348,7 +361,7 @@ export function GuideView({
       {tab === "Gear" ? (
         <section id="gear" className="mt-2">
           <p className="max-w-3xl text-muted">
-            Each slot lists its rolls under the icon. The gold list matches level {level}. {activeBand.gem}
+            Each slot lists its rolls under the icon. Under level 60 the gold list is the Act 1 list, and every line on it exists at item level 1. From level 60 the gold list is the endgame list. {activeBand.gem}
           </p>
           <div className="mt-4">
             <GearCards cards={guide.gearCards} totals={guide.gearTotals} level={level} />

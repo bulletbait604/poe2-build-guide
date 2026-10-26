@@ -36,7 +36,8 @@ function requireLists(html: string, label: string) {
 }
 
 const now = render(createElement(GuideView, { guide, gameClass, initialLevel: 12 }));
-if (!now.includes("Shop these rolls.")) failures.push("Now tab did not render the gear check");
+if (!now.includes("Renly in Clearfell Encampment")) failures.push("Now tab did not name Renly in Clearfell Encampment");
+if (!now.includes("Laced Boots")) failures.push("Now tab did not name the level 12 boots");
 requireLists(now, "Now");
 
 const leveling = render(createElement(GuideView, { guide, gameClass, initialLevel: 12, initialTab: "Leveling" }));
@@ -47,7 +48,10 @@ const gear = render(createElement(GearCards, { cards: guide.gearCards, totals: g
 requireLists(gear, "Gear");
 if (gear.includes("group-hover:block")) failures.push("Gear stats are still hidden until hover");
 if (gear.includes("While leveling")) failures.push("Gear card still renders the while-leveling sentence");
-if (!gear.includes("30% increased Movement Speed")) failures.push("Endgame totals are missing 30% movement speed");
+if (!gear.includes("35% increased Movement Speed")) failures.push("Endgame totals are missing the item level 82 movement speed roll");
+if (!gear.includes("30% increased Movement Speed") && !gear.includes("35% increased Movement Speed")) {
+  failures.push("Gear is missing a movement speed roll");
+}
 if (gear.includes("10-15% increased Movement Speed")) failures.push("Gear still mashes movement speed into 10-15%");
 
 if (failures.length) {

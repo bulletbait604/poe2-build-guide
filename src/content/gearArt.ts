@@ -69,6 +69,7 @@ const weapons: Record<string, string> = {
 
 function family(defence: string): SetName {
   const text = defence.toLowerCase();
+  if (text.includes("intelligence") && text.includes("life")) return "int";
   if (text.includes("evasion") && text.includes("energy")) return "dexint";
   if (text.includes("armour") && text.includes("evasion")) return "strdex";
   if (text.includes("energy")) return "int";

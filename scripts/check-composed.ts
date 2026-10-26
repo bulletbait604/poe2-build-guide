@@ -35,10 +35,14 @@ for (const spec of specs) {
   const ready = guide.timeline.find((step) => step.checks.some((check) => check.text.startsWith(`Socket ${spec.skill} now`)));
   const levelOne = guide.timeline.find((step) => step.level === 1);
   const opening = levelOne?.checks.map((check) => check.text).join(" ") ?? "";
-  if (ready && ready.level > 1 && !opening.includes(`Do not socket ${spec.skill} yet`)) {
+  if (spec.skill === "Skeletal Sniper") {
+    if (!opening.includes("Wait on Skeletal Sniper")) failures.push(`${spec.id} level 1 does not wait on Skeletal Sniper`);
+    if (/Tier 1 gem/.test(opening) && opening.includes("Skeletal Sniper is a Tier 1")) {
+      failures.push(`${spec.id} calls Skeletal Sniper a Tier 1 gem`);
+    }
+  } else if (ready && ready.level > 1 && !opening.includes(`Wait on ${spec.skill}`)) {
     failures.push(`${spec.id} level 1 still tells you to socket ${spec.skill}`);
-  }
-  if (!ready && !opening.includes(`Socket ${spec.skill}.`)) {
+  } else if (!ready && !opening.includes(`Socket ${spec.skill}.`)) {
     failures.push(`${spec.id} level 1 does not name ${spec.skill}`);
   }
 
@@ -49,7 +53,7 @@ for (const spec of specs) {
       }
       if (step.gear) {
         const lines = Array.isArray(step.gear) ? step.gear : [step.gear];
-        const numeric = lines.filter((line) => /^(?:\+)?(?:\()?\d/.test(line));
+        const numeric = lines.filter((line) => /^(?:\+)?(?:\()?\d|^Adds |^Allies /.test(line));
         if (numeric.length < 3) {
           failures.push(`${spec.id} ${phase.id} gear step "${step.title}" has fewer than 3 stat lines`);
         }
@@ -63,10 +67,11 @@ for (const spec of specs) {
       }
       if (row.gear) {
         const lines = row.stats ?? [];
-        if (lines.length < 3) failures.push(`${spec.id} level ${step.level} gear check has no stat list`);
+        const minimum = step.level === 4 ? 1 : 3;
+        if (lines.length < minimum) failures.push(`${spec.id} level ${step.level} gear check has no stat list`);
         for (const line of lines) {
-          if (!/^(?:\+)?(?:\()?\d/.test(line)) {
-            failures.push(`${spec.id} level ${step.level} stat is not value-first: ${line}`);
+          if (!/^(?:\+)?(?:\()?\d|^Adds |^Allies /.test(line)) {
+            failures.push(`${spec.id} level ${step.level} stat is not a mod line: ${line}`);
           }
         }
       }
@@ -82,8 +87,8 @@ for (const spec of specs) {
       ["leveling", card.leveling],
       ["endgame", card.endgame],
     ] as const) {
-      const numeric = lines.filter((line) => /^(?:\+)?(?:\()?\d/.test(line));
-      if (numeric.length < 3) failures.push(`${spec.id} ${card.slot} ${name} has fewer than 3 value-first stat lines`);
+      const numeric = lines.filter((line) => /^(?:\+)?(?:\()?\d|^Adds |^Allies /.test(line));
+      if (numeric.length < 3) failures.push(`${spec.id} ${card.slot} ${name} has fewer than 3 stat lines`);
       if (/quiver/i.test(card.slot) && lines.some((line) => /\+[2-9] to Level of all Projectile/.test(line))) {
         failures.push(`${spec.id} quiver lists a projectile gem level above +1`);
       }

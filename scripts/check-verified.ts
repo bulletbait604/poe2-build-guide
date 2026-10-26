@@ -100,7 +100,7 @@ for (const match of specText.matchAll(/u\("((?:\\.|[^"\\])*)", "([^"]+)", (\d+)/
     failures.push(`unique ${name} has no poe2db required level on record`);
     continue;
   }
-  if (level < row.level) failures.push(`${name} is suggested at ${level}, before required level ${row.level}`);
+  if (level !== row.level) failures.push(`${name} is listed at level ${level}; poe2db required level is ${row.level}`);
   if (slot !== row.slot) failures.push(`${name} is in slot ${slot}; poe2db base is ${row.slot}`);
 }
 if (usedUniques.size < 40) failures.push(`only ${usedUniques.size} unique names were parsed`);
@@ -117,6 +117,9 @@ const affixes = new Set(
 (14-19)% increased Cast Speed
 (155-169)% increased Physical Damage
 (17-19)% increased Attack Speed
+(20-22)% increased Attack Speed
+(23-25)% increased Attack Speed
+(209-238)% increased Spell Damage
 (25-28)% increased Cast Speed
 (26-28)% increased Attack Speed
 (26-39) to (44-66) added Physical Damage
@@ -125,6 +128,36 @@ const affixes = new Set(
 (37-55) to (63-94) added Physical Damage
 (4-6) to (7-11) added Physical Damage
 (40-49)% increased Physical Damage
+(50-64)% increased Physical Damage
+(50-68)% increased Spell Damage
+(25-34)% increased Spell Damage
+(35-44)% increased Spell Damage
+(45-54)% increased Spell Damage
+(55-64)% increased Spell Damage
+(65-74)% increased Spell Damage
+(65-84)% increased Physical Damage
+(69-88)% increased Spell Damage
+(75-89)% increased Spell Damage
+(85-109)% increased Physical Damage
+(89-108)% increased Spell Damage
+(90-104)% increased Spell Damage
+(109-128)% increased Spell Damage
+(110-134)% increased Physical Damage
+(129-148)% increased Spell Damage
+(135-154)% increased Physical Damage
+(149-188)% increased Spell Damage
+(170-179)% increased Physical Damage
+(189-208)% increased Spell Damage
+(13-16)% increased Cast Speed
+(17-20)% increased Cast Speed
+(20-25)% increased Cast Speed
+(21-24)% increased Cast Speed
+(26-31)% increased Cast Speed
+(29-32)% increased Cast Speed
+(32-37)% increased Cast Speed
+(38-43)% increased Cast Speed
+(44-49)% increased Cast Speed
++(5-6) to Level of all Spell Skills
 (5-6) to Level of all Spell Skills
 (5-7)% increased Attack Speed
 (5-7)% increased Attack Speed for allies in your Presence
@@ -134,10 +167,30 @@ const affixes = new Set(
 (9-12)% increased Cast Speed
 +1 to Level of all Melee Skills
 +1 to Level of all Minion Skills
++2 to Level of all Minion Skills
 +1 to Level of all Projectile Skills
 +1 to Level of all Spell Skills
 +10-17 maximum Energy Shield
 +10-19 maximum Life
++18-24 maximum Energy Shield
++20-29 maximum Life
++21-25% Cold Resistance
++21-25% Fire Resistance
++21-25% Lightning Resistance
++31-35 maximum Energy Shield
++31-35% Cold Resistance
++31-35% Fire Resistance
++31-35% Lightning Resistance
++41-45% Cold Resistance
++41-45% Fire Resistance
++41-45% Lightning Resistance
++42-47 maximum Energy Shield
++70-84 maximum Life
++74-80 maximum Energy Shield
++81-90 maximum Energy Shield
++85-99 maximum Life
++190-199 maximum Life
+35% increased Movement Speed
 +100-119 maximum Life
 +11-15% Cold Resistance
 +11-15% Fire Resistance
@@ -147,9 +200,19 @@ const affixes = new Set(
 +16-20% Cold Resistance
 +16-20% Fire Resistance
 +16-20% Lightning Resistance
++13-16 Dexterity
++13-16 Intelligence
++13-16 Strength
 +17-20 Dexterity
 +17-20 Intelligence
 +17-20 Strength
++21-24 Dexterity
++21-24 Intelligence
++21-24 Strength
++31-33 Dexterity
++31-33 Intelligence
++31-33 Strength
++4 to Level of all Melee Skills
 +175-189 maximum Life
 +2 to Level of all Melee Skills
 +2 to Level of all Projectile Skills

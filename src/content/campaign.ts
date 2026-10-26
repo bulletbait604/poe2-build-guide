@@ -1,4 +1,7 @@
 import type { BuildSpec } from "@/content/buildSpecs";
+import { instructsUse, pressLine } from "@/content/earlySkill";
+import { mainSkillReadyAt } from "@/content/gemFacts";
+import { loadoutFor } from "@/content/loadouts";
 import { statsForLevel } from "@/content/statLines";
 import { stepImage } from "@/content/zoneArt";
 import type { GuidePhase, GuideStep } from "@/lib/types";
@@ -47,7 +50,14 @@ function step(
 }
 
 export function storyPhases(spec: BuildSpec): GuidePhase[] {
-  const fight = `Use ${spec.skill}. ${spec.pack}`;
+  const loadout = loadoutFor(spec);
+  const readyAt = mainSkillReadyAt(spec.skill, loadout.overview, loadout.leveling);
+  const fightAt = (level: number) => {
+    const line = pressLine(spec, loadout, level);
+    if (!instructsUse(line, spec.skill)) return line;
+    return `${line} ${spec.pack}`;
+  };
+  const bossAt = (level: number) => (level < readyAt && instructsUse(spec.boss, spec.skill) ? fightAt(level) : spec.boss);
   const flask = spec.speed.includes("cast")
     ? "Take the 30% increased mana recovery from flasks only if you are drinking a mana flask to keep casting. Otherwise take the 30% increased life recovery."
     : "Take the 30% increased life recovery from flasks. Take mana recovery only if this build drinks a mana flask to attack.";
@@ -70,7 +80,7 @@ export function storyPhases(spec: BuildSpec): GuidePhase[] {
         "Kill the Bloated Miller",
         "Nobody to turn this in to. The road opens Clearfell Encampment.",
         "The way into Clearfell. No permanent stat.",
-        `Kill the Bloated Miller in the Riverbank. That opens Clearfell Encampment. ${fight}`,
+        `Kill the Bloated Miller in the Riverbank. That opens Clearfell Encampment. ${fightAt(1)}`,
         statsForLevel(spec, 1),
       ),
       step(
@@ -115,9 +125,9 @@ export function storyPhases(spec: BuildSpec): GuidePhase[] {
         "Act 1",
         "Freythorn",
         "Ominous Altars",
-        "The +30 spirit is the boss reward. Finn, in Clearfell Encampment, then gives an Uncut Support Gem. Finn does not give the spirit.",
-        "+30 maximum spirit, and a spirit gem on the first kill.",
-        "Freythorn is the side zone off the Hunting Grounds. Finish the rituals and kill the King in the Mists. Quest log: Ominous Altars. That kill is +30 spirit. Spirit pays for auras and minions. It is not mana. The first kill also drops a spirit gem. Leave the dryad. That fight is only a support gem.",
+        "Maxroll: +30 spirit from the King in the Mists, and an Uncut Spirit Gem on the first kill. poe2db lists the quest reward as three charms. Finn's page does not list an Uncut Support Gem.",
+        "+30 maximum spirit from the King in the Mists, on Maxroll's permanent campaign stats page. The first kill also drops an Uncut Spirit Gem.",
+        "Freythorn is the side zone off the Hunting Grounds. Finish the rituals and kill the King in the Mists. Quest log: Ominous Altars. Maxroll's permanent stats page: that kill is +30 spirit, and the first kill drops an Uncut Spirit Gem. Spirit pays for auras and minions. It is not mana. poe2db lists the quest reward as a Ruby Charm, a Sapphire Charm, and a Topaz Charm. Finn's poe2db page does not show an Uncut Support Gem turn-in. Maxroll's Act 1 notes put an Uncut Support Gem on the optional Dyadic Ritual in the Hunting Grounds. Leave the dryad. That fight is only a support gem.",
       ),
       step(
         "The Lost Lute",
@@ -125,8 +135,8 @@ export function storyPhases(spec: BuildSpec): GuidePhase[] {
         "Ogham Farmlands",
         "The Lost Lute",
         "Return the lute to Una in Clearfell Encampment.",
-        "Book of Specialisation: +2 Weapon Set Passive Skill Points.",
-        "Quest log: The Lost Lute. It unlocks after you have been through the dark with Una. The lute is in her house in Ogham Farmlands, the round open-roof building, in a crate at the back. Return it to Una in Clearfell Encampment. Count Geonor does not grant these points.",
+        "Book of Specialisation. Maxroll's campaign walkthrough calls this 2 Weapon Set Passive Skill Points. poe2db's quest page also lists 2 Passive Skill Points and 2 Passive Respec Points.",
+        "Quest log: The Lost Lute. It unlocks after you have been through the dark with Una. The lute is in her house in Ogham Farmlands, the round open-roof building, in a crate at the back. Return it to Una in Clearfell Encampment and use the book. Maxroll's campaign walkthrough (updated 2026-06-02) calls the reward 2 Weapon Set Passive Skill Points. poe2db's quest page lists a Book of Specialisation with 2 Passive Skill Points and 2 Passive Respec Points. Put the points on weapon set 1. Count Geonor does not grant these points.",
         earlyGear,
       ),
       step(
@@ -154,7 +164,7 @@ export function storyPhases(spec: BuildSpec): GuidePhase[] {
         "The Mad Wolf of Ogham",
         "Speak to the Hooded One after the kill. He sends you to the Vastiri Outskirts.",
         "Passage to Act 2. Geonor does not grant weapon-set points.",
-        `Count Geonor is the last floor. Quest log: The Mad Wolf of Ogham. ${spec.boss} Then speak to the Hooded One and sail.`,
+        `Count Geonor is the last floor. Quest log: The Mad Wolf of Ogham. ${bossAt(12)} Then speak to the Hooded One and sail.`,
       ),
     ]),
     phase("act-2", "acts", "Act 2", "Levels 14–29", 14, 29, [
@@ -164,8 +174,8 @@ export function storyPhases(spec: BuildSpec): GuidePhase[] {
         "Vastiri Outskirts",
         "Earning Passage",
         "Speak to the Hooded One, then Zarka. The caravan is the Ardura.",
-        "Passage on the Ardura Caravan, plus an Uncut Skill Gem. No permanent stat.",
-        `Quest log: Earning Passage. Rathbreaker, in the Vastiri Outskirts, is the door into the Ardura Caravan. Defeat him and return to Zarka. Then Mawdun Quarry and Rudja, the Dread Engineer, in Mawdun Mine. That fight is what moves the story. ${fight}`,
+        "Passage on the Ardura Caravan, plus an Uncut Skill Gem and 200 gold. No permanent stat.",
+        `Quest log: Earning Passage. Rathbreaker, in the Vastiri Outskirts, is the door into the Ardura Caravan. Defeat him and return to Zarka. poe2db: the reward is an Uncut Skill Gem and 200 gold. Then Mawdun Quarry and Rudja, the Dread Engineer, in Mawdun Mine. That fight is what moves the story. ${fightAt(14)}`,
         act2Gear,
       ),
       step(
@@ -251,7 +261,7 @@ export function storyPhases(spec: BuildSpec): GuidePhase[] {
         "Reach Ziggurat Encampment",
         "Servi and Oswald are in Ziggurat Encampment. You do not need them yet.",
         "The town. No permanent stat.",
-        `The marsh is only the road to Ziggurat Encampment. Leave Rootdredge and the Orok campfire. One is a gem and the other is a jeweller's orb. ${fight}`,
+        `The marsh is only the road to Ziggurat Encampment. Leave Rootdredge and the Orok campfire. One is a gem and the other is a jeweller's orb. ${fightAt(30)}`,
         act3Gear,
       ),
       step(
@@ -319,7 +329,7 @@ export function storyPhases(spec: BuildSpec): GuidePhase[] {
         "The Search",
         "Makoru, in Kingsmarch, hires the ship.",
         "The boat. The weapon pieces are the island bosses, not permanent stats.",
-        `Quest log: The Search. Talk to Makoru and take the boat. The marked islands hold the weapon pieces, and they can be sailed in any order. Skip gem hunts, map scraps, and bell chests. ${fight}`,
+        `Quest log: The Search. Talk to Makoru and take the boat. The marked islands hold the weapon pieces, and they can be sailed in any order. Skip gem hunts, map scraps, and bell chests. ${fightAt(42)}`,
         act4Gear,
       ),
       step(
@@ -393,7 +403,7 @@ export function storyPhases(spec: BuildSpec): GuidePhase[] {
         "Kill Tavakai, the Chieftain",
         "The Heart of the Tribe is the boss arena in Ngakanu.",
         "Act 4 ends. The defence lesson was already the shark fin. The Atlas is still closed.",
-        `Sail to Ngakanu and enter the Heart of the Tribe. Tavakai, the Chieftain, is the act boss. ${spec.boss} The defence lesson was the shark fin on Whakapanu. The Atlas is still closed.`,
+        `Sail to Ngakanu and enter the Heart of the Tribe. Tavakai, the Chieftain, is the act boss. ${bossAt(48)} The defence lesson was the shark fin on Whakapanu. The Atlas is still closed.`,
       ),
     ]),
     phase("interlude-barya", "interludes", "The Stolen Barya", "Do this one first", 52, 54, [
@@ -506,14 +516,14 @@ export function storyPhases(spec: BuildSpec): GuidePhase[] {
         ["75% Fire Resistance", "75% Cold Resistance", "75% Lightning Resistance", "30% Chaos Resistance", "50% Chaos Resistance", "30% increased Movement Speed"],
       ),
       step(
-        "What to upgrade",
+        "Map gear",
         "Maps",
-        "Town or the trade site",
+        "your hideout",
         "Gear check",
-        "Buy the rare, or craft with a Transmutation and an Augmentation while the base is still normal.",
+        "Search the trade site for the base named on the Gear tab.",
         "The targets on the Gear tab.",
-        `Weapon damage, then life, then the lowest resistance. The defence on the gear is ${spec.defence}.`,
-        statsForLevel(spec, 78),
+        `Search the trade site. Maps are waystone areas after the campaign. The defence on the gear is ${spec.defence}. Buy the base named on the Gear tab. Life tops by slot: body +(200-214) at item level 80, shield +(175-189) at 70, helmet and belt +(150-174) at 65, boots, gloves, and amulet +(120-149) at 60, ring +(100-119) at 54. Flat energy shield tops: body +(91-96) at item level 79, helmet +(61-73) at 60, boots and gloves +(48-60) at 54. 35% increased Movement Speed needs item level 82. The list under this step is the ring-legal life tier and the boot-legal energy shield tier, so it does not repeat the body-only numbers. If that rare is missing, buy a normal base and use an Orb of Transmutation, then an Orb of Augmentation.`,
+        statsForLevel(spec, 82),
       ),
       step(
         "Uniques stay optional",
