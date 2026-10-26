@@ -48,7 +48,7 @@ export const extraSpecs: BuildSpec[] = [
     boss: "Freezing Mark, freeze, Snipe.",
     ascendancyPick: "Point Blank, then Endless Munitions.",
     focus: "Evasion, life, movement speed, and a cold or physical bow.",
-    uniques: [u("Queen of the Forest", "Body", 28, optional)],
+    uniques: [u("Queen of the Forest", "Body", 51, optional)],
   }),
   spec({
     id: "pathfinder-cold-spark",
@@ -111,7 +111,7 @@ export const extraSpecs: BuildSpec[] = [
     boss: "Freeze, then Snipe. Snipe only on a frozen enemy.",
     ascendancyPick: "Take the Amazon projectile node and use Ice Shot for a zone before a second node.",
     focus: "Movement speed, evasion, life, and a bow that already kills.",
-    uniques: [u("Queen of the Forest", "Body", 28, optional)],
+    uniques: [u("Queen of the Forest", "Body", 51, optional)],
   }),
   spec({
     id: "spirit-walker-minions",
@@ -153,7 +153,7 @@ export const extraSpecs: BuildSpec[] = [
     boss: "Keep the bleed on. Blood Hunt when it is ready.",
     ascendancyPick: "A Ritualist node after Rake and Blood Hunt are both on the bar.",
     focus: "Physical damage on the spear, life, and movement speed.",
-    uniques: [u("Blackbraid", "Body", 1, optional)],
+    uniques: [u("Blackbraid", "Body", 4, optional)],
   }),
   spec({
     id: "titan-boneshatter",
@@ -174,7 +174,7 @@ export const extraSpecs: BuildSpec[] = [
     boss: "Prime the stun, then Boneshatter. Do not shatter a boss that is not stunned.",
     ascendancyPick: "A stun or armour node after Boneshatter is already stunning rares.",
     focus: "Armour, life, and a physical mace.",
-    uniques: [u("Hrimnor's Hymn", "Mace", 1, optional)],
+    uniques: [u("Hrimnor's Hymn", "Mace", 4, optional)],
   }),
   spec({
     id: "warbringer-shockwave",
@@ -195,7 +195,7 @@ export const extraSpecs: BuildSpec[] = [
     boss: "Totem before the fight. Replace it when it dies. Do not tank the slam.",
     ascendancyPick: "An armour-break or ancestral node after the totem is in every pack.",
     focus: "Armour, life, and a mace that still hits.",
-    uniques: [u("Blackbraid", "Body", 1, optional)],
+    uniques: [u("Blackbraid", "Body", 4, optional)],
   }),
   spec({
     id: "smith-earthquake",
@@ -216,7 +216,7 @@ export const extraSpecs: BuildSpec[] = [
     boss: "Earthquake at the feet. Strike when the burst is down. Move.",
     ascendancyPick: "Temper or the body node. If you take the body node, the chest stays a rare with life and armour.",
     focus: "A normal body with life and armour. Physical damage on the mace.",
-    uniques: [u("Hrimnor's Hymn", "Mace", 1, "Fine on the weapon. Not on the body if you took a body node.")],
+    uniques: [u("Hrimnor's Hymn", "Mace", 4, "The mace is fine. Smith of Kitava can only use a normal body armour.")],
   }),
   spec({
     id: "witchhunter-oil-grenade",
@@ -258,7 +258,7 @@ export const extraSpecs: BuildSpec[] = [
     boss: "Freezing Mark, Frost Bomb, Supporting Fire, then the sniper command.",
     ascendancyPick: "A Tactician node for the attack you are using. After 36 that attack is Supporting Fire.",
     focus: "Save 21,700 gold. Life, resistances, and one of each minion.",
-    uniques: [u("Goldrim", "Helmet", 1, optional)],
+    uniques: [u("Goldrim", "Helmet", 10, optional)],
   }),
   spec({
     id: "gemling-spark-comet",
@@ -315,7 +315,7 @@ export const extraSpecs: BuildSpec[] = [
     defence: "energy shield",
     speed: "attack speed",
     damage: "cold damage",
-    summary: "The top Martial Artist starter on the October 5, 2026 list. Tap Hollow Form and the copies finish Whirling Assault. Ice Strike hits the bell.",
+    summary: "An S-tier Martial Artist starter on the October 5, 2026 list. Tap Hollow Form and the copies finish Whirling Assault. Ice Strike hits the bell.",
     fantasy: "A martial artist who taps a form and lets the copies clear the screen.",
     pack: "Hollow Form, then Whirling Assault.",
     boss: "Freezing Mark, Hollow Form, Ice Strike the bell.",
@@ -341,8 +341,8 @@ export const extraSpecs: BuildSpec[] = [
     pack: "Devour a bell or a corpse, then Oil Barrage.",
     boss: "Frost Bomb, Hand of Chayula, Oil Barrage.",
     ascendancyPick: "A charge or barrage node after Oil Barrage is the button.",
-    focus: "Cooldown recovery for Hollow Focus. A body with +50 spirit later.",
-    uniques: [u("Changeling Talisman", "Talisman", 1, "Act 1. The early form wants a talisman.")],
+    focus: "Cooldown recovery for Hollow Focus. A body with +(47-50) to Spirit later.",
+    uniques: [u("Changeling Talisman", "Talisman", 38, "Crafted from Amor Mandragora. It requires level 38.")],
   }),
   spec({
     id: "martial-artist-storm-wave",
@@ -462,7 +462,7 @@ export const extraSpecs: BuildSpec[] = [
     defence: "energy shield",
     speed: "cast speed",
     damage: "fire and minion damage",
-    summary: "Infernal Legion is the lich minion starter on the October 2026 list. The support goes on a minion you expect to burn.",
+    summary: "Infernal Legion Lich is a B-tier build on the October 5, 2026 list. The support goes on a minion you expect to burn.",
     fantasy: "A lich whose minions burn and whose sniper still takes the shot.",
     pack: "Command the sniper. Let the legion minion burn.",
     boss: "Curse, command, replace what died.",
@@ -546,7 +546,7 @@ export const extraSpecs: BuildSpec[] = [
     defence: "energy shield",
     speed: "cast speed",
     damage: "cold damage",
-    summary: "Frostbolt freezes. Cast on Critical drops Comet. Detonate the ice crystals. An A-tier Disciple starter next to the minion build.",
+    summary: "Frostbolt freezes. Cast on Critical drops Comet. Detonate the ice crystals. An A-tier Disciple starter on the October 5, 2026 list.",
     fantasy: "A disciple who throws a frostbolt and lets a comet answer the crit.",
     pack: "Frostbolt through the pack.",
     boss: "Frost Bomb, Elemental Weakness, Frostbolt, detonate.",
@@ -573,7 +573,7 @@ export const extraSpecs: BuildSpec[] = [
     boss: "Volcano, Shockwave Totem, Frost Bomb. Keep rage full.",
     ascendancyPick: "Take Maximum Rage or Turning of the Seasons.",
     focus: "Life, armour, and rage. Movement speed so the walk is the clear.",
-    uniques: [u("Blackbraid", "Body", 1, optional)],
+    uniques: [u("Blackbraid", "Body", 4, optional)],
   }),
   spec({
     id: "shaman-demon-calamity",
@@ -594,7 +594,7 @@ export const extraSpecs: BuildSpec[] = [
     boss: "Furious Slam for space. Keep rage up so the calamity continues.",
     ascendancyPick: "An armour or rage node after Maul is already the clear.",
     focus: "Life and armour on the chest, helmet, and boots.",
-    uniques: [u("Blackbraid", "Body", 1, optional)],
+    uniques: [u("Blackbraid", "Body", 4, optional)],
   }),
   spec({
     id: "oracle-entangle",

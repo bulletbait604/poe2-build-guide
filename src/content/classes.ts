@@ -66,7 +66,7 @@ export const classes: GameClass[] = [
       {
         id: "tactician",
         name: "Tactician",
-        blurb: "Storm Blast, grenades, an Artillery Ballista, or Fragmentation Rounds.",
+        blurb: "Stormblast Bolts, grenades, an Artillery Ballista, or Fragmentation Rounds.",
         guideId: "tactician-stormblast",
         primary: false,
       },
