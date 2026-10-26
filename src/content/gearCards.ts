@@ -290,6 +290,9 @@ function howFor(slot: string, spec: BuildSpec) {
   if (/body/i.test(slot)) {
     return "Vendor a life chest during the acts. In maps, buy it. Trade filter: Body Armour, maximum Life or energy shield, and the defence this build wears. A Greater Iron Rune adds 18% armour, evasion, and energy shield if the chest has a socket.";
   }
+  if (/helm/i.test(slot)) {
+    return "Vendor a helmet with life or energy shield during the acts. In maps, buy the rare with one resistance.";
+  }
   if (/ring/i.test(slot)) {
     return "One element per ring. Trade filter: Ring, one elemental resistance, then chaos resistance on a second search once fire, cold, and lightning are at 75%.";
   }
