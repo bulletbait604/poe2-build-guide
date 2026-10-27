@@ -8,12 +8,8 @@ import { useState } from "react";
 
 function aloneCopy(name: string) {
   const fact = gemFact(name);
-  if (fact?.kind === "support" || fact?.kind === "lineage") {
-    const level = typeof fact.level === "number" ? ` Required level ${fact.level}.` : "";
-    const kind = fact.kind === "lineage" ? "lineage support" : "support";
-    return `This is a ${kind}, not a button.${level} Link it into a skill that lists it.`;
-  }
-  return "Press this skill by itself. Add a support only when that gem says it supports this skill.";
+  if (fact?.kind === "support" || fact?.kind === "lineage") return "Support. Not a button.";
+  return "Alone.";
 }
 
 function colorFor(damage: string) {
@@ -79,7 +75,6 @@ export function GemLinks({ groups, damage }: { groups: GemGroup[]; damage: strin
       {groups.map((group) => (
         <section key={group.label} className="border border-line bg-[#14110e] p-4">
           <h3 className="font-display text-xl text-parchment">{group.label}</h3>
-          <p className="mt-1 max-w-3xl text-sm leading-6 text-muted">{group.detail}</p>
           <div className="mt-4 space-y-3">
             {group.skills.map((skill) => (
               <div key={`${group.label}-${skill.name}`} className="border border-line/80 bg-black/50 p-3">
@@ -102,11 +97,6 @@ export function GemLinks({ groups, damage }: { groups: GemGroup[]; damage: strin
                     <p className="mb-6 text-sm text-muted">{aloneCopy(skill.name)}</p>
                   )}
                 </div>
-                {skill.supports.length > 0 ? (
-                  <p className="mt-2 text-xs leading-5 text-muted">
-                    Add these in order. Support 1 first. Stop when you run out of sockets. The last number is the one you drop.
-                  </p>
-                ) : null}
               </div>
             ))}
           </div>

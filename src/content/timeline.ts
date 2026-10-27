@@ -2,7 +2,7 @@ import type { BuildSpec } from "@/content/buildSpecs";
 import { armourAt, armourText, baseAt, isCaster, shops, weaponStats, weaponText } from "@/content/shopping";
 import { statsForLevel } from "@/content/statLines";
 import { stepImage } from "@/content/zoneArt";
-import { pressLine } from "@/content/earlySkill";
+import { skillAt } from "@/content/earlySkill";
 import { mainSkillReadyAt, requiredLevel } from "@/content/gemFacts";
 import { pointsForBand } from "@/content/passivePlan";
 import type { Loadout, StepCheck, TimelineStep } from "@/lib/types";
@@ -12,7 +12,8 @@ const SUPPORT_STOPS = [12, 22, 28, 38, 44, 52];
 
 function sentence(text: string) {
   const cut = text.split(/(?<=\.)\s/)[0]?.trim() ?? text.trim();
-  return cut.length > 220 ? `${cut.slice(0, 217)}…` : cut;
+  const words = cut.split(/\s+/);
+  return words.length <= 22 ? cut : `${words.slice(0, 22).join(" ")}.`;
 }
 
 function actFor(level: number) {
@@ -48,25 +49,30 @@ function gearCheck(spec: BuildSpec, level: number) {
     const weaponNow = baseAt(spec.weaponNoun, 4);
     const weaponWas = baseAt(spec.weaponNoun, 1);
     const fresh = weaponStats(spec.weaponNoun, 4).filter((line) => !weaponStats(spec.weaponNoun, 1).includes(line));
-    const changes = [
-      weaponNow.name === weaponWas.name ? `Weapon base is still ${weaponWas.name}. No new weapon base at level 4.` : `New weapon base: ${weaponNow.name} (${weaponNow.detail}).`,
-      bodyNow.name === bodyWas.name ? `Body is still ${bodyWas.name}.` : `New body: ${bodyNow.name} (${bodyNow.detail}).`,
-      bootsNow.name === bootsWas.name ? `Boots are still ${bootsWas.name}.` : `New boots: ${bootsNow.name} (${bootsNow.detail}).`,
-      fresh.length ? "New rolls since level 1 are the list under this line." : "No new roll since level 1. Keep the level 1 list.",
-    ];
-    return check(changes.join(" "), actFor(level), shop.where, `Buy from ${shop.who}`, fresh.length > 0, fresh.length ? fresh : undefined);
+    const changed = [
+      weaponNow.name === weaponWas.name ? "" : weaponNow.name,
+      bodyNow.name === bodyWas.name ? "" : bodyNow.name,
+      bootsNow.name === bootsWas.name ? "" : bootsNow.name,
+    ].filter(Boolean);
+    const text = changed.length ? `New: ${changed.join(", ")}.` : `Keep ${weaponWas.name}.`;
+    return check(text, actFor(level), shop.where, `Buy from ${shop.who}`, fresh.length > 0, fresh.length ? fresh : undefined);
   }
-  const armour = armourText(spec.defence, level, isCaster(spec));
-  const text = level === 1 ? armour : `${weaponText(spec.weaponNoun, level, attack)}\n${armour}`;
-  return check(text, actFor(level), shop.where, `Buy from ${shop.who}`, true, level === 1 ? statsForLevel(spec, level) : weaponStats(spec.weaponNoun, level));
+  if (level === 1) {
+    return check(armourText(spec.defence, level, isCaster(spec)), actFor(level), shop.where, `Buy from ${shop.who}`, true, statsForLevel(spec, level));
+  }
+  const row = shops(level);
+  const weaponShop = spec.weaponNoun === "wand" || spec.weaponNoun === "staff" || spec.weaponNoun === "sceptre" ? row.caster : row.armour;
+  const weapon = baseAt(attack && spec.weaponNoun === "staff" ? "quarterstaff" : spec.weaponNoun, level);
+  const boots = armourAt("boots", spec.defence, level);
+  const body = armourAt("body", spec.defence, level);
+  const text = `${weaponShop.who} in ${weaponShop.where}: ${weapon.name}. ${row.armour.who} in ${row.armour.where}: ${boots.name}, ${body.name}.`;
+  return check(text, actFor(level), shop.where, `Buy from ${shop.who}`, true, weaponStats(spec.weaponNoun, level));
 }
 
 function passiveLine(spec: BuildSpec, level: number) {
   const plan = pointsForBand(spec, Math.max(1, level - 3), level);
   const point = plan.points[0];
-  const text = point
-    ? `Next passive on the class path: ${sentence(point)}`
-    : "Spend the new point on the highlighted path. Do not path across the tree.";
+  const text = point ? `Next: ${sentence(point)}` : "Next node on the highlighted path.";
   return check(text, actFor(level), "Passive tree", "Spend the passive point");
 }
 
@@ -94,7 +100,7 @@ function checksFor(level: number, spec: BuildSpec, loadout: Loadout, readyAt: nu
     const hollow = /Hollow Palm/i.test(`${loadout.overview} ${loadout.leveling.map((row) => row.text).join(" ")}`);
     if (hollow) {
       checks[0] = check(
-        `Hollow Palm Technique needs both hand slots empty. poe2db: you can attack as though using a quarterstaff only while both hands are empty. Do not equip a quarterstaff until level 21. ${checks[0].text}`,
+        `Hollow Palm: both hands empty until level 21. ${checks[0].text}`,
         "Act 1",
         checks[0].zone,
         checks[0].quest,
@@ -102,63 +108,35 @@ function checksFor(level: number, spec: BuildSpec, loadout: Loadout, readyAt: nu
         checks[0].stats,
       );
     }
+    const button = skillAt(spec, loadout, 1);
     if (readyAt <= 1 && spec.skill !== "Skeletal Sniper") {
-      checks.push(check(`Socket ${spec.skill}. That is the left mouse button. ${pressLine(spec, loadout, 1)}`, "Act 1", "Your skill panel", "Socket the main skill"));
+      checks.push(check(`Socket ${spec.skill}. Left mouse button.`, "Act 1", "Your skill panel", "Socket the main skill"));
+    } else if (spec.skill === "Skeletal Sniper") {
+      checks.push(check(`Wait on Skeletal Sniper. Use ${button}.`, "Act 1", "Your skill panel", "Wait on the main skill"));
     } else {
-      checks.push(
-        check(
-          `Wait on ${spec.skill}. ${pressLine(spec, loadout, 1)}`,
-          "Act 1",
-          "Your skill panel",
-          "Wait on the main skill",
-        ),
-      );
+      checks.push(check(`Wait on ${spec.skill}. Use ${button}.`, "Act 1", "Your skill panel", "Wait on the main skill"));
     }
     checks.push(gearCheck(spec, level));
   } else if (level === 4) {
-    if (helperLevel <= 4) {
-      checks.push(
-        check(
-          `Add ${spec.helper} when you get a second skill gem. It is the right mouse button, not a replacement.`,
-          "Act 1",
-          "Your skill panel",
-          "Socket the second skill",
-        ),
-      );
-    } else {
-      checks.push(
-        check(
-          `Wait on ${spec.helper}. Tier ${helperLevel} gem: usable from level ${helperLevel}.`,
-          "Act 1",
-          "Your skill panel",
-          "Wait on the second skill",
-        ),
-      );
-    }
+    checks.push(
+      check(
+        helperLevel <= 4 ? `Add ${spec.helper}. Right mouse button.` : `Wait on ${spec.helper}.`,
+        "Act 1",
+        "Your skill panel",
+        helperLevel <= 4 ? "Socket the second skill" : "Wait on the second skill",
+      ),
+    );
     checks.push(gearCheck(spec, level));
     checks.push(passiveLine(spec, level));
   } else if (level === 8) {
-    checks.push(
-      check(
-        "The Crowbell is in the Hunting Grounds. Kill him. The reward is a Book of Specialisation: +2 weapon-set passive points. Those points only apply while that weapon set is active. They are not the point you get for leveling up.",
-        "Act 1",
-        "Hunting Grounds",
-        "Kill The Crowbell",
-      ),
-    );
-    checks.push(
-      check(
-        "Freythorn is the side zone. Quest log: Ominous Altars. Finish the rituals and kill the King in the Mists. Maxroll's permanent stats page: +30 spirit, and an Uncut Spirit Gem on the first kill. Spirit pays for auras and minions. It is not mana. poe2db lists the quest reward as a Ruby, Sapphire, and Topaz Charm. Finn's page does not list an Uncut Support Gem. An Uncut Support Gem is the optional Dyadic Ritual in the Hunting Grounds.",
-        "Act 1",
-        "Freythorn",
-        "Ominous Altars",
-      ),
-    );
+    checks.push(check("Kill The Crowbell in the Hunting Grounds. +2 weapon-set passive points.", "Act 1", "Hunting Grounds", "Kill The Crowbell"));
+    // Spirit pays for auras and minions. It is not mana.
+    checks.push(check("Freythorn: kill the King in the Mists. +30 spirit.", "Act 1", "Freythorn", "Ominous Altars"));
     checks.push(passiveLine(spec, level));
   } else if (level === 12) {
     checks.push(
       check(
-        "Quest log: The Lost Lute. The lute is in Una's house in Ogham Farmlands, the round open-roof building, in a crate at the back. Return it to Una in Clearfell Encampment. Reward: a Book of Specialisation, +2 weapon-set passive points. Count Geonor does not grant these points.",
+        "The Lost Lute is in Ogham Farmlands. Return it to Una in Clearfell Encampment. +2 weapon-set points.",
         "Act 1",
         "Ogham Farmlands",
         "The Lost Lute",
@@ -166,7 +144,7 @@ function checksFor(level: number, spec: BuildSpec, loadout: Loadout, readyAt: nu
     );
     checks.push(
       check(
-        "Ogham Manor, first floor: read the Psalm of Madness and kill Candlemass, the Living Rite. Use Candlemass' Essence for +20 maximum life. Last floor, quest log The Mad Wolf of Ogham: kill Count Geonor, then speak to the Hooded One. He sails you to the Vastiri Outskirts.",
+        "Ogham Manor: use Candlemass' Essence (+20 life), then kill Count Geonor.",
         "Act 1",
         "Ogham Manor",
         "The Mad Wolf of Ogham",
@@ -174,17 +152,10 @@ function checksFor(level: number, spec: BuildSpec, loadout: Loadout, readyAt: nu
     );
     checks.push(gearCheck(spec, level));
   } else if (level === 16) {
+    checks.push(check("Traitor's Passage: kill Balbala and take the Djinn Barya.", "Act 2", "Traitor's Passage", "Ascent to Power"));
     checks.push(
       check(
-        "Traitor's Passage. Quest log: Ascent to Power. Kill Balbala, the Traitor, and take the Djinn Barya. That coin opens the Trial of the Sekhemas. It is not a gem.",
-        "Act 2",
-        "Traitor's Passage",
-        "Ascent to Power",
-      ),
-    );
-    checks.push(
-      check(
-        `Clear the Trial of the Sekhemas once. Use the Altar of Ascendancy. That is your first 2 ascendancy points. Ascendancy points are not passive-tree points. On the ascendancy panel, take ${sentence(node)}`,
+        `Trial of the Sekhemas. Take ${sentence(node)}`,
         "Act 2",
         "Trial of the Sekhemas",
         "Ascent to Power",
@@ -192,20 +163,13 @@ function checksFor(level: number, spec: BuildSpec, loadout: Loadout, readyAt: nu
     );
     checks.push(gearCheck(spec, level));
   } else if (level === 22) {
-    checks.push(
-      check(
-        "Keth. Kill Kabala, the Constrictor Queen, for +2 weapon-set points. Kill hyenas until the Kabala Clan Relic drops. The relic is the key for the Valley of the Titans, not a bonus by itself.",
-        "Act 2",
-        "Keth",
-        "Kill Kabala, the Constrictor Queen",
-      ),
-    );
+    checks.push(check("Keth: kill Kabala. +2 weapon-set points. Keep the Kabala Clan Relic.", "Act 2", "Keth", "Kill Kabala, the Constrictor Queen"));
     checks.push(passiveLine(spec, level));
     checks.push(gearCheck(spec, level));
   } else if (level === 28) {
     checks.push(
       check(
-        "Deshar. Quest log: Tradition's Toll. Take the Final Letter to Shambrin on the Ardura Caravan for +2 weapon-set points. Then the Spires of Deshar: click the Sisters of Garukhan shrine for +10% lightning resistance. No kill. Finish on the Dreadnought by killing Jamanra, the Abomination.",
+        "Deshar: Final Letter to Shambrin. +2 weapon-set points. Sisters of Garukhan: +10% lightning resistance. Then Jamanra on the Dreadnought.",
         "Act 2",
         "Deshar",
         "Tradition's Toll",
@@ -214,47 +178,28 @@ function checksFor(level: number, spec: BuildSpec, loadout: Loadout, readyAt: nu
     checks.push(gearCheck(spec, level));
     checks.push(passiveLine(spec, level));
   } else if (level === 33) {
-    checks.push(
-      check(
-        "The Trial of Chaos is in the Chimeral Wetlands. Run it once for the next 2 ascendancy points.",
-        "Act 3",
-        "Chimeral Wetlands",
-        "Trial of Chaos",
-      ),
-    );
+    checks.push(check("Trial of Chaos in the Chimeral Wetlands. +2 ascendancy points.", "Act 3", "Chimeral Wetlands", "Trial of Chaos"));
     checks.push(
       second
-        ? check(`On the ascendancy panel, take ${sentence(second)}`, "Act 3", "Ascendancy panel", "Spend the ascendancy points")
-        : check(
-            "Use the new ascendancy node for a whole zone before you take another.",
-            "Act 3",
-            "Ascendancy panel",
-            "Spend the ascendancy points",
-          ),
+        ? check(`Take ${sentence(second)}`, "Act 3", "Ascendancy panel", "Spend the ascendancy points")
+        : check("Use the new ascendancy node for one zone.", "Act 3", "Ascendancy panel", "Spend the ascendancy points"),
     );
     checks.push(
       check(
-        "Jungle Ruins: Mighty Silverfist is +2 weapon-set points if you skipped him. Jiquani's Machinarium: kill Blackjaw, the Remnant, for +10% fire resistance. Open him with a Small Soul Core at the Stone Altar.",
+        "Blackjaw in Jiquani's Machinarium: +10% fire resistance. Mighty Silverfist: +2 weapon-set points.",
         "Act 3",
         "Jiquani's Machinarium",
         "Kill Blackjaw, the Remnant",
       ),
     );
   } else if (level === 38) {
-    checks.push(
-      check(
-        "The Azak Bog. Quest log: Tribal Vengeance. Kill Ignagduk, the Bog Witch, and turn the quest in to Servi in Ziggurat Encampment. That is +30 spirit.",
-        "Act 3",
-        "The Azak Bog",
-        "Tribal Vengeance",
-      ),
-    );
+    checks.push(check("Azak Bog: kill Ignagduk and turn in to Servi. +30 spirit.", "Act 3", "The Azak Bog", "Tribal Vengeance"));
     checks.push(gearCheck(spec, level));
     checks.push(passiveLine(spec, level));
   } else if (level === 44) {
     checks.push(
       check(
-        "Quest log: Trial of the Ancestors. In the Halls of the Dead, Ngamahu is +5 strength or +5% fire resistance, Tasalio is +5 intelligence or +5% cold resistance, and Tawhoa is +5 dexterity or +5% lightning resistance. Take the resistance you are lowest on. Then kill Yama the White and speak to Hinekora for +2 weapon-set points. The Silent Hall, on the way, is +5% maximum mana.",
+        "Halls of the Dead: take the resistance you are lowest on. Hinekora: +2 weapon-set points.",
         "Act 4",
         "Halls of the Dead",
         "Trial of the Ancestors",
@@ -264,7 +209,7 @@ function checksFor(level: number, spec: BuildSpec, loadout: Loadout, readyAt: nu
   } else if (level === 52) {
     checks.push(
       check(
-        "Do the Stolen Barya interlude first. Recap these before you zone in.",
+        "Stolen Barya first. Cap resistances, then enter.",
         "Interlude: The Stolen Barya",
         "The Khari Crossing",
         "Clearing the Way",
@@ -274,7 +219,7 @@ function checksFor(level: number, spec: BuildSpec, loadout: Loadout, readyAt: nu
     );
     checks.push(
       check(
-        "Quest log: Clearing the Way. Kill Akthi, the Final Sting, and Anundr, the Sandworm, in the Khari Crossing, then take the Book of Specialisation from Risu in the Khari Bazaar. That is +2 weapon-set points. The Skullmaw Stairway is the Molten Shrine: use the Molten One's Gift for +5% maximum life.",
+        "Khari Crossing: kill Akthi and Anundr. Risu gives +2 weapon-set points. Molten Shrine: +5% life.",
         "Interlude: The Stolen Barya",
         "The Khari Crossing",
         "Clearing the Way",
@@ -282,17 +227,10 @@ function checksFor(level: number, spec: BuildSpec, loadout: Loadout, readyAt: nu
     );
     checks.push(gearCheck(spec, level));
   } else if (level === 58) {
+    checks.push(check("Kriar Village: kill Lythara. +40 spirit.", "Interlude: Doryani's Contingency", "Kriar Village", "Slay Lythara, the Wayward Spear"));
     checks.push(
       check(
-        "Doryani's Contingency, Kriar Village: kill Lythara, the Wayward Spear, for +40 spirit. With the King in the Mists and Ignagduk, that is 100 spirit from the campaign.",
-        "Interlude: Doryani's Contingency",
-        "Kriar Village",
-        "Slay Lythara, the Wayward Spear",
-      ),
-    );
-    checks.push(
-      check(
-        "Holten is last. Kill Oswin, the Dread Warden, in Wolvenhold for +2 weapon-set points. Then speak to the Hooded One in Kingsmarch. Quest log: Siege of Oriath. That is the last +2. You should have 24.",
+        "Wolvenhold: kill Oswin. +2 weapon-set points. Then the Hooded One in Kingsmarch.",
         "Interlude: Kingsmarch",
         "Kingsmarch",
         "Siege of Oriath",
@@ -301,50 +239,29 @@ function checksFor(level: number, spec: BuildSpec, loadout: Loadout, readyAt: nu
     checks.push(gearCheck(spec, level));
   } else if (level === 66) {
     checks.push(
-      check(
-        "Cap each element before you raise the map tier.",
-        "Maps",
-        "Your map device",
-        "Gear check",
-        true,
-        ["75% Fire Resistance", "75% Cold Resistance", "75% Lightning Resistance"],
-      ),
+      check("Cap each element before the next map tier.", "Maps", "Your map device", "Gear check", true, [
+        "75% Fire Resistance",
+        "75% Cold Resistance",
+        "75% Lightning Resistance",
+      ]),
     );
     checks.push(
-      check(
-        "Chaos resistance stays in this band.",
-        "Maps",
-        "Town or the trade site",
-        "Gear check",
-        true,
-        ["30% Chaos Resistance", "50% Chaos Resistance", "+20-23% Chaos Resistance"],
-      ),
+      check("Chaos resistance: 30% to 50%.", "Maps", "Town or the trade site", "Gear check", true, [
+        "30% Chaos Resistance",
+        "50% Chaos Resistance",
+        "+20-23% Chaos Resistance",
+      ]),
     );
     checks.push(passiveLine(spec, level));
   } else if (level === 78) {
-    checks.push(
-      check(
-        "A rare with these rolls still beats a unique that has neither. +(200-214) maximum Life is body armour only, at item level 80. Boots and gloves stop at +(120-149). Helmets and belts stop at +(150-174). Rings stop at +(100-119). Shields stop at +(175-189). +(91-96) maximum Energy Shield is body armour only, at item level 79.",
-        "Maps",
-        "Town or the trade site",
-        "Gear check",
-        true,
-        statsForLevel(spec, level),
-      ),
-    );
+    checks.push(check("Buy the endgame rolls below.", "Maps", "Town or the trade site", "Gear check", true, statsForLevel(spec, level)));
     checks.push(gearCheck(spec, level));
-    checks.push(
-      check(
-        "Add one support at a time. A new skill name is a different build.",
-        "Maps",
-        "Your skill panel",
-        "Socket supports",
-      ),
-    );
+    checks.push(check("Add one support at a time.", "Maps", "Your skill panel", "Socket supports"));
   }
 
   return checks;
 }
+
 
 function supportReadyAt(index: number, name: string, skillReadyAt: number) {
   const drip = SUPPORT_STOPS[index] ?? 58;
@@ -407,7 +324,7 @@ export function timelineFor(spec: BuildSpec, loadout: Loadout): TimelineStep[] {
   }
   if (readyAt > 1) {
     const line = check(
-      `Socket ${spec.skill} now. It is the left mouse button from here.`,
+      `Socket ${spec.skill} now. Left mouse button.`,
       actFor(readyAt),
       "Your skill panel",
       "Socket the main skill",
@@ -423,7 +340,7 @@ export function timelineFor(spec: BuildSpec, loadout: Loadout): TimelineStep[] {
     const level = supportReadyAt(index, support, readyAt);
     const step = merged.get(level);
     const line = check(
-      `Link ${support} into ${spec.skill}. This is support ${index + 1}. Tier ${requiredLevel(support)} gem: usable from level ${requiredLevel(support)}.`,
+      `Link ${support} into ${spec.skill}.`,
       actFor(level),
       "Your skill panel",
       "Socket supports",

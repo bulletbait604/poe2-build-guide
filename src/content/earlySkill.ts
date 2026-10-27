@@ -53,20 +53,9 @@ export function skillAt(spec: BuildSpec, loadout: Loadout, level: number) {
   return starterFor(spec.weaponNoun);
 }
 
-function switchReason(skill: string, leveling: LevelStep[], readyAt: number) {
-  const row = leveling.find((entry) => new RegExp(`\\b${escapeName(skill)}\\b`).test(entry.text));
-  if (!row) return "that is when this route's leveling notes put it on the bar";
-  const sentence =
-    row.text.split(/(?<=\.)\s/).find((part) => new RegExp(`level ${readyAt}\\b`).test(part)) ?? row.text.split(/(?<=\.)\s/)[0];
-  const cleaned = sentence.replace(/\.$/, "").trim();
-  if (/as soon as it drops|put it on the bar/i.test(cleaned)) {
-    return "that is when this route's leveling notes put it on the bar";
-  }
-  return cleaned;
-}
-
-const SOCKET_HELP =
-  "Skill gems come from an Uncut Skill Gem. Open the Skills panel, choose the gem, and assign it to the left mouse button.";
+// Supporting Fire and Maul have no Uncut Skill Gem Tier on poe2db. Supporting Fire comes from Tactician's Unleash Hell!.
+// Maul requires a Talisman and gem level 1 requires level 1. Skeletal Sniper is a persistent minion with a spirit reservation and no Uncut tier.
+// Those facts stay here. The lines below only name the button.
 
 /** Level 1 button for a minion guide. Each route names its own skill. Skeletal Sniper is not that button. */
 export function minionOpener(spec: BuildSpec) {
@@ -78,44 +67,14 @@ export function minionOpener(spec: BuildSpec) {
 
 export function pressLine(spec: BuildSpec, loadout: Loadout, level: number) {
   const ready = joinsAtLevel(spec.skill, loadout.overview, loadout.leveling);
-  const tier = gemTier(spec.skill) ?? requiredLevel(spec.skill);
   const now = skillAt(spec, loadout, level);
   const hollow = /Hollow Palm/i.test(`${loadout.overview} ${loadout.leveling.map((row) => row.text).join(" ")}`);
-  const hands = hollow && level < 21 ? " Both hand slots stay empty until level 21. Hollow Palm Technique turns off if a weapon is equipped." : "";
-  if (spec.skill === "Supporting Fire") {
-    const grant =
-      "Supporting Fire is not an Uncut Skill Gem. poe2db lists no Uncut Skill Gem Tier for it. Tactician's Unleash Hell! grants it.";
-    if (level < ready) {
-      return `Use ${now} on the left mouse button. ${grant} This route switches at level ${ready}. ${SOCKET_HELP}${hands}`;
-    }
-    return `Use Supporting Fire on the left mouse button. ${grant} ${SOCKET_HELP}${hands}`;
+  const hands = hollow && level < 21 ? " Hands empty until 21." : "";
+  if (spec.skill === "Skeletal Sniper" && level < 30) {
+    return `Use ${minionOpener(spec)}. Wait on Skeletal Sniper.${hands}`;
   }
-  if (spec.skill === "Maul") {
-    const grant =
-      "Maul is not an Uncut Skill Gem. poe2db lists no Uncut Skill Gem Tier. It requires a Talisman. Gem level 1 requires level 1.";
-    if (level < ready) {
-      return `Use ${now} on the left mouse button. ${grant} This route switches at level ${ready}. ${SOCKET_HELP}${hands}`;
-    }
-    return `Use Maul on the left mouse button. ${grant} ${SOCKET_HELP}${hands}`;
-  }
-  if (spec.skill === "Skeletal Sniper") {
-    const opener = minionOpener(spec);
-    const reservation =
-      "Skeletal Sniper is a persistent minion. poe2db does not list an Uncut Skill Gem Tier for it. The gem prints a spirit reservation. Socket it when the character sheet spirit can pay that reservation.";
-    if (level < 30) {
-      return `Use ${opener} on the left mouse button. Wait on Skeletal Sniper. ${reservation} ${SOCKET_HELP}${hands}`;
-    }
-    return `Use Skeletal Sniper on the left mouse button if the character sheet spirit can pay the reservation printed on the gem. ${reservation} ${SOCKET_HELP}${hands}`;
-  }
-  if (level >= ready) {
-    return `Use ${spec.skill} on the left mouse button. ${SOCKET_HELP}${hands}`;
-  }
-  const reason = switchReason(spec.skill, loadout.leveling, ready);
-  const tierLine =
-    ready === tier
-      ? `${spec.skill} is a Tier ${tier} gem: usable from level ${tier}.`
-      : `${spec.skill} is a Tier ${tier} gem: usable from level ${tier}; this route switches at level ${ready} because ${reason}.`;
-  return `Use ${now} on the left mouse button. ${tierLine} ${SOCKET_HELP}${hands}`;
+  if (level >= ready) return `Use ${spec.skill}.${hands}`;
+  return `Use ${now}. Wait on ${spec.skill}.${hands}`;
 }
 
 /**
