@@ -64,11 +64,11 @@ function baseName(slot: string, spec: BuildSpec) {
   return baseLabel(slot, spec);
 }
 
-function whyFor(slot: string, spec: BuildSpec, row: GearStage | undefined) {
-  if (row?.maps) return row.maps;
-  if (/boot/i.test(slot)) return "Boots need increased Movement Speed. A pair at 0% stays in town.";
-  if (/ring|amulet|belt/i.test(slot)) return "This is where the resistance cap is finished.";
-  return `${spec.defence} and life live on this piece. ${spec.weaponStat}`;
+function whyFor(slot: string) {
+  if (/boot/i.test(slot)) return "Movement speed.";
+  if (/ring|amulet|belt/i.test(slot)) return "Resistances.";
+  if (/weapon|bow|spear|crossbow|staff|wand|mace|sceptre|quarterstaff/i.test(slot)) return "Damage.";
+  return "Life and defence.";
 }
 
 function iconFor(slot: string, spec: BuildSpec) {
@@ -109,7 +109,7 @@ function listsFor(slot: string, spec: BuildSpec, gear: GearStage[]): StatLines {
       return {
         leveling: ["10% increased Movement Speed", "+10-19 maximum Life", hybridLeveling, "+6-10% Fire Resistance"],
         endgame: ["35% increased Movement Speed", "+120-149 maximum Life", hybridHands, "+36-40% Fire Resistance"],
-        skip: "The energy shield on these boots is the combined evasion and energy shield mod. It stops at item level 46. Intelligence boots roll +48-60 maximum Energy Shield at item level 54.",
+        skip: "Skip item rarity.",
       };
     }
     return {
@@ -127,7 +127,7 @@ function listsFor(slot: string, spec: BuildSpec, gear: GearStage[]): StatLines {
         "+36-40% Cold Resistance",
         "+36-40% Lightning Resistance",
       ],
-      skip: "Skip these rolls: increased Rarity of Items found, Critical Hit Chance. Don't spend currency on a unique; wear one only if it drops and beats your current item.",
+      skip: "Skip item rarity.",
     };
   }
   if (/body/i.test(slot)) {
@@ -135,7 +135,7 @@ function listsFor(slot: string, spec: BuildSpec, gear: GearStage[]): StatLines {
       return {
         leveling: ["+10-19 maximum Life", hybridLeveling, "+6-10% Fire Resistance"],
         endgame: ["+200-214 maximum Life", hybridBody, "(101-110) % increased Evasion and Energy Shield"],
-        skip: "Life on this body reaches +200-214 at item level 80. The combined evasion and energy shield mod reaches its top at item level 75. Intelligence body armour rolls +91-96 maximum Energy Shield at item level 79.",
+        skip: "Skip stun threshold.",
       };
     }
     return {
@@ -153,7 +153,7 @@ function listsFor(slot: string, spec: BuildSpec, gear: GearStage[]): StatLines {
       return {
         leveling: ["+10-19 maximum Life", hybridLeveling, "+6-10% Fire Resistance"],
         endgame: ["+150-174 maximum Life", hybridHelmet, "+36-40% Fire Resistance"],
-        skip: "The combined evasion and energy shield mod on a helmet stops at item level 54.",
+        skip: "Skip stun threshold.",
       };
     }
     return {
@@ -167,20 +167,20 @@ function listsFor(slot: string, spec: BuildSpec, gear: GearStage[]): StatLines {
       return {
         leveling: [attacker(spec) ? "(5-7)% increased Attack Speed" : "+6-10% Fire Resistance", "+10-19 maximum Life", hybridLeveling],
         endgame: [attacker(spec) ? "(14-16)% increased Attack Speed" : "+36-40% Fire Resistance", hybridHands, "+120-149 maximum Life", GLOVE_ATTRIBUTE_TOP],
-        skip: "Dexterity on gloves reaches +34-36 at item level 81. Strength and Intelligence on gloves stop at +31-33, item level 74. The combined evasion and energy shield mod stops at item level 46.",
+        skip: "Skip item rarity.",
       };
     }
     if (attacker(spec)) {
       return {
         leveling: ["(5-7)% increased Attack Speed", es ? "+10-17 maximum Energy Shield" : "+10-19 maximum Life", "+6-10% Fire Resistance"],
         endgame: ["(14-16)% increased Attack Speed", es ? "+48-60 maximum Energy Shield" : "+120-149 maximum Life", GLOVE_ATTRIBUTE_TOP],
-        skip: "Dexterity on gloves reaches +34-36 at item level 81. Strength and Intelligence on gloves stop at +31-33, item level 74. Skip item rarity.",
+        skip: "Skip item rarity.",
       };
     }
     return {
       leveling: ["+6-10% Fire Resistance", es ? "+10-17 maximum Energy Shield" : "+10-19 maximum Life", `+5-8 ${attr}`],
       endgame: ["+36-40% Fire Resistance", es ? "+48-60 maximum Energy Shield" : "+120-149 maximum Life", GLOVE_ATTRIBUTE_TOP],
-      skip: "Dexterity on gloves reaches +34-36 at item level 81. Strength and Intelligence on gloves stop at +31-33, item level 74. Skip item rarity. Cast speed is an amulet roll.",
+      skip: "Skip item rarity.",
     };
   }
   if (/ring/i.test(slot)) {
@@ -199,34 +199,34 @@ function listsFor(slot: string, spec: BuildSpec, gear: GearStage[]): StatLines {
         endgame: caster(spec)
           ? [gemEnd, "(25-28)% increased Cast Speed", "+80-89 maximum Energy Shield"]
           : [gemEnd, "+80-89 maximum Energy Shield", spirit ? "+47-50 Spirit" : "+36-40% Fire Resistance"],
-        skip: "Amulet energy shield is its own ladder. +8-14 is item level 1. +80-89 needs item level 80. The body roll +91-96 does not exist on an amulet.",
+        skip: "Skip item rarity.",
       };
     }
     if (caster(spec)) {
       return {
         leveling: ["(9-12)% increased Cast Speed", "+6-10% Fire Resistance", `+5-8 ${attr}`],
         endgame: [gemEnd, "(25-28)% increased Cast Speed", spirit ? "+47-50 Spirit" : "+36-40% Fire Resistance"],
-        skip: "Skip item rarity. Attributes on an amulet stop at +31-33, item level 74.",
+        skip: "Skip item rarity.",
       };
     }
     return {
       leveling: ["+6-10% Fire Resistance", "+10-19 maximum Life", `+5-8 ${attr}`],
       endgame: [gemEnd, spirit ? "+47-50 Spirit" : "+36-40% Fire Resistance", `+31-33 ${attr}`],
-      skip: "Attributes on an amulet stop at +31-33, item level 74. Skip item rarity.",
+      skip: "Skip item rarity.",
     };
   }
   if (/belt/i.test(slot)) {
     return {
       leveling: ["+10-19 maximum Life", "+6-10% Fire Resistance", "+5-8 Strength"],
       endgame: ["+150-174 maximum Life", "+36-40% Fire Resistance", BELT_ATTRIBUTE_TOP],
-      skip: "Belts roll Strength only. +34-36 to Strength needs item level 81. Dexterity and Intelligence do not roll on a belt.",
+      skip: "Belts roll Strength only.",
     };
   }
   if (/quiver/i.test(slot)) {
     return {
       leveling: ["(5-7)% increased Attack Speed", "Adds 1 to 3 Physical Damage to Attacks", "+5-8 Dexterity"],
       endgame: ["+1 to Level of all Projectile Skills", "(14-16)% increased Attack Speed", "(11-13)% increased Attack Speed"],
-      skip: "A quiver rolls +1 to Level of all Projectile Skills. It does not roll +2 or +3.",
+      skip: "Quiver gem level stops at +1.",
     };
   }
   if (/jewel/i.test(slot)) {
@@ -249,21 +249,21 @@ function listsFor(slot: string, spec: BuildSpec, gear: GearStage[]): StatLines {
     return {
       leveling: ["(40-49)% increased Physical Damage", "(5-7)% increased Attack Speed", "Adds (1-2) to (4-5) Physical Damage"],
       endgame: ["(170-179)% increased Physical Damage", "(155-169)% increased Physical Damage", "+4 to Level of all Projectile Skills"],
-      skip: "Skip these rolls: increased Rarity of Items found, Critical Hit Chance. Don't spend currency on a unique; wear one only if it drops and beats your current item. Also skip an Artillery Bow. That base has 50% reduced Projectile Range.",
+      skip: "Skip an Artillery Bow.",
     };
   }
   if (noun === "crossbow" || /crossbow/i.test(slot)) {
     return {
       leveling: ["(40-49)% increased Physical Damage", "(5-7)% increased Attack Speed", "Adds (2-3) to (5-7) Physical Damage"],
       endgame: ["(170-179)% increased Physical Damage", "(155-169)% increased Physical Damage", "+5 to Level of all Projectile Skills"],
-      skip: "Skip these rolls: increased Rarity of Items found, Critical Hit Chance. Don't spend currency on a unique; wear one only if it drops and beats your current item.",
+      skip: "Skip item rarity.",
     };
   }
   if (noun === "quarterstaff" || /quarterstaff/i.test(slot)) {
     return {
       leveling: ["(40-49)% increased Physical Damage", "(5-7)% increased Attack Speed", "Adds (2-3) to (5-7) Physical Damage"],
       endgame: ["(170-179)% increased Physical Damage", "(155-169)% increased Physical Damage", "+5 to Level of all Melee Skills"],
-      skip: "Skip these rolls: increased Rarity of Items found, Critical Hit Chance. Don't spend currency on a unique; wear one only if it drops and beats your current item.",
+      skip: "Skip item rarity.",
     };
   }
   if (noun === "spear" || /spear/i.test(slot)) {
@@ -272,19 +272,15 @@ function listsFor(slot: string, spec: BuildSpec, gear: GearStage[]): StatLines {
     return {
       leveling: ["(40-49)% increased Physical Damage", "(5-7)% increased Attack Speed", "Adds (1-2) to (4-5) Physical Damage"],
       endgame: ["(170-179)% increased Physical Damage", "(155-169)% increased Physical Damage", minionSpear ? "(26-28)% increased Attack Speed" : meleeSpear ? "+4 to Level of all Melee Skills" : "+4 to Level of all Projectile Skills"],
-      skip:
-        spec.skill === "Rake" || spec.skill === "Blood Hunt"
-          ? "Rake and Blood Hunt are melee Strikes (poe2db: Attack, AoE, Melee, Strike, Physical). From item level 18 the gem roll is +1 to Level of all Melee Skills. The spear also rolls +1 to Level of all Projectile Skills at the same item level. Skip these rolls: increased Rarity of Items found, Critical Hit Chance. Don't spend currency on a unique; wear one only if it drops and beats your current item."
-          : spec.damage.toLowerCase().includes("minion")
-            ? "Skip these rolls: increased Rarity of Items found, Critical Hit Chance. Don't spend currency on a unique; wear one only if it drops and beats your current item. +1 to Level of all Minion Skills is a sceptre roll from item level 2, or an amulet roll from item level 5. A spear does not roll it."
-            : "Skip these rolls: increased Rarity of Items found, Critical Hit Chance. Don't spend currency on a unique; wear one only if it drops and beats your current item.",
+      // Rake and Blood Hunt are melee Strikes. Minion gem levels are a sceptre or amulet roll, not a spear roll.
+      skip: "Skip item rarity.",
     };
   }
   if (noun === "wand" || /wand/i.test(slot)) {
     return {
       leveling: ["(25-34)% increased Spell Damage", "(9-12)% increased Cast Speed", "+5-8 Intelligence"],
       endgame: ["+4 to Level of all Spell Skills", "(33-35)% increased Cast Speed", "+28-30 Intelligence"],
-      skip: "Skip these rolls: increased Rarity of Items found, Critical Hit Chance. Don't spend currency on a unique; wear one only if it drops and beats your current item. +1 to Level of all Spell Skills needs item level 5.",
+      skip: "Skip item rarity.",
     };
   }
   if (noun === "staff" || /^staff$/i.test(slot)) {
@@ -295,22 +291,20 @@ function listsFor(slot: string, spec: BuildSpec, gear: GearStage[]): StatLines {
       endgame: spec.skill === "Maul"
         ? ["(170-179)% increased Physical Damage", "(155-169)% increased Physical Damage", "+5 to Level of all Melee Skills"]
         : ["+(5-6) to Level of all Spell Skills", "(50-52)% increased Cast Speed", "+28-30 Intelligence"],
-      skip: spec.skill === "Maul"
-        ? "Maul is a Bear-form melee Strike and needs Talismans. Skip spell damage and +to spell skills. Skip these rolls: increased Rarity of Items found, Critical Hit Chance. Don't spend currency on a unique; wear one only if it drops and beats your current item."
-        : "Skip these rolls: increased Rarity of Items found, Critical Hit Chance. Don't spend currency on a unique; wear one only if it drops and beats your current item. +(5-6) to Level of all Spell Skills needs item level 78.",
+      skip: spec.skill === "Maul" ? "Skip spell damage." : "Skip item rarity.",
     };
   }
   if (noun === "sceptre" || /sceptre/i.test(slot)) {
     return {
       leveling: ["Allies in your Presence deal (25-34)% increased Damage", "+5-8 Intelligence", "Allies in your Presence deal (1-2) to (3-4) added Attack Physical Damage"],
       endgame: ["+4 to Level of all Minion Skills", "Allies in your Presence have (14-16)% increased Attack Speed", "+28-30 Intelligence"],
-      skip: "Skip these rolls: increased Rarity of Items found, Critical Hit Chance. Don't spend currency on a unique; wear one only if it drops and beats your current item. Allies in your Presence have (5-7)% increased Attack Speed needs item level 5. Presence is the area around your character.",
+      skip: "Skip item rarity.",
     };
   }
   return {
     leveling: ["(40-49)% increased Physical Damage", "(5-7)% increased Attack Speed", "Adds (1-2) to (4-5) Physical Damage", "Adds (2-3) to (5-7) Physical Damage"],
     endgame: ["(170-179)% increased Physical Damage", "(155-169)% increased Physical Damage", "+4 to Level of all Melee Skills"],
-    skip: "Skip these rolls: increased Rarity of Items found, Critical Hit Chance. Don't spend currency on a unique; wear one only if it drops and beats your current item. Use a one-hand mace plus a shield, or a two-hand mace with the shield slot empty. Do not equip both. The one-hand added-physical line is (1-2) to (4-5) at item level 1. The two-hand line is (2-3) to (5-7) at item level 1. A one-hand mace rolls +4 to Level of all Melee Skills at item level 81. A two-hand mace rolls +5 to Level of all Melee Skills at item level 81.",
+    skip: "One-hand mace plus a shield, or a two-hand mace alone.",
   };
 }
 
@@ -320,7 +314,7 @@ export function gearCardsFor(spec: BuildSpec, gear: GearStage[]): GearCard[] {
     return {
       slot: row.slot,
       base: baseName(row.slot, spec),
-      why: whyFor(row.slot, spec, row),
+      why: whyFor(row.slot),
       note: spec.skill === "Maul" && /weapon|staff/i.test(row.slot) ? weaponText("quarterstaff", 1, true) : row.early,
       icon: iconFor(row.slot, spec),
       leveling: lists.leveling,

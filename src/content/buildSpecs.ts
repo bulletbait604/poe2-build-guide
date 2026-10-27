@@ -30,8 +30,8 @@ export type BuildSpec = {
 const u = (name: string, slot: string, level: number, note: string): UniqueDraft => ({ name, slot, level, note });
 
 const optional = "Optional. A rare with the stats on the gear card replaces it. Do not buy this to start.";
-const chayula =
-  "Requires level 35. The poe2db page also prints Req. level 44 (Effective: 35). Equip it at 35.";
+// poe2db header is "Requires: Level 35". A later table prints "Req. level 44 (Effective: 35)". Equip at 35.
+const chayula = "Equip at 35.";
 
 export const buildSpecs: BuildSpec[] = [
   {
@@ -221,7 +221,7 @@ export const buildSpecs: BuildSpec[] = [
     defence: "evasion",
     speed: "attack speed",
     damage: "physical damage",
-    summary: "Rake is the Ritualist attack. It is a Tier 3 melee Strike and needs a spear. Spear Stab is the button until level 3. From item level 18, keep +1 to Level of all Melee Skills. Blood Boil pops when things die. Charms are whatever you already found.",
+    summary: "Rake is the Ritualist attack. Spear Stab until level 3. Keep +1 to Level of all Melee Skills on the spear.",
     fantasy: "A huntress who rakes a line and lets the boils finish the rest.",
     pack: "From level 3, Rake through the pack and walk out the other side. Leave Blood Boil on.",
     boss: "Rake, step, rake. Drink when you are hit.",

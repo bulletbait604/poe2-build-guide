@@ -94,8 +94,7 @@ function questsFor(from: number, to: number, spec: BuildSpec) {
 export function pointsForBand(spec: BuildSpec, from: number, to: number): PointPlan {
   if (from >= 66) {
     return {
-      intro:
-        "By level 65 you have already placed 64 level points. From 66 to 100 you get one more each level. Stay on the same branch you started in the campaign.",
+      intro: "Stay on the same branch.",
       points: [
         "Each new point is the next small node on the branch you already started.",
         "Take a notable only when it is the very next node and it gives damage, life, energy shield, armour, or evasion for this build.",
@@ -110,10 +109,7 @@ export function pointsForBand(spec: BuildSpec, from: number, to: number): PointP
   const lastLevel = Math.min(to, 65);
   const start = firstLevel - 2;
   const count = lastLevel - firstLevel + 1;
-  const intro =
-    count === 1
-      ? `Level ${firstLevel} gives 1 point. You then have ${firstLevel - 1} level points.`
-      : `Levels ${firstLevel}–${lastLevel} give ${count} points, one each level. At level ${lastLevel} you have ${lastLevel - 1} level points.`;
+  const intro = "Next points, in order.";
 
   return {
     intro,

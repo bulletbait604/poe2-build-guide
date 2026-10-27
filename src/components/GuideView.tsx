@@ -7,7 +7,6 @@ import { StatList } from "@/components/StatList";
 import { TreeMap } from "@/components/TreeMap";
 import { ascendancyIcon, classIcon } from "@/content/ascendancyArt";
 import type { GameClass } from "@/content/classes";
-import { proseToStats } from "@/content/statLines";
 import type { Guide, GuideChapter, TimelineStep } from "@/lib/types";
 import Image from "next/image";
 import Link from "next/link";
@@ -255,23 +254,6 @@ export function GuideView({
 
       {tab === "Now" && current ? (
         <section id="now" className="mt-2 space-y-4">
-          <p className="max-w-3xl text-muted">
-            Do the list on the gold card. Check a line when it is done. The next card is what is coming, not what you do today.
-            Weapon-set points apply only while that weapon set is active. Spirit pays for auras and minions. Ascendancy points are a separate panel from the passive tree.
-          </p>
-          <details className="mt-3 border border-line bg-panel p-3 text-sm text-parchment">
-            <summary className="cursor-pointer text-gold">Words on this page</summary>
-            <ul className="mt-2 space-y-2">
-              <li><span className="text-gold">Gold card. </span>The checklist on this Now tab. Do those lines before the later cards.</li>
-              <li><span className="text-gold">Weapon set. </span>You have two weapon sets. A skill can be assigned to one of them. Weapon-set points are passive points that work only while that set is active. They are not the point you get for leveling up.</li>
-              <li><span className="text-gold">Item level. </span>Hold Alt and hover the item. Item level is not the level you need to equip the base. A roll can need a higher item level than that requirement.</li>
-              <li><span className="text-gold">Stun threshold. </span>How much stun a hit must build before you are stunned. A higher number means you are harder to stun. It is not life.</li>
-              <li><span className="text-gold">Presence. </span>The area around your character. “Allies in your Presence” affects allies standing in that area. It is not a skill you turn on.</li>
-              <li><span className="text-gold">Maps. </span>Waystone areas after the campaign. The campaign ends first. A roll such as +(200-214) to maximum Life needs item level 80, so it is a maps roll.</li>
-              <li><span className="text-gold">Rare monster. </span>A monster with a yellow name. Stronger than a normal monster. Weaker than a unique boss.</li>
-              <li><span className="text-gold">Pack. </span>A group of monsters standing together. The clear skill is for the pack. The boss skill is for the rare or the unique.</li>
-            </ul>
-          </details>
           <StepCard step={current} active done={done} onToggle={toggle} guideId={guide.id} />
           {upcoming ? (
             <div>
@@ -279,15 +261,11 @@ export function GuideView({
               <StepCard step={upcoming} active={false} done={done} onToggle={toggle} guideId={guide.id} />
             </div>
           ) : null}
-          <p className="text-sm text-muted">{activeBand.ignore}</p>
         </section>
       ) : null}
 
       {tab === "Leveling" ? (
         <section id="leveling" className="mt-2">
-          <p className="max-w-3xl text-muted">
-            A new card every few levels. Stay on the gold one. The list under the cards is the same quest rewards, written as the walk, so you do each fight once. Skip a fight that only drops a gem.
-          </p>
           <div className="mt-4 space-y-3 border-l border-gold/40 pl-4">
             {guide.timeline.map((step, index) => (
               <StepCard
@@ -325,21 +303,7 @@ export function GuideView({
                           </p>
                         </div>
                       </div>
-                      <p className="mt-1 text-sm text-muted">{step.detail}</p>
-                      <p className="mt-1 text-sm">
-                        <span className="text-gold">Talk to. </span>
-                        {step.npc}
-                      </p>
-                      <p className="text-sm">
-                        <span className="text-gold">Reward. </span>
-                        {step.reward}
-                      </p>
-                      {step.gear ? (
-                        <div className="text-sm" data-gear-section="campaign">
-                          <span className="text-gold">Gear. </span>
-                          <StatList lines={Array.isArray(step.gear) ? step.gear : proseToStats(step.gear)} />
-                        </div>
-                      ) : null}
+                      <p className="mt-1 text-sm text-parchment">{step.detail}</p>
                     </li>
                   ))}
                 </ol>
@@ -351,18 +315,12 @@ export function GuideView({
 
       {tab === "Skills" ? (
         <section id="skills" className="mt-2">
-          <p className="mb-4 max-w-3xl text-muted">
-            The big gem is the skill. The numbered gems are the supports, in the order you add them. A skill with no numbers is pressed by itself.
-          </p>
           <GemLinks groups={guide.loadout.groups} damage={guide.damage} />
         </section>
       ) : null}
 
       {tab === "Gear" ? (
         <section id="gear" className="mt-2">
-          <p className="max-w-3xl text-muted">
-            Each slot lists its rolls under the icon. Under level 60 the gold list is the Act 1 list, and every line on it exists at item level 1. From level 60 the gold list is the endgame list. {activeBand.gem}
-          </p>
           <div className="mt-4">
             <GearCards cards={guide.gearCards} totals={guide.gearTotals} level={level} />
           </div>
@@ -372,11 +330,7 @@ export function GuideView({
       {tab === "Tree" ? (
         <section id="passive" className="mt-2">
           <div className="mb-4 border border-gold bg-panel p-4">
-            <p className="text-xs tracking-[0.16em] text-gold uppercase">Spend the next points in this order</p>
-            <p className="mt-2 text-muted">
-              This is the campaign path from your class start on the official 0.5.5 tree. It is the connected walk, not a copied planner tree. Take the nodes in order. A line that says “the next node connected to” means the next node touching the one you just took.
-            </p>
-            <p className="mt-2 text-muted">{activeBand.pointsIntro}</p>
+            <p className="text-xs tracking-[0.16em] text-gold uppercase">campaign path</p>
             <ol className="mt-2 list-decimal space-y-1 pl-5">
               {activeBand.points.slice(0, 4).map((point) => (
                 <li key={point}>{point}</li>
@@ -405,8 +359,8 @@ export function GuideView({
       ) : null}
 
       <section className="mt-10">
-        <h2 className="font-display text-2xl">Uniques, if one drops</h2>
-        <p className="mt-2 max-w-3xl text-muted">Wear it when it beats the rare you have. Do not buy one to start.</p>
+        <h2 className="font-display text-2xl">Uniques</h2>
+        <p className="mt-2 max-w-3xl text-muted">Wear it if it beats your rare.</p>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           {guide.uniques.map((piece) => (
             <div key={piece.name} className="flex gap-3 border border-line p-3">
@@ -421,11 +375,7 @@ export function GuideView({
       </section>
 
       <section className="mt-8 border border-line p-4">
-        <h2 className="font-display text-xl">Where this layout comes from</h2>
-        <p className="mt-2 text-sm text-muted">
-          The tabs, the socket row, and the slot cards follow the shape of the Maxroll, Mobalytics, and PoE Vault guides.
-          The sentences are written for this page. The links are the pages the numbers came from.
-        </p>
+        <h2 className="font-display text-xl">Sources</h2>
         <ul className="mt-3 flex flex-wrap gap-3 text-sm">
           {guide.links.map((link) => (
             <li key={link.url}>

@@ -65,25 +65,14 @@ function buildBands(spec: BuildSpec, loadout: Loadout): LevelBand[] {
 }
 
 function gemLine(spec: BuildSpec, to: number, loadout: Loadout) {
-  const main = loadout.groups.flatMap((group) => group.skills).find((skill) => skill.name === spec.skill);
-  const supports = main?.supports ?? [];
-  const first = supports[0];
   const readyAt = mainSkillReadyAt(spec.skill, loadout.overview, loadout.leveling);
-  if (to < readyAt) {
-    return `${spec.skill} is not on the bar yet. It joins at level ${readyAt}. ${spec.helper} is the second button once its gem is offered.`;
-  }
-  if (!first) return `${spec.skill} stays the main skill. ${spec.helper} is the second button. The skill tab lists every gem this route names.`;
-  if (to < readyAt + 10) return `${spec.skill} is the main skill from level ${readyAt}. First support: ${first}.`;
-  return `Link ${supports.join(", ")} into ${spec.skill}. Add one of those supports at a time. The skill tab is the full layout.`;
+  if (to < readyAt) return `Wait on ${spec.skill}. Use ${spec.helper}.`;
+  return spec.skill;
 }
 
 function ignoreLine(spec: BuildSpec, to: number) {
-  if (to <= 9) return "Do not buy a unique to fill a slot. Buy the named base on the gear card, or use an Orb of Transmutation and then an Orb of Augmentation on a normal base.";
-  if (to <= 19) return "Do not refund a point you just placed. The list above is the order.";
-  if (to <= 29) return "Do not take a second ascendancy node until the first one has been in use for a whole zone.";
-  if (to <= 44) return "Do not path across the tree for one notable, and do not start a second build in the other weapon set.";
-  if (to <= 59) return "Do not skip an interlude reward. The points and the spirit are permanent.";
-  return "Search the trade site for the base named on the gear card. Do not buy a unique that costs more than the rare you already have.";
+  if (to < 61) return `Buy the ${spec.weaponNoun} base on the card.`;
+  return `Trade site: ${spec.weaponNoun}.`;
 }
 
 export function composeGuide(spec: BuildSpec): Guide {

@@ -4,7 +4,8 @@
 // https://poe2db.tw/us/Bows and the matching pages for each weapon and armour class.
 // Rare-mod numbers are the single tiers already checked in statLines.ts.
 
-import { amuletEnergyAt, energyAt, hybridEvasionEnergyAt, lifeAt, resistAt, type AffixSlot } from "@/content/statLines";
+// Shopping lines name the vendor and the one base for that stage.
+// Tier ladders, item-level gates, and vendor-category notes stay in the comments above and in statLines.ts.
 
 type Base = { name: string; level: number; detail: string };
 
@@ -564,16 +565,6 @@ export function defenceKey(defence: string): DefenceFamily {
   return "str";
 }
 
-function wantsEnergyShield(defence: string) {
-  const text = defence.toLowerCase();
-  if (text.includes("life") && !text.includes("energy")) return false;
-  return text.includes("energy") || defenceKey(defence) === "int";
-}
-
-function hybridEvasionEnergy(defence: string) {
-  return defenceKey(defence) === "dexint";
-}
-
 export function casterWeapon(noun: string) {
   const key = weaponKind(noun);
   return key === "wand" || key === "staff" || key === "sceptre";
@@ -636,26 +627,12 @@ function place(shop: Shop) {
   return `${shop.who} in ${shop.where}`;
 }
 
-function fallback(shop: Shop, base: string, level: number) {
-  const row = shops(level);
-  if (level >= 61) {
-    return `If the trade site has no ${base} with one of those rolls, buy a normal ${base} and use an Orb of Transmutation, then an Orb of Augmentation. ${row.next}`;
-  }
-  return `If ${shop.who} has no ${base} with one of those rolls, buy a normal ${base} and use an Orb of Transmutation, then an Orb of Augmentation. ${row.next}`;
-}
-
 const PLURAL_BASE = /(?:Boots|Sandals|Greaves|Bracers|Gloves|Gauntlets|Mitts|Sabatons|Wraps|Shoes)$/;
 
 export function withArticle(name: string) {
   if (PLURAL_BASE.test(name)) return name;
   return /^[aeiou]/i.test(name) ? `an ${name}` : `a ${name}`;
 }
-
-const SKIP_ROLLS =
-  "Skip these rolls: increased Rarity of Items found, Critical Hit Chance. Don't spend currency on a unique; wear one only if it drops and beats your current item.";
-
-const RESIST_FIRST =
-  "Resistances first: until Fire, Cold, and Lightning are each 75% (the cap, shown on the character sheet), pick resistance over extra Life.";
 
 type TaggedRoll = { ilvl: number; text: string };
 
@@ -892,14 +869,9 @@ export function weaponRollPlan(noun: string, level: number): { now: string[]; la
   return { now, later: [fromLine(nextRoll(PHYS_PERCENT, level))].filter(Boolean), ideal: PHYS_IDEAL, gem: "" };
 }
 
-function ignoreWeapon(noun: string) {
-  if (noun === "bow") {
-    return `${SKIP_ROLLS} Also skip an Artillery Bow. That base has 50% reduced Projectile Range.`;
-  }
-  if (noun === "quiver") {
-    return `${SKIP_ROLLS} A quiver rolls +1 to Level of all Projectile Skills. It does not roll +2 or +3.`;
-  }
-  return SKIP_ROLLS;
+
+function emptyShop(base: string) {
+  return `No ${base} with those rolls: buy a normal one and use an Orb of Transmutation, then an Orb of Augmentation.`;
 }
 
 export function weaponStats(noun: string, level: number) {
@@ -910,220 +882,69 @@ export function weaponText(noun: string, level: number, attack = false) {
   const key = attack && weaponKind(noun) === "staff" ? "quarterstaff" : weaponKind(noun);
   const shop = shopFor(weaponKind(noun), level);
   const base = attack && weaponKind(noun) === "staff" ? baseAt("staff", level) : baseAt(key, level);
-  const rolls = weaponRollPlan(key, level);
   const great = key === "mace" ? pick(GREAT, level) : null;
-  const shield = noun.toLowerCase().includes("shield") ? baseAt("shield", level) : null;
-  const hand = great
-    ? `Use either setup. One-hand mace plus shield: ${withArticle(base.name)} (${base.detail}). Two-hand mace, shield slot empty: ${withArticle(great.name)} (${great.detail}). Do not equip both.`
-    : "";
-  const off = shield ? `The shield at this level is ${withArticle(shield.name)} (${shield.detail}).` : "";
-  const bowNext = key === "bow" ? "A Shortbow needs level 5 and 12 Dexterity. A Recurve Bow needs level 16 and 31 Dexterity." : "";
-  const bear = attack
-    ? "Maul is a Bear-form melee Strike (poe2db: Attack, Shapeshift, Bear, AoE, Melee, Strike, Requires Talismans). Shop attack and melee rolls. Skip spell damage and +to spell skills. The talisman attack ladder matches the quarterstaff ladder: the same physical percent, added physical, melee gem level, and attack speed tiers."
-    : "";
-  return [
-    `Buy ${withArticle(noun)} from ${place(shop)}. ${vendorSplit(level)}`,
-    `The base at level ${level} is ${withArticle(base.name)} (${base.detail}).`,
-    bear,
-    bowNext,
-    hand,
-    off,
-    "Acceptable rolls are the list under this line. A roll is legal only when the item's item level, shown by holding Alt and hovering the item, is at least the level named below.",
-    rolls.gem ? `The gem roll at this item level is ${rolls.gem}.` : "",
-    ...(level > 1 ? rolls.later : []),
-    ...(level >= 60 ? rolls.ideal : []),
-    ignoreWeapon(key),
-    fallback(shop, base.name, level),
-  ]
-    .filter(Boolean)
-    .join("\n");
-}
-
-export function quiverText(level: number) {
-  const shop = shops(level).armour;
-  const base = baseAt("quiver", level);
-  return [
-    `Buy a quiver from ${place(shop)}.`,
-    `The base at level ${level} is ${withArticle(base.name)} (${base.detail}). At level 1 the Broadhead Quiver adds 1 to 3 Physical Damage to Attacks. Keep that one unless this build's damage is fire, in which case a level 8 Fire Quiver adds 3 to 5 Fire damage to Attacks.`,
-    "Acceptable rolls are the list under this line.",
-    level < 5
-      ? "At this level the attack-speed roll is (5-7)%. +1 to Level of all Projectile Skills needs item level 5. A quiver does not roll +2 or +3."
-      : "Keep +1 to Level of all Projectile Skills. (14-16)% increased Attack Speed needs item level 60. A quiver does not roll +2 or +3.",
-    ignoreWeapon("quiver"),
-    fallback(shop, base.name, level),
-  ].join("\n");
-}
-
-function shownRoll(defence: string, level: number, slot: AffixSlot, detail: string) {
-  // Level 1 pure bases stand in until the hybrid base exists. They do not roll the combined mod.
-  if (hybridEvasionEnergy(defence) && /start at level/.test(detail)) return lifeAt(level, slot);
-  return poolLine(defence, level, slot);
-}
-
-function poolLine(defence: string, level: number, slot: AffixSlot) {
-  // Belts, rings, and armour shields roll IncreasedLife. They do not roll the body energy-shield ladder.
-  if (slot === "belt" || slot === "ring" || slot === "shield") return lifeAt(level, slot);
-  if (slot === "amulet") return wantsEnergyShield(defence) ? amuletEnergyAt(level) : lifeAt(level, slot);
-  if (hybridEvasionEnergy(defence)) return hybridEvasionEnergyAt(level, slot);
-  return wantsEnergyShield(defence) ? energyAt(level, slot) : lifeAt(level, slot);
-}
-
-function vendorSplit(level: number) {
-  const row = shops(level);
-  if (level >= 61) {
-    return "On the trade site, search the armour categories (weapons, body armours, helms, gloves, boots, shields, quivers, and belts) and the caster categories (sceptres, energy shield shields, wands, staves, life flasks, mana flasks, wisdom scrolls, rings, amulets, and charms). Quarterstaves are weapons. Spell staves stay with the wands and sceptres.";
-  }
-  return `${row.armour.who} sells weapons, body armours, helms, gloves, boots, shields, quivers, and belts. ${row.caster.who} sells sceptres, energy shield shields, wands, staves, life flasks, mana flasks, wisdom scrolls, rings, amulets, and charms. Quarterstaves are weapons. Spell staves stay with the wands and sceptres.`;
-}
-
-function amuletAdvice(key: DefenceFamily) {
-  if (key === "int") {
-    return "At level 1 buy an Azure Amulet, (20-30)% increased Mana Regeneration Rate. At level 8 buy a Lapis Amulet. The base itself is +(10-15) to Intelligence.";
-  }
-  if (key === "dex" || key === "dexint") {
-    return "At level 1 buy a Crimson Amulet, (2-4) Life Regeneration per second. At level 8 buy a Jade Amulet. The base itself is +(10-15) to Dexterity.";
-  }
-  return "At level 1 buy a Crimson Amulet, (2-4) Life Regeneration per second. At level 8 buy an Amber Amulet. The base itself is +(10-15) to Strength.";
-}
-
-function amuletShort(key: DefenceFamily) {
-  if (key === "int") return "a Lapis Amulet at level 8, +(10-15) to Intelligence";
-  if (key === "dex" || key === "dexint") return "a Jade Amulet at level 8, +(10-15) to Dexterity";
-  return "an Amber Amulet at level 8, +(10-15) to Strength";
-}
-
-function defenceLabel(key: DefenceFamily) {
-  if (key === "strdex") return "armour and evasion";
-  if (key === "dexint") return "evasion and energy shield";
-  return key;
-}
-
-function capSentence(defence: string) {
-  if (hybridEvasionEnergy(defence)) {
-    return " Maps are waystone areas after the campaign. On an evasion and energy shield body, life reaches +(200-214) at item level 80, and the combined mod reaches +(142-161) to Evasion Rating +(43-48) to maximum Energy Shield at item level 75. Helmets of that defence stop at +(79-94) to Evasion Rating +(26-29) to maximum Energy Shield, item level 54. Gloves and boots stop at +(65-78) to Evasion Rating +(22-25) to maximum Energy Shield, item level 46. Intelligence body armour rolls +(91-96) to maximum Energy Shield at item level 79.";
-  }
-  if (wantsEnergyShield(defence)) {
-    return " The top energy shield roll on an intelligence body is +(91-96) to maximum Energy Shield, and it needs item level 79. Boots and gloves stop at +(48-60), item level 54. Helmets stop at +(61-73), item level 60. An amulet uses its own ladder and reaches +(80-89) to maximum Energy Shield at item level 80.";
-  }
-  return " The top life roll on a body is +(200-214) to maximum Life, and it needs item level 80. Boots and gloves stop at +(120-149), item level 60. Helmets and belts stop at +(150-174), item level 65. Rings stop at +(100-119), item level 54. Shields stop at +(175-189), item level 70. Armour and evasion bodies use that same life ladder. They have no flat energy shield.";
-}
-
-function resistLine(level: number) {
-  const resist = resistAt(level);
-  return `+${resist.fire}% Fire Resistance, +${resist.cold}% Cold Resistance, and +${resist.lightning}% Lightning Resistance`;
-}
-
-function moveLine(level: number) {
-  if (level < 16) return "10% increased Movement Speed is acceptable. Ideal at item level 16 is 15% increased Movement Speed.";
-  if (level < 33) return "15% increased Movement Speed is acceptable. Ideal at item level 33 is 20% increased Movement Speed.";
-  if (level < 46) return "20% increased Movement Speed is acceptable. Ideal at item level 46 is 25% increased Movement Speed.";
-  if (level < 65) return "25% increased Movement Speed is acceptable. Ideal at item level 65 is 30% increased Movement Speed.";
-  return "30% increased Movement Speed is acceptable. Ideal at item level 82 is 35% increased Movement Speed.";
+  const choice = great ? ` Or ${great.name}, with no shield.` : "";
+  return `Buy ${withArticle(base.name)} from ${place(shop)}.${choice} Acceptable rolls are the list under this line. ${emptyShop(base.name)}`;
 }
 
 export function armourText(defence: string, level: number, caster: boolean) {
   const row = shops(level);
-  const armour = row.armour;
-  const jewels = row.caster;
+  const boots = armourAt("boots", defence, level);
   const body = armourAt("body", defence, level);
   const helm = armourAt("helmet", defence, level);
   const gloves = armourAt("gloves", defence, level);
-  const boots = armourAt("boots", defence, level);
   const belt = armourAt("belt", defence, level);
-  const resist = resistLine(level);
-  const bootsLife = shownRoll(defence, level, "boots", boots.detail);
-  const bodyLife = shownRoll(defence, level, "body", body.detail);
-  const helmLife = shownRoll(defence, level, "helmet", helm.detail);
-  const gloveLife = shownRoll(defence, level, "gloves", gloves.detail);
-  const beltLife = poolLine(defence, level, "belt");
-  const ring = caster
-    ? `Buy a Lazuli Ring from ${jewels.who}. The base is +(20-30) to maximum Mana. At level 8 a Ruby Ring is +(20-30)% to Fire Resistance, at level 12 a Sapphire Ring is +(20-30)% to Cold Resistance, and at level 16 a Topaz Ring is +(20-30)% to Lightning Resistance.`
-    : `Buy an Iron Ring from ${jewels.who}. The base Adds 1 to 4 Physical Damage to Attacks. At level 8 a Ruby Ring is +(20-30)% to Fire Resistance, at level 12 a Sapphire Ring is +(20-30)% to Cold Resistance, and at level 16 a Topaz Ring is +(20-30)% to Lightning Resistance.`;
-  const key = defenceKey(defence);
-  return [
-    `Buy the armour from ${place(armour)}. ${vendorSplit(level)}`,
-    `Boots: ${withArticle(boots.name)} (${boots.detail}). ${moveLine(level)} Also take ${bootsLife} and one of ${resist}.`,
-    `Body: ${withArticle(body.name)} (${body.detail}). Acceptable: ${bodyLife}.${level >= 65 ? ` Maps are waystone areas after the campaign.${capSentence(defence)}` : ""}${level >= 30 ? " From level 30, a Greater Iron Rune in the body socket adds 18% increased Armour, Evasion and Energy Shield. It requires level 30." : ""}`,
-    `Helmet: ${withArticle(helm.name)} (${helm.detail}). Acceptable: ${helmLife}.`,
-    `Gloves: ${withArticle(gloves.name)} (${gloves.detail}). Acceptable: ${gloveLife}.`,
-    `Belt: ${withArticle(belt.name)} from ${place(armour)} (${belt.detail}). Acceptable: ${beltLife}. Belts roll Strength. The top tier is +34-36 to Strength at item level 81.`,
-    `Rings and amulets are sold by ${jewels.who} in ${jewels.where}.`,
-    ring,
-    amuletAdvice(key),
-    `Ignore boots with 0% increased Movement Speed. ${RESIST_FIRST} ${SKIP_ROLLS}`,
-    fallback(armour, boots.name, level),
-  ].join("\n");
+  const ring = caster ? "Lazuli Ring" : "Iron Ring";
+  return `${place(row.armour)}: ${boots.name}, ${body.name}, ${helm.name}, ${gloves.name}, ${belt.name}. ${place(row.caster)}: ${ring}. Acceptable rolls are the list under this line.`;
+}
+
+function amuletName(key: DefenceFamily, level: number) {
+  if (key === "int") return level >= 8 ? "Lapis Amulet" : "Azure Amulet";
+  if (key === "dex" || key === "dexint") return level >= 8 ? "Jade Amulet" : "Crimson Amulet";
+  return level >= 8 ? "Amber Amulet" : "Crimson Amulet";
+}
+
+function ringName(caster: boolean, level: number) {
+  if (level >= 16) return "Topaz Ring";
+  if (level >= 12) return "Sapphire Ring";
+  if (level >= 8) return "Ruby Ring";
+  return caster ? "Lazuli Ring" : "Iron Ring";
+}
+
+function armourSlotKey(slot: string): ArmourSlot | null {
+  if (/body/i.test(slot)) return "body";
+  if (/helm/i.test(slot)) return "helmet";
+  if (/glove/i.test(slot)) return "gloves";
+  if (/boot/i.test(slot)) return "boots";
+  if (/belt/i.test(slot)) return "belt";
+  return null;
+}
+
+function vendorFor(slot: string, spec: ShopSpec, level: number) {
+  const row = shops(level);
+  if (/ring|amulet/i.test(slot)) return row.caster;
+  if (/shield/i.test(slot) && defenceKey(spec.defence) === "int") return row.caster;
+  if (/wand|sceptre/i.test(slot) || (/staff/i.test(slot) && !/quarter/i.test(slot))) return row.caster;
+  return row.armour;
 }
 
 function pieceText(slot: string, spec: ShopSpec, level: number) {
   const twoHand = spec.weaponNoun === "quarterstaff" || spec.weaponNoun === "staff";
-  if (/shield/i.test(slot) && twoHand) return "This weapon is two-handed. Leave the shield slot empty.";
-  if (/quiver/i.test(slot)) return quiverText(level);
+  if (/shield/i.test(slot) && twoHand) return "No shield. Both hands hold the weapon.";
+  if (/quiver/i.test(slot)) return `${place(shops(level).armour)}: ${baseAt("quiver", level).name}.`;
   if (/shield/i.test(slot)) {
-    const row = shops(level);
-    const energyShield = defenceKey(spec.defence) === "int";
-    const shop = energyShield ? row.caster : row.armour;
-    const base = baseAt("shield", level);
-    const life = poolLine(spec.defence, level, "shield");
-    const named = energyShield
-      ? `${shop.who} sells energy shield shields. ${row.armour.who} sells armour shields such as ${base.name}, so leave that base on the armour vendor.`
-      : `The base at level ${level} is ${withArticle(base.name)} (${base.detail}). ${row.caster.who} sells energy shield shields.`;
-    return [
-      `Buy a shield from ${place(shop)}.`,
-      named,
-      `Acceptable: ${life}, and ${resistLine(level)}.`,
-      SKIP_ROLLS,
-      fallback(shop, energyShield ? "energy shield shield" : base.name, level),
-    ].join("\n");
+    if (defenceKey(spec.defence) === "int") return `${place(shops(level).caster)}: energy shield shield.`;
+    return `${place(shops(level).armour)}: ${baseAt("shield", level).name}.`;
   }
   if (/bow|spear|crossbow|quarterstaff|mace|wand|staff|sceptre|weapon/i.test(slot)) {
-    return weaponText(nounFromSlot(slot, spec.weaponNoun), level);
+    const noun = nounFromSlot(slot, spec.weaponNoun);
+    return `${place(shopFor(noun, level))}: ${baseAt(noun, level).name}.`;
   }
-  const row = shops(level);
-  const caster = isCaster(spec);
-  if (/boot/i.test(slot)) {
-    const base = armourAt("boots", spec.defence, level);
-    return [
-      `Buy boots from ${place(row.armour)}.`,
-      `The base at level ${level} is ${withArticle(base.name)} (${base.detail}).`,
-      moveLine(level),
-      `Also take ${shownRoll(spec.defence, level, "boots", base.detail)} and one of ${resistLine(level)}.`,
-      `Ignore a pair with 0% increased Movement Speed. ${RESIST_FIRST}`,
-      fallback(row.armour, base.name, level),
-    ].join("\n");
-  }
-  if (/body|helm|glove|belt/i.test(slot)) {
-    const slotKey: AffixSlot = /body/i.test(slot) ? "body" : /helm/i.test(slot) ? "helmet" : /glove/i.test(slot) ? "gloves" : "belt";
-    const key: ArmourSlot = slotKey === "helmet" ? "helmet" : slotKey === "gloves" ? "gloves" : slotKey === "belt" ? "belt" : "body";
-    const base = armourAt(key, spec.defence, level);
-    const life = shownRoll(spec.defence, level, slotKey, base.detail);
-    const rune = slotKey === "body" && level >= 30 ? " From level 30, a Greater Iron Rune in the body socket adds 18% increased Armour, Evasion and Energy Shield. It requires level 30." : "";
-    const maps = slotKey === "body" && level >= 65 ? ` Maps are waystone areas after the campaign.${capSentence(spec.defence)}` : "";
-    return [
-      `Buy this from ${place(row.armour)}.`,
-      `The base at level ${level} is ${withArticle(base.name)} (${base.detail}).`,
-      `Acceptable: ${life}, and one of ${resistLine(level)}.${rune}${maps}`,
-      `${RESIST_FIRST} ${SKIP_ROLLS}`,
-      fallback(row.armour, base.name, level),
-    ].join("\n");
-  }
-  if (/ring|amulet/i.test(slot)) {
-    const key = defenceKey(spec.defence);
-    const amulet = amuletShort(key);
-    const ring = caster
-      ? "a Lazuli Ring at level 1, +(20-30) to maximum Mana"
-      : "an Iron Ring at level 1, Adds 1 to 4 Physical Damage to Attacks";
-    const named = /amulet/i.test(slot) ? amulet : ring;
-    return [
-      `Buy this from ${place(row.caster)}.`,
-      `Take ${named}.`,
-      "At level 8 a Ruby Ring is +(20-30)% to Fire Resistance. At level 12 a Sapphire Ring is +(20-30)% to Cold Resistance. At level 16 a Topaz Ring is +(20-30)% to Lightning Resistance.",
-      `Acceptable rare rolls: ${poolLine(spec.defence, level, /amulet/i.test(slot) ? "amulet" : "ring")}, and ${resistLine(level)}.`,
-      RESIST_FIRST,
-      fallback(row.caster, /amulet/i.test(slot) ? "amulet" : "ring", level),
-    ].join("\n");
-  }
-  return armourText(spec.defence, level, caster);
+  const slotKey = armourSlotKey(slot);
+  if (slotKey) return `${place(shops(level).armour)}: ${armourAt(slotKey, spec.defence, level).name}.`;
+  if (/amulet/i.test(slot)) return `${place(shops(level).caster)}: ${amuletName(defenceKey(spec.defence), level)}.`;
+  if (/ring/i.test(slot)) return `${place(shops(level).caster)}: ${ringName(isCaster(spec), level)}.`;
+  return armourText(spec.defence, level, isCaster(spec));
 }
 
 export function slotStage(slot: string, spec: ShopSpec): [string, string, string] {
@@ -1142,57 +963,32 @@ function nounFromSlot(slot: string, fallback: string) {
   return fallback;
 }
 
+function namedPair(early: string, maps: string) {
+  return early === maps ? early : `${early}, then ${maps}`;
+}
+
 export function baseLabel(slot: string, spec: ShopSpec) {
-  if (/quiver/i.test(slot)) {
-    const base = baseAt("quiver", 1);
-    return `${base.name}. ${base.detail}.`;
-  }
+  const who = place(vendorFor(slot, spec, 1));
+  if (/quiver/i.test(slot)) return `${namedPair(baseAt("quiver", 1).name, baseAt("quiver", 65).name)} · ${who}`;
   if (/shield/i.test(slot)) {
-    if (spec.weaponNoun === "quarterstaff" || spec.weaponNoun === "staff") return "No shield. This weapon uses both hands.";
-    if (defenceKey(spec.defence) === "int") {
-      return "Energy shield shield. The caster vendor sells these. Armour shields such as the Splintered Tower Shield stay with the armour vendor.";
-    }
-    const base = baseAt("shield", 1);
-    return `${base.name}. ${base.detail}.`;
+    if (spec.weaponNoun === "quarterstaff" || spec.weaponNoun === "staff") return "No shield. Both hands hold the weapon.";
+    if (defenceKey(spec.defence) === "int") return `Energy shield shield · ${who}`;
+    return `${namedPair(baseAt("shield", 1).name, baseAt("shield", 65).name)} · ${who}`;
   }
   if (/bow|spear|crossbow|weapon|staff|wand|mace|sceptre|quarterstaff/i.test(slot)) {
     const noun = nounFromSlot(slot, spec.weaponNoun);
-    const now = baseAt(noun, 1);
-    const mid = baseAt(noun, 16);
-    const maps = baseAt(noun, 65);
-    if (weaponKind(noun) === "bow") {
-      return "Crude Bow at level 1. Shortbow at level 5. Recurve Bow at level 16. Heavy Bow at level 65.";
-    }
-    return `${now.name} at level 1. ${mid.name} at level ${mid.level}. ${maps.name} at level ${maps.level}.`;
+    return `${namedPair(baseAt(noun, 1).name, baseAt(noun, 65).name)} · ${who}`;
   }
-  const key = defenceKey(spec.defence);
-  const slotKey: ArmourSlot | null = /body/i.test(slot)
-    ? "body"
-    : /helm/i.test(slot)
-      ? "helmet"
-      : /glove/i.test(slot)
-        ? "gloves"
-        : /boot/i.test(slot)
-          ? "boots"
-          : /belt/i.test(slot)
-            ? "belt"
-            : null;
+  const slotKey = armourSlotKey(slot);
   if (slotKey) {
-    const now = armourAt(slotKey, spec.defence, 1);
-    const mid = armourAt(slotKey, spec.defence, 16);
-    return `${now.name} (${defenceLabel(key)}) at level 1. ${mid.name} at level ${mid.level}.`;
+    return `${namedPair(armourAt(slotKey, spec.defence, 1).name, armourAt(slotKey, spec.defence, 65).name)} · ${who}`;
   }
   if (/amulet/i.test(slot)) {
-    if (key === "int") return "Azure Amulet at level 1. Lapis Amulet at level 8, +(10-15) to Intelligence.";
-    if (key === "dex" || key === "dexint") return "Crimson Amulet at level 1. Jade Amulet at level 8, +(10-15) to Dexterity.";
-    return "Crimson Amulet at level 1. Amber Amulet at level 8, +(10-15) to Strength.";
+    const key = defenceKey(spec.defence);
+    return `${namedPair(amuletName(key, 1), amuletName(key, 8))} · ${who}`;
   }
-  if (/ring/i.test(slot)) {
-    return isCaster(spec)
-      ? "Lazuli Ring at level 1, +(20-30) to maximum Mana. Ruby Ring at level 8."
-      : "Iron Ring at level 1, Adds 1 to 4 Physical Damage to Attacks. Ruby Ring at level 8.";
-  }
-  return slot;
+  if (/ring/i.test(slot)) return `${namedPair(ringName(isCaster(spec), 1), "Ruby Ring")} · ${who}`;
+  return `${slot} · ${who}`;
 }
 
 export function howToBuy(slot: string, spec: ShopSpec) {
@@ -1202,5 +998,5 @@ export function howToBuy(slot: string, spec: ShopSpec) {
 export function weaponLine(noun: string, level: number) {
   const base = baseAt(noun, level);
   const shop = shopFor(noun, level);
-  return `${place(shop)}: a ${base.name}. ${base.detail}.`;
+  return `${place(shop)}: ${withArticle(base.name)}.`;
 }

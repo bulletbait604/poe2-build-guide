@@ -118,14 +118,6 @@ export function GearCards({ cards, totals, level }: { cards: GearCard[]; totals:
               <Lines title="Leveling" lines={selected.leveling} active={levelingNow} />
               <Lines title="Endgame" lines={selected.endgame} active={!levelingNow} />
             </div>
-            <p className="mt-3 text-sm text-muted">
-              <span className="text-gold">Skip. </span>
-              {selected.skip}
-            </p>
-            <p className="mt-2 whitespace-pre-line text-sm text-parchment">
-              <span className="text-gold">How to get it. </span>
-              {selected.how}
-            </p>
           </article>
         ) : null}
       </div>
