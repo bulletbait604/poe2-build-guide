@@ -30,6 +30,8 @@ export type BuildSpec = {
 const u = (name: string, slot: string, level: number, note: string): UniqueDraft => ({ name, slot, level, note });
 
 const optional = "Optional. A rare with the stats on the gear card replaces it. Do not buy this to start.";
+const chayula =
+  "Requires level 35. The poe2db page also prints Req. level 44 (Effective: 35). Equip it at 35.";
 
 export const buildSpecs: BuildSpec[] = [
   {
@@ -603,7 +605,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Breach, thunder, move. Flames between slams, not during them.",
     ascendancyPick: "Take Into the Breach first. Skip a darkness node if you can no longer see the swing you need to dodge.",
     focus: "Life or energy shield, attack damage on a rare staff, chaos resistance if you find it.",
-    uniques: [u("Eye of Chayula", "Amulet", 35, optional), u("Ghostwrithe", "Body", 1, "Energy shield if it drops. A rare body with life can be safer.")],
+    uniques: [u("Eye of Chayula", "Amulet", 35, `${optional} ${chayula}`), u("Ghostwrithe", "Body", 1, "Energy shield if it drops. A rare body with life can be safer.")],
   },
   {
     id: "acolyte-ice",
@@ -624,7 +626,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Same bell. Do not ignore a slam because darkness is full.",
     ascendancyPick: "Take Into the Breach. Take darkness only if you can still read the fight.",
     focus: "Life on the body, energy shield on a second piece, attack damage on the staff.",
-    uniques: [u("Eye of Chayula", "Amulet", 35, optional), u("The Blood Thorn", "Quarterstaff", 1, optional)],
+    uniques: [u("Eye of Chayula", "Amulet", 35, `${optional} ${chayula}`), u("The Blood Thorn", "Quarterstaff", 1, optional)],
   },
   {
     id: "infernalist-skeletal-sniper",
@@ -1308,15 +1310,15 @@ export const buildSpecs: BuildSpec[] = [
     support: "Rapid Attacks II",
     weaponNoun: "crossbow",
     weaponStat: "Cold or physical damage, plus reload speed.",
-    defence: "armour",
+    defence: "armour and evasion",
     speed: "reload speed",
     damage: "cold damage",
-    summary: "Freeze with Permafrost Bolts, then Fragmentation Rounds on the frozen target. Galvanic Shards until the bolt gem exists. Obsessive Rituals grants Sorcery Ward. Pitiless Killer is Culling Strike. The ascendancy is one of those, not a unique.",
+    summary: "Freeze with Permafrost Bolts, then Fragmentation Rounds on the frozen target. Galvanic Shards until the bolt gem exists. Obsessive Rituals grants Sorcery Ward, which turns armour and evasion into a shield. Pitiless Killer is Culling Strike. The ascendancy is one of those, not a unique.",
     fantasy: "A hunter who freezes a pack and breaks the frozen one with the next magazine.",
     pack: "Permafrost the pack, fragmentation on the rare, reload while you walk.",
     boss: "Freeze, fragmentation, move, reload off to the side. Do not reload in the slam.",
     ascendancyPick: "Take Obsessive Rituals or Pitiless Killer and keep using the same two ammos. Obsessive Rituals grants Sorcery Ward. Pitiless Killer is Culling Strike.",
-    focus: "Damage and reload on a rare crossbow. Life, armour, and cold resistance.",
+    focus: "Damage and reload on a rare crossbow. Life, armour and evasion, and cold resistance. Sorcery Ward uses both armour and evasion.",
     uniques: [u("Mist Whisper", "Crossbow", 1, optional), u("Goldrim", "Helmet", 10, optional)],
   },
   {
@@ -1527,7 +1529,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Breach beside the boss, flicker, leave. If the screen is unreadable, stop and use Falling Thunder instead.",
     ascendancyPick: "Take the breach node. Skip a darkness node if the fight becomes impossible to read.",
     focus: "Life on every piece before you flicker. Chaos resistance if you find it. A rare staff with damage.",
-    uniques: [u("Eye of Chayula", "Amulet", 35, "Maps only, and only if it drops. Do not buy it to start."), u("Ghostmarch", "Boots", 16, optional)],
+    uniques: [u("Eye of Chayula", "Amulet", 35, `Maps only, and only if it drops. Do not buy it to start. ${chayula}`), u("Ghostmarch", "Boots", 16, optional)],
   },
   {
     id: "acolyte-flames",
@@ -1548,7 +1550,7 @@ export const buildSpecs: BuildSpec[] = [
     boss: "Flames, thunder from the side, flask. Do not stand in a slam you cannot see.",
     ascendancyPick: "Take the chaos node. Leave darkness for later, or skip it.",
     focus: "Life, evasion, and chaos resistance. Damage on a rare staff. No required unique.",
-    uniques: [u("Eye of Chayula", "Amulet", 35, "Optional, and not for the campaign."), u("Dream Fragments", "Ring", 12, optional)],
+    uniques: [u("Eye of Chayula", "Amulet", 35, `Optional, and not for the campaign. ${chayula}`), u("Dream Fragments", "Ring", 12, optional)],
   },
   {
     id: "infernalist-bonestorm",

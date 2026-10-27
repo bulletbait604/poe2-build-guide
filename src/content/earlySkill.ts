@@ -90,6 +90,14 @@ export function pressLine(spec: BuildSpec, loadout: Loadout, level: number) {
     }
     return `Use Supporting Fire on the left mouse button. ${grant} ${SOCKET_HELP}${hands}`;
   }
+  if (spec.skill === "Maul") {
+    const grant =
+      "Maul is not an Uncut Skill Gem. poe2db lists no Uncut Skill Gem Tier. It requires a Talisman. Gem level 1 requires level 1.";
+    if (level < ready) {
+      return `Use ${now} on the left mouse button. ${grant} This route switches at level ${ready}. ${SOCKET_HELP}${hands}`;
+    }
+    return `Use Maul on the left mouse button. ${grant} ${SOCKET_HELP}${hands}`;
+  }
   if (spec.skill === "Skeletal Sniper") {
     const opener = minionOpener(spec);
     const reservation =

@@ -4,7 +4,7 @@
 // https://poe2db.tw/us/Bows and the matching pages for each weapon and armour class.
 // Rare-mod numbers are the single tiers already checked in statLines.ts.
 
-import { energyAt, lifeAt, resistAt, type AffixSlot } from "@/content/statLines";
+import { amuletEnergyAt, energyAt, hybridEvasionEnergyAt, lifeAt, resistAt, type AffixSlot } from "@/content/statLines";
 
 type Base = { name: string; level: number; detail: string };
 
@@ -191,8 +191,9 @@ const SHIELD: Base[] = [
 ];
 
 type ArmourSlot = "body" | "helmet" | "gloves" | "boots" | "belt";
+type DefenceFamily = "str" | "dex" | "int" | "strdex" | "dexint";
 
-const ARMOUR: Record<"str" | "dex" | "int", Record<ArmourSlot, Base[]>> = {
+const ARMOUR: Record<DefenceFamily, Record<ArmourSlot, Base[]>> = {
   dex: {
     body: [
       { name: "Leather Vest", level: 1, detail: "evasion body" },
@@ -361,6 +362,135 @@ const ARMOUR: Record<"str" | "dex" | "int", Record<ArmourSlot, Base[]>> = {
       { name: "Heavy Belt", level: 50, detail: "Has (1-3) Charm Slots" },
     ],
   },
+  strdex: {
+    body: [
+      { name: "Chain Mail", level: 1, detail: "armour and evasion body" },
+      { name: "Rogue Armour", level: 11, detail: "armour and evasion body, requires 13 Strength and 13 Dexterity" },
+      { name: "Vagabond Armour", level: 16, detail: "armour and evasion body, requires 17 Strength and 17 Dexterity" },
+      { name: "Cloaked Mail", level: 26, detail: "armour and evasion body, requires 25 Strength and 25 Dexterity" },
+      { name: "Explorer Armour", level: 33, detail: "armour and evasion body, requires 31 Strength and 31 Dexterity" },
+      { name: "Scale Mail", level: 37, detail: "armour and evasion body, requires 34 Strength and 34 Dexterity" },
+      { name: "Knight Armour", level: 45, detail: "armour and evasion body, requires 41 Strength and 41 Dexterity" },
+      { name: "Ancestral Mail", level: 50, detail: "armour and evasion body, requires 44 Strength and 44 Dexterity" },
+      { name: "Lamellar Mail", level: 52, detail: "armour and evasion body, requires 46 Strength and 46 Dexterity" },
+      { name: "Gladiator Armour", level: 58, detail: "armour and evasion body, requires 51 Strength and 51 Dexterity" },
+      { name: "Heroic Armour", level: 65, detail: "armour and evasion body, requires 67 Strength and 67 Dexterity" },
+      { name: "Tournament Mail", level: 68, detail: "armour and evasion body, requires 67 Strength and 67 Dexterity" },
+      { name: "Slayer Armour", level: 73, detail: "armour and evasion body, requires 67 Strength and 67 Dexterity" },
+      { name: "Death Mail", level: 75, detail: "armour and evasion body, requires 67 Strength and 67 Dexterity" },
+      { name: "Thane Mail", level: 80, detail: "armour and evasion body, requires 67 Strength and 67 Dexterity" },
+    ],
+    helmet: [
+      { name: "Rusted Greathelm", level: 1, detail: "armour helmet. Armour-and-evasion helmets start at level 5 with a Brimmed Helm, which requires 7 Strength and 7 Dexterity" },
+      { name: "Brimmed Helm", level: 5, detail: "armour and evasion helmet, requires 7 Strength and 7 Dexterity" },
+      { name: "Guarded Helm", level: 11, detail: "armour and evasion helmet, requires 11 Strength and 11 Dexterity" },
+      { name: "Visored Helm", level: 16, detail: "armour and evasion helmet, requires 15 Strength and 15 Dexterity" },
+      { name: "Cowled Helm", level: 26, detail: "armour and evasion helmet, requires 22 Strength and 22 Dexterity" },
+      { name: "Shielded Helm", level: 33, detail: "armour and evasion helmet, requires 27 Strength and 27 Dexterity" },
+      { name: "Closed Helm", level: 45, detail: "armour and evasion helmet, requires 36 Strength and 36 Dexterity" },
+      { name: "Decorated Helm", level: 52, detail: "armour and evasion helmet, requires 41 Strength and 41 Dexterity" },
+      { name: "Gallant Helm", level: 65, detail: "armour and evasion helmet, requires 50 Strength and 50 Dexterity" },
+      { name: "Cryptic Helm", level: 70, detail: "armour and evasion helmet, requires 54 Strength and 54 Dexterity" },
+      { name: "Champion Helm", level: 75, detail: "armour and evasion helmet, requires 59 Strength and 59 Dexterity" },
+      { name: "Gladiatorial Helm", level: 80, detail: "armour and evasion helmet, requires 63 Strength and 63 Dexterity" },
+    ],
+    gloves: [
+      { name: "Stocky Mitts", level: 1, detail: "armour gloves. Armour-and-evasion gloves start at level 6 with Ringmail Gauntlets, which require 6 Strength and 6 Dexterity" },
+      { name: "Ringmail Gauntlets", level: 6, detail: "armour and evasion gloves, requires 6 Strength and 6 Dexterity" },
+      { name: "Layered Gauntlets", level: 16, detail: "armour and evasion gloves, requires 13 Strength and 13 Dexterity" },
+      { name: "Doubled Gauntlets", level: 33, detail: "armour and evasion gloves, requires 24 Strength and 24 Dexterity" },
+      { name: "Plate Gauntlets", level: 45, detail: "armour and evasion gloves, requires 32 Strength and 32 Dexterity" },
+      { name: "Burnished Gauntlets", level: 52, detail: "armour and evasion gloves, requires 36 Strength and 36 Dexterity" },
+      { name: "Ornate Gauntlets", level: 65, detail: "armour and evasion gloves, requires 44 Strength and 44 Dexterity" },
+      { name: "Ancient Gauntlets", level: 70, detail: "armour and evasion gloves, requires 52 Strength and 52 Dexterity" },
+      { name: "Cultist Gauntlets", level: 75, detail: "armour and evasion gloves, requires 52 Strength and 52 Dexterity" },
+      { name: "Blacksteel Gauntlets", level: 80, detail: "armour and evasion gloves, requires 55 Strength and 55 Dexterity" },
+    ],
+    boots: [
+      { name: "Rough Greaves", level: 1, detail: "armour boots. Armour-and-evasion boots start at level 6 with Mail Sabatons, which require 7 Strength and 7 Dexterity" },
+      { name: "Mail Sabatons", level: 6, detail: "armour and evasion boots, requires 7 Strength and 7 Dexterity" },
+      { name: "Braced Sabatons", level: 16, detail: "armour and evasion boots, requires 14 Strength and 14 Dexterity" },
+      { name: "Stacked Sabatons", level: 33, detail: "armour and evasion boots, requires 26 Strength and 26 Dexterity" },
+      { name: "Covered Sabatons", level: 45, detail: "armour and evasion boots, requires 34 Strength and 34 Dexterity" },
+      { name: "Flexile Sabatons", level: 52, detail: "armour and evasion boots, requires 38 Strength and 38 Dexterity" },
+      { name: "Bold Sabatons", level: 65, detail: "armour and evasion boots, requires 47 Strength and 47 Dexterity" },
+      { name: "Noble Sabatons", level: 70, detail: "armour and evasion boots, requires 51 Strength and 51 Dexterity" },
+      { name: "Fortress Sabatons", level: 75, detail: "armour and evasion boots, requires 56 Strength and 56 Dexterity" },
+      { name: "Blacksteel Sabatons", level: 80, detail: "armour and evasion boots, requires 59 Strength and 59 Dexterity" },
+    ],
+    belt: [
+      { name: "Rawhide Belt", level: 1, detail: "Has (1-3) Charm Slots and (20-30)% increased Life Recovery from Flasks" },
+      { name: "Wide Belt", level: 14, detail: "Has (1-3) Charm Slots and (20-30)% increased Flask Charges gained" },
+      { name: "Plate Belt", level: 25, detail: "Has (1-3) Charm Slots and +(140-180) to Armour" },
+      { name: "Ornate Belt", level: 31, detail: "Has (1-3) Charm Slots" },
+      { name: "Heavy Belt", level: 50, detail: "Has (1-3) Charm Slots" },
+    ],
+  },
+  dexint: {
+    body: [
+      { name: "Hermit Garb", level: 1, detail: "evasion and energy shield body" },
+      { name: "Waxed Jacket", level: 11, detail: "evasion and energy shield body, requires 13 Dexterity and 13 Intelligence" },
+      { name: "Marabout Garb", level: 16, detail: "evasion and energy shield body, requires 17 Dexterity and 17 Intelligence" },
+      { name: "Wayfarer Jacket", level: 28, detail: "evasion and energy shield body, requires 26 Dexterity and 26 Intelligence" },
+      { name: "Anchorite Garb", level: 33, detail: "evasion and energy shield body, requires 31 Dexterity and 31 Intelligence" },
+      { name: "Scalper's Jacket", level: 39, detail: "evasion and energy shield body, requires 35 Dexterity and 35 Intelligence" },
+      { name: "Scoundrel Jacket", level: 45, detail: "evasion and energy shield body, requires 41 Dexterity and 41 Intelligence" },
+      { name: "Ascetic Garb", level: 51, detail: "evasion and energy shield body, requires 45 Dexterity and 45 Intelligence" },
+      { name: "Clandestine Jacket", level: 52, detail: "evasion and energy shield body, requires 46 Dexterity and 46 Intelligence" },
+      { name: "Monastic Garb", level: 56, detail: "evasion and energy shield body, requires 50 Dexterity and 50 Intelligence" },
+      { name: "Torment Jacket", level: 65, detail: "evasion and energy shield body, requires 67 Dexterity and 67 Intelligence" },
+      { name: "Devout Garb", level: 68, detail: "evasion and energy shield body, requires 67 Dexterity and 67 Intelligence" },
+      { name: "Assassin Garb", level: 73, detail: "evasion and energy shield body, requires 67 Dexterity and 67 Intelligence" },
+      { name: "Falconer's Jacket", level: 75, detail: "evasion and energy shield body, requires 67 Dexterity and 67 Intelligence" },
+      { name: "Austere Garb", level: 80, detail: "evasion and energy shield body, requires 67 Dexterity and 67 Intelligence" },
+    ],
+    helmet: [
+      { name: "Shabby Hood", level: 1, detail: "evasion helmet. Evasion-and-energy-shield helmets start at level 5 with a Hewn Mask, which requires 7 Dexterity and 7 Intelligence" },
+      { name: "Hewn Mask", level: 5, detail: "evasion and energy shield helmet, requires 7 Dexterity and 7 Intelligence" },
+      { name: "Face Mask", level: 10, detail: "evasion and energy shield helmet, requires 10 Dexterity and 10 Intelligence" },
+      { name: "Hooded Mask", level: 16, detail: "evasion and energy shield helmet, requires 15 Dexterity and 15 Intelligence" },
+      { name: "Veiled Mask", level: 28, detail: "evasion and energy shield helmet, requires 23 Dexterity and 23 Intelligence" },
+      { name: "Tribal Mask", level: 33, detail: "evasion and energy shield helmet, requires 27 Dexterity and 27 Intelligence" },
+      { name: "Solid Mask", level: 45, detail: "evasion and energy shield helmet, requires 36 Dexterity and 36 Intelligence" },
+      { name: "Shaded Mask", level: 52, detail: "evasion and energy shield helmet, requires 41 Dexterity and 41 Intelligence" },
+      { name: "Death Mask", level: 65, detail: "evasion and energy shield helmet, requires 50 Dexterity and 50 Intelligence" },
+      { name: "Faridun Mask", level: 70, detail: "evasion and energy shield helmet, requires 54 Dexterity and 54 Intelligence" },
+      { name: "Soaring Mask", level: 75, detail: "evasion and energy shield helmet, requires 59 Dexterity and 59 Intelligence" },
+      { name: "Grinning Mask", level: 80, detail: "evasion and energy shield helmet, requires 63 Dexterity and 63 Intelligence" },
+    ],
+    gloves: [
+      { name: "Suede Bracers", level: 1, detail: "evasion gloves. Evasion-and-energy-shield gloves start at level 4 with Gauze Wraps, which require 6 Dexterity and 6 Intelligence" },
+      { name: "Gauze Wraps", level: 4, detail: "evasion and energy shield gloves, requires 6 Dexterity and 6 Intelligence" },
+      { name: "Linen Wraps", level: 16, detail: "evasion and energy shield gloves, requires 13 Dexterity and 13 Intelligence" },
+      { name: "Spiral Wraps", level: 33, detail: "evasion and energy shield gloves, requires 24 Dexterity and 24 Intelligence" },
+      { name: "Buckled Wraps", level: 45, detail: "evasion and energy shield gloves, requires 32 Dexterity and 32 Intelligence" },
+      { name: "Furtive Wraps", level: 52, detail: "evasion and energy shield gloves, requires 36 Dexterity and 36 Intelligence" },
+      { name: "Utility Wraps", level: 65, detail: "evasion and energy shield gloves, requires 44 Dexterity and 44 Intelligence" },
+      { name: "Elegant Wraps", level: 70, detail: "evasion and energy shield gloves, requires 48 Dexterity and 48 Intelligence" },
+      { name: "Vaal Wraps", level: 75, detail: "evasion and energy shield gloves, requires 52 Dexterity and 52 Intelligence" },
+      { name: "Secured Wraps", level: 80, detail: "evasion and energy shield gloves, requires 55 Dexterity and 55 Intelligence" },
+    ],
+    boots: [
+      { name: "Rawhide Boots", level: 1, detail: "evasion boots. Evasion-and-energy-shield boots start at level 5 with Frayed Shoes, which require 7 Dexterity and 7 Intelligence" },
+      { name: "Frayed Shoes", level: 5, detail: "evasion and energy shield boots, requires 7 Dexterity and 7 Intelligence" },
+      { name: "Threaded Shoes", level: 16, detail: "evasion and energy shield boots, requires 14 Dexterity and 14 Intelligence" },
+      { name: "Hunting Shoes", level: 33, detail: "evasion and energy shield boots, requires 26 Dexterity and 26 Intelligence" },
+      { name: "Steelpoint Shoes", level: 45, detail: "evasion and energy shield boots, requires 34 Dexterity and 34 Intelligence" },
+      { name: "Velour Shoes", level: 52, detail: "evasion and energy shield boots, requires 38 Dexterity and 38 Intelligence" },
+      { name: "Bladed Shoes", level: 65, detail: "evasion and energy shield boots, requires 47 Dexterity and 47 Intelligence" },
+      { name: "Charmed Shoes", level: 70, detail: "evasion and energy shield boots, requires 51 Dexterity and 51 Intelligence" },
+      { name: "Quickslip Shoes", level: 75, detail: "evasion and energy shield boots, requires 56 Dexterity and 56 Intelligence" },
+      { name: "Daggerfoot Shoes", level: 80, detail: "evasion and energy shield boots, requires 59 Dexterity and 59 Intelligence" },
+    ],
+    belt: [
+      { name: "Rawhide Belt", level: 1, detail: "Has (1-3) Charm Slots and (20-30)% increased Life Recovery from Flasks" },
+      { name: "Wide Belt", level: 14, detail: "Has (1-3) Charm Slots and (20-30)% increased Flask Charges gained" },
+      { name: "Long Belt", level: 20, detail: "Has (1-3) Charm Slots and (15-20)% increased Charm Effect Duration" },
+      { name: "Ornate Belt", level: 31, detail: "Has (1-3) Charm Slots" },
+      { name: "Mail Belt", level: 40, detail: "Has (1-3) Charm Slots" },
+      { name: "Heavy Belt", level: 50, detail: "Has (1-3) Charm Slots" },
+    ],
+  },
 };
 
 export type ShopSpec = { weaponNoun: string; defence: string; speed: string };
@@ -424,19 +554,24 @@ export function shops(level: number): { armour: Shop; caster: Shop; next: string
   };
 }
 
-export function defenceKey(defence: string): "str" | "dex" | "int" {
+export function defenceKey(defence: string): DefenceFamily {
   const text = defence.toLowerCase();
+  if (text.includes("armour") && text.includes("evasion") && !text.includes("energy")) return "strdex";
+  if (text.includes("evasion") && text.includes("energy")) return "dexint";
   if (text.includes("intelligence")) return "int";
   if (text.includes("energy") && !text.includes("armour") && !text.includes("evasion")) return "int";
-  if (text.includes("evasion") && text.includes("energy")) return "int";
   if (text.includes("evasion")) return "dex";
   return "str";
 }
 
 function wantsEnergyShield(defence: string) {
   const text = defence.toLowerCase();
-  if (text.includes("life")) return false;
+  if (text.includes("life") && !text.includes("energy")) return false;
   return text.includes("energy") || defenceKey(defence) === "int";
+}
+
+function hybridEvasionEnergy(defence: string) {
+  return defenceKey(defence) === "dexint";
 }
 
 export function casterWeapon(noun: string) {
@@ -509,7 +644,7 @@ function fallback(shop: Shop, base: string, level: number) {
   return `If ${shop.who} has no ${base} with one of those rolls, buy a normal ${base} and use an Orb of Transmutation, then an Orb of Augmentation. ${row.next}`;
 }
 
-const PLURAL_BASE = /(?:Boots|Sandals|Greaves|Bracers|Gloves|Gauntlets|Mitts)$/;
+const PLURAL_BASE = /(?:Boots|Sandals|Greaves|Bracers|Gloves|Gauntlets|Mitts|Sabatons|Wraps|Shoes)$/;
 
 export function withArticle(name: string) {
   if (PLURAL_BASE.test(name)) return name;
@@ -787,7 +922,7 @@ export function weaponText(noun: string, level: number, attack = false) {
     ? "Maul is a Bear-form melee Strike (poe2db: Attack, Shapeshift, Bear, AoE, Melee, Strike, Requires Talismans). Shop attack and melee rolls. Skip spell damage and +to spell skills. The talisman attack ladder matches the quarterstaff ladder: the same physical percent, added physical, melee gem level, and attack speed tiers."
     : "";
   return [
-    `Buy ${withArticle(noun)} from ${place(shop)}.`,
+    `Buy ${withArticle(noun)} from ${place(shop)}. ${vendorSplit(level)}`,
     `The base at level ${level} is ${withArticle(base.name)} (${base.detail}).`,
     bear,
     bowNext,
@@ -819,10 +954,58 @@ export function quiverText(level: number) {
   ].join("\n");
 }
 
+function shownRoll(defence: string, level: number, slot: AffixSlot, detail: string) {
+  // Level 1 pure bases stand in until the hybrid base exists. They do not roll the combined mod.
+  if (hybridEvasionEnergy(defence) && /start at level/.test(detail)) return lifeAt(level, slot);
+  return poolLine(defence, level, slot);
+}
+
 function poolLine(defence: string, level: number, slot: AffixSlot) {
-  // Belts, rings, and strength shields roll IncreasedLife. They do not roll the body energy-shield ladder.
-  if (slot === "belt" || slot === "ring" || slot === "shield" || slot === "amulet") return lifeAt(level, slot);
+  // Belts, rings, and armour shields roll IncreasedLife. They do not roll the body energy-shield ladder.
+  if (slot === "belt" || slot === "ring" || slot === "shield") return lifeAt(level, slot);
+  if (slot === "amulet") return wantsEnergyShield(defence) ? amuletEnergyAt(level) : lifeAt(level, slot);
+  if (hybridEvasionEnergy(defence)) return hybridEvasionEnergyAt(level, slot);
   return wantsEnergyShield(defence) ? energyAt(level, slot) : lifeAt(level, slot);
+}
+
+function vendorSplit(level: number) {
+  const row = shops(level);
+  if (level >= 61) {
+    return "On the trade site, search the armour categories (weapons, body armours, helms, gloves, boots, shields, quivers, and belts) and the caster categories (sceptres, energy shield shields, wands, staves, life flasks, mana flasks, wisdom scrolls, rings, amulets, and charms). Quarterstaves are weapons. Spell staves stay with the wands and sceptres.";
+  }
+  return `${row.armour.who} sells weapons, body armours, helms, gloves, boots, shields, quivers, and belts. ${row.caster.who} sells sceptres, energy shield shields, wands, staves, life flasks, mana flasks, wisdom scrolls, rings, amulets, and charms. Quarterstaves are weapons. Spell staves stay with the wands and sceptres.`;
+}
+
+function amuletAdvice(key: DefenceFamily) {
+  if (key === "int") {
+    return "At level 1 buy an Azure Amulet, (20-30)% increased Mana Regeneration Rate. At level 8 buy a Lapis Amulet. The base itself is +(10-15) to Intelligence.";
+  }
+  if (key === "dex" || key === "dexint") {
+    return "At level 1 buy a Crimson Amulet, (2-4) Life Regeneration per second. At level 8 buy a Jade Amulet. The base itself is +(10-15) to Dexterity.";
+  }
+  return "At level 1 buy a Crimson Amulet, (2-4) Life Regeneration per second. At level 8 buy an Amber Amulet. The base itself is +(10-15) to Strength.";
+}
+
+function amuletShort(key: DefenceFamily) {
+  if (key === "int") return "a Lapis Amulet at level 8, +(10-15) to Intelligence";
+  if (key === "dex" || key === "dexint") return "a Jade Amulet at level 8, +(10-15) to Dexterity";
+  return "an Amber Amulet at level 8, +(10-15) to Strength";
+}
+
+function defenceLabel(key: DefenceFamily) {
+  if (key === "strdex") return "armour and evasion";
+  if (key === "dexint") return "evasion and energy shield";
+  return key;
+}
+
+function capSentence(defence: string) {
+  if (hybridEvasionEnergy(defence)) {
+    return " Maps are waystone areas after the campaign. On an evasion and energy shield body, life reaches +(200-214) at item level 80, and the combined mod reaches +(142-161) to Evasion Rating +(43-48) to maximum Energy Shield at item level 75. Helmets of that defence stop at +(79-94) to Evasion Rating +(26-29) to maximum Energy Shield, item level 54. Gloves and boots stop at +(65-78) to Evasion Rating +(22-25) to maximum Energy Shield, item level 46. Intelligence body armour rolls +(91-96) to maximum Energy Shield at item level 79.";
+  }
+  if (wantsEnergyShield(defence)) {
+    return " The top energy shield roll on an intelligence body is +(91-96) to maximum Energy Shield, and it needs item level 79. Boots and gloves stop at +(48-60), item level 54. Helmets stop at +(61-73), item level 60. An amulet uses its own ladder and reaches +(80-89) to maximum Energy Shield at item level 80.";
+  }
+  return " The top life roll on a body is +(200-214) to maximum Life, and it needs item level 80. Boots and gloves stop at +(120-149), item level 60. Helmets and belts stop at +(150-174), item level 65. Rings stop at +(100-119), item level 54. Shields stop at +(175-189), item level 70. Armour and evasion bodies use that same life ladder. They have no flat energy shield.";
 }
 
 function resistLine(level: number) {
@@ -848,30 +1031,25 @@ export function armourText(defence: string, level: number, caster: boolean) {
   const boots = armourAt("boots", defence, level);
   const belt = armourAt("belt", defence, level);
   const resist = resistLine(level);
-  const bootsLife = poolLine(defence, level, "boots");
-  const bodyLife = poolLine(defence, level, "body");
-  const helmLife = poolLine(defence, level, "helmet");
-  const gloveLife = poolLine(defence, level, "gloves");
+  const bootsLife = shownRoll(defence, level, "boots", boots.detail);
+  const bodyLife = shownRoll(defence, level, "body", body.detail);
+  const helmLife = shownRoll(defence, level, "helmet", helm.detail);
+  const gloveLife = shownRoll(defence, level, "gloves", gloves.detail);
   const beltLife = poolLine(defence, level, "belt");
   const ring = caster
     ? `Buy a Lazuli Ring from ${jewels.who}. The base is +(20-30) to maximum Mana. At level 8 a Ruby Ring is +(20-30)% to Fire Resistance, at level 12 a Sapphire Ring is +(20-30)% to Cold Resistance, and at level 16 a Topaz Ring is +(20-30)% to Lightning Resistance.`
     : `Buy an Iron Ring from ${jewels.who}. The base Adds 1 to 4 Physical Damage to Attacks. At level 8 a Ruby Ring is +(20-30)% to Fire Resistance, at level 12 a Sapphire Ring is +(20-30)% to Cold Resistance, and at level 16 a Topaz Ring is +(20-30)% to Lightning Resistance.`;
   const key = defenceKey(defence);
-  const amulet = key === "int"
-    ? "At level 1 buy an Azure Amulet, (20-30)% increased Mana Regeneration Rate. At level 8 buy a Lapis Amulet. The base itself is +(10-15) to Intelligence."
-    : key === "dex"
-      ? "At level 1 buy a Crimson Amulet, (2-4) Life Regeneration per second. At level 8 buy a Jade Amulet. The base itself is +(10-15) to Dexterity."
-      : "At level 1 buy a Crimson Amulet, (2-4) Life Regeneration per second. At level 8 buy an Amber Amulet. The base itself is +(10-15) to Strength.";
   return [
-    `Buy the armour from ${place(armour)}.`,
+    `Buy the armour from ${place(armour)}. ${vendorSplit(level)}`,
     `Boots: ${withArticle(boots.name)} (${boots.detail}). ${moveLine(level)} Also take ${bootsLife} and one of ${resist}.`,
-    `Body: ${withArticle(body.name)} (${body.detail}). Acceptable: ${bodyLife}.${level >= 65 ? ` Maps are waystone areas after the campaign. ${wantsEnergyShield(defence) ? "The top energy shield roll on a body is +(91-96) to maximum Energy Shield, and it needs item level 79. Boots and gloves stop at +(48-60), item level 54. Helmets stop at +(61-73), item level 60." : "The top life roll on a body is +(200-214) to maximum Life, and it needs item level 80. Boots and gloves stop at +(120-149), item level 60. Helmets and belts stop at +(150-174), item level 65. Rings stop at +(100-119), item level 54. Shields stop at +(175-189), item level 70."}` : ""}${level >= 30 ? " From level 30, a Greater Iron Rune in the body socket adds 18% increased Armour, Evasion and Energy Shield. It requires level 30." : ""}`,
+    `Body: ${withArticle(body.name)} (${body.detail}). Acceptable: ${bodyLife}.${level >= 65 ? ` Maps are waystone areas after the campaign.${capSentence(defence)}` : ""}${level >= 30 ? " From level 30, a Greater Iron Rune in the body socket adds 18% increased Armour, Evasion and Energy Shield. It requires level 30." : ""}`,
     `Helmet: ${withArticle(helm.name)} (${helm.detail}). Acceptable: ${helmLife}.`,
     `Gloves: ${withArticle(gloves.name)} (${gloves.detail}). Acceptable: ${gloveLife}.`,
-    `Belt: ${withArticle(belt.name)} from ${place(armour)} (${belt.detail}). Acceptable: ${beltLife}.`,
+    `Belt: ${withArticle(belt.name)} from ${place(armour)} (${belt.detail}). Acceptable: ${beltLife}. Belts roll Strength. The top tier is +34-36 to Strength at item level 81.`,
     `Rings and amulets are sold by ${jewels.who} in ${jewels.where}.`,
     ring,
-    amulet,
+    amuletAdvice(key),
     `Ignore boots with 0% increased Movement Speed. ${RESIST_FIRST} ${SKIP_ROLLS}`,
     fallback(armour, boots.name, level),
   ].join("\n");
@@ -882,15 +1060,20 @@ function pieceText(slot: string, spec: ShopSpec, level: number) {
   if (/shield/i.test(slot) && twoHand) return "This weapon is two-handed. Leave the shield slot empty.";
   if (/quiver/i.test(slot)) return quiverText(level);
   if (/shield/i.test(slot)) {
-    const shop = shops(level).armour;
+    const row = shops(level);
+    const energyShield = defenceKey(spec.defence) === "int";
+    const shop = energyShield ? row.caster : row.armour;
     const base = baseAt("shield", level);
     const life = poolLine(spec.defence, level, "shield");
+    const named = energyShield
+      ? `${shop.who} sells energy shield shields. ${row.armour.who} sells armour shields such as ${base.name}, so leave that base on the armour vendor.`
+      : `The base at level ${level} is ${withArticle(base.name)} (${base.detail}). ${row.caster.who} sells energy shield shields.`;
     return [
       `Buy a shield from ${place(shop)}.`,
-      `The base at level ${level} is ${withArticle(base.name)} (${base.detail}).`,
+      named,
       `Acceptable: ${life}, and ${resistLine(level)}.`,
       SKIP_ROLLS,
-      fallback(shop, base.name, level),
+      fallback(shop, energyShield ? "energy shield shield" : base.name, level),
     ].join("\n");
   }
   if (/bow|spear|crossbow|quarterstaff|mace|wand|staff|sceptre|weapon/i.test(slot)) {
@@ -904,7 +1087,7 @@ function pieceText(slot: string, spec: ShopSpec, level: number) {
       `Buy boots from ${place(row.armour)}.`,
       `The base at level ${level} is ${withArticle(base.name)} (${base.detail}).`,
       moveLine(level),
-      `Also take ${poolLine(spec.defence, level, "boots")} and one of ${resistLine(level)}.`,
+      `Also take ${shownRoll(spec.defence, level, "boots", base.detail)} and one of ${resistLine(level)}.`,
       `Ignore a pair with 0% increased Movement Speed. ${RESIST_FIRST}`,
       fallback(row.armour, base.name, level),
     ].join("\n");
@@ -913,14 +1096,9 @@ function pieceText(slot: string, spec: ShopSpec, level: number) {
     const slotKey: AffixSlot = /body/i.test(slot) ? "body" : /helm/i.test(slot) ? "helmet" : /glove/i.test(slot) ? "gloves" : "belt";
     const key: ArmourSlot = slotKey === "helmet" ? "helmet" : slotKey === "gloves" ? "gloves" : slotKey === "belt" ? "belt" : "body";
     const base = armourAt(key, spec.defence, level);
-    const life = poolLine(spec.defence, level, slotKey);
+    const life = shownRoll(spec.defence, level, slotKey, base.detail);
     const rune = slotKey === "body" && level >= 30 ? " From level 30, a Greater Iron Rune in the body socket adds 18% increased Armour, Evasion and Energy Shield. It requires level 30." : "";
-    const maps =
-      slotKey === "body" && level >= 65
-        ? wantsEnergyShield(spec.defence)
-          ? " Maps are waystone areas after the campaign. +(91-96) to maximum Energy Shield on a body needs item level 79."
-          : " Maps are waystone areas after the campaign. +(200-214) to maximum Life on a body needs item level 80. That roll is not on boots, gloves, helmets, belts, or rings."
-        : "";
+    const maps = slotKey === "body" && level >= 65 ? ` Maps are waystone areas after the campaign.${capSentence(spec.defence)}` : "";
     return [
       `Buy this from ${place(row.armour)}.`,
       `The base at level ${level} is ${withArticle(base.name)} (${base.detail}).`,
@@ -931,7 +1109,7 @@ function pieceText(slot: string, spec: ShopSpec, level: number) {
   }
   if (/ring|amulet/i.test(slot)) {
     const key = defenceKey(spec.defence);
-    const amulet = key === "int" ? "a Lapis Amulet at level 8, +(10-15) to Intelligence" : key === "dex" ? "a Jade Amulet at level 8, +(10-15) to Dexterity" : "an Amber Amulet at level 8, +(10-15) to Strength";
+    const amulet = amuletShort(key);
     const ring = caster
       ? "a Lazuli Ring at level 1, +(20-30) to maximum Mana"
       : "an Iron Ring at level 1, Adds 1 to 4 Physical Damage to Attacks";
@@ -971,6 +1149,9 @@ export function baseLabel(slot: string, spec: ShopSpec) {
   }
   if (/shield/i.test(slot)) {
     if (spec.weaponNoun === "quarterstaff" || spec.weaponNoun === "staff") return "No shield. This weapon uses both hands.";
+    if (defenceKey(spec.defence) === "int") {
+      return "Energy shield shield. The caster vendor sells these. Armour shields such as the Splintered Tower Shield stay with the armour vendor.";
+    }
     const base = baseAt("shield", 1);
     return `${base.name}. ${base.detail}.`;
   }
@@ -999,11 +1180,11 @@ export function baseLabel(slot: string, spec: ShopSpec) {
   if (slotKey) {
     const now = armourAt(slotKey, spec.defence, 1);
     const mid = armourAt(slotKey, spec.defence, 16);
-    return `${now.name} (${key}) at level 1. ${mid.name} at level ${mid.level}.`;
+    return `${now.name} (${defenceLabel(key)}) at level 1. ${mid.name} at level ${mid.level}.`;
   }
   if (/amulet/i.test(slot)) {
     if (key === "int") return "Azure Amulet at level 1. Lapis Amulet at level 8, +(10-15) to Intelligence.";
-    if (key === "dex") return "Crimson Amulet at level 1. Jade Amulet at level 8, +(10-15) to Dexterity.";
+    if (key === "dex" || key === "dexint") return "Crimson Amulet at level 1. Jade Amulet at level 8, +(10-15) to Dexterity.";
     return "Crimson Amulet at level 1. Amber Amulet at level 8, +(10-15) to Strength.";
   }
   if (/ring/i.test(slot)) {

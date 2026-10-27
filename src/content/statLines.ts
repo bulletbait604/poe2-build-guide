@@ -47,7 +47,8 @@ const LIFE_CAP: Record<AffixSlot, number> = {
   shared: 54,
 };
 
-// Highest BaseLocalDefences energy shield item level on that slot. Boots and gloves stop at 54.
+// Highest BaseLocalDefences energy shield item level on a pure intelligence piece. Boots and gloves stop at 54.
+// Amulets do not use this ladder. Their IncreasedEnergyShield prefix is AMULET_ES below.
 const ENERGY_CAP: Record<AffixSlot, number> = {
   body: 79,
   helmet: 60,
@@ -137,7 +138,54 @@ const MOVE: Array<[number, string]> = [
   [82, "35% increased Movement Speed"],
 ];
 
+// poe2db IncreasedEnergyShield on amulets. This is not the body BaseLocalDefences ladder.
+// https://poe2db.tw/us/Amulets
+const AMULET_ES: Array<[number, string]> = [
+  [1, "+8-14 maximum Energy Shield"],
+  [11, "+15-20 maximum Energy Shield"],
+  [16, "+21-24 maximum Energy Shield"],
+  [25, "+25-33 maximum Energy Shield"],
+  [33, "+34-41 maximum Energy Shield"],
+  [46, "+42-51 maximum Energy Shield"],
+  [54, "+52-61 maximum Energy Shield"],
+  [65, "+62-70 maximum Energy Shield"],
+  [70, "+71-79 maximum Energy Shield"],
+  [80, "+80-89 maximum Energy Shield"],
+];
+
+// Combined BaseLocalDefences on dexterity/intelligence (evasion and energy shield) pieces.
+// https://poe2db.tw/us/Body_Armours_dex_int
+// Body reaches item level 75. Helmets stop at 54. Gloves and boots stop at 46.
+// Armour/evasion pieces have no energy shield on this mod. Armour/energy shield bodies use a
+// parallel ladder that tops at +(150-170) to Armour+(43-48) to maximum Energy Shield, item level 75.
+// No current guide shops armour and energy shield, so that ladder stays off the cards.
+const HYBRID_EV_ES: Array<[number, string]> = [
+  [1, "+(6-10) to Evasion Rating +(5-8) to maximum Energy Shield"],
+  [16, "+(11-41) to Evasion Rating +(9-15) to maximum Energy Shield"],
+  [33, "+(42-64) to Evasion Rating +(16-21) to maximum Energy Shield"],
+  [46, "+(65-78) to Evasion Rating +(22-25) to maximum Energy Shield"],
+  [54, "+(79-94) to Evasion Rating +(26-29) to maximum Energy Shield"],
+  [60, "+(95-119) to Evasion Rating +(30-36) to maximum Energy Shield"],
+  [65, "+(120-141) to Evasion Rating +(37-42) to maximum Energy Shield"],
+  [75, "+(142-161) to Evasion Rating +(43-48) to maximum Energy Shield"],
+];
+
+const HYBRID_EV_ES_CAP: Record<AffixSlot, number> = {
+  body: 75,
+  helmet: 54,
+  gloves: 46,
+  boots: 46,
+  belt: 46,
+  ring: 46,
+  amulet: 46,
+  shield: 46,
+  shared: 46,
+};
+
 // Boots_dex Dexterity ladder. +25-27 needs item level 55. +13-16 needs 22. +21-24 needs 44.
+// Belts are Strength only and continue to +34-36 at item level 81.
+// Gloves roll +34-36 Dexterity at item level 81. Strength and Intelligence on gloves stop at +31-33.
+// Shared lists stay on this boot ladder so a boot line does not print a belt-only tier.
 const ATTR: Array<[number, string]> = [
   [1, "5-8"],
   [11, "9-12"],
@@ -156,6 +204,17 @@ export function lifeAt(level: number, slot: AffixSlot = "shared") {
 export function energyAt(level: number, slot: AffixSlot = "shared") {
   return tierAt(Math.min(level, ENERGY_CAP[slot]), ENERGY);
 }
+
+export function amuletEnergyAt(level: number) {
+  return tierAt(level, AMULET_ES);
+}
+
+export function hybridEvasionEnergyAt(level: number, slot: AffixSlot = "body") {
+  return tierAt(Math.min(level, HYBRID_EV_ES_CAP[slot]), HYBRID_EV_ES);
+}
+
+export const BELT_ATTRIBUTE_TOP = "+34-36 Strength";
+export const GLOVE_ATTRIBUTE_TOP = "+34-36 Dexterity";
 
 export function resistAt(level: number) {
   return {

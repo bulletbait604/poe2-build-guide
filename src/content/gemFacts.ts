@@ -18,7 +18,8 @@ export function gemFact(name: string): GemFact | undefined {
 export function gemTier(name: string): number | null {
   // The catalog number is not an Uncut Skill Gem tier. The gem reserves spirit instead.
   // Persistent or ascendancy-granted. poe2db does not list an Uncut Skill Gem Tier.
-  if (name === "Skeletal Sniper" || name === "Supporting Fire") return null;
+  // Maul's poe2db page lists no Uncut Skill Gem Tier. Gem level 1 requires level 1 and a Talisman.
+  if (name === "Skeletal Sniper" || name === "Supporting Fire" || name === "Maul") return null;
   const level = facts[name]?.level;
   return typeof level === "number" ? level : null;
 }
